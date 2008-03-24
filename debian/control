@@ -9,14 +9,15 @@ Package: libmono-microsoft-visualbasic8.0-cil
 Section: libs
 Architecture: all
 Depends: ${cli:Depends}
-Description: Mono-Basic runtime library  .NET 2.0 version
+Description: Visual Basic 2005 runtime libraries for Mono
+ This package contains the Mono Visual Basic runtime library, aimed at
+ the specifications / features of the Visual Basic 2005.
+ .
  Mono is a platform for running and developing applications based on the
  ECMA/ISO Standards. Mono is an open source effort led by Novell.
  Mono provides a complete CLR (Common Language Runtime) including compiler and
  runtime, which can produce and execute CIL (Common Intermediate Language)
  bytecode (aka assemblies), and a class library.
- .
- This package contains the Mono Visual Basic runtime library aimed at .NET 2.0 API
 
 Package: mono-vbnc
 Section: devel
@@ -39,7 +40,7 @@ Description: Mono Visual Basic Compiler (VB.Net)
 Package: mono-basic-dbg
 Section: devel
 Architecture: all
-Depends: libmono-microsoft-visualbasic8.0-cil
+Depends: libmono-microsoft-visualbasic8.0-cil (= ${Source-Version})
 Description: Mono Basic Compiler debug symboles
  This package contains debug symbols
  .
