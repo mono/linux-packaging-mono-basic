@@ -40,7 +40,7 @@ Description: Mono Visual Basic Compiler (VB.Net)
 Package: mono-basic-dbg
 Section: devel
 Architecture: all
-Depends: libmono-microsoft-visualbasic8.0-cil (= ${Source-Version})
+Depends: libmono-microsoft-visualbasic8.0-cil (= ${source:version})
 Description: Mono Basic Compiler debug symboles
  This package contains debug symbols
  .
