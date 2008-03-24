@@ -1,0 +1,4 @@
+debian/tmp/usr/bin
+debian/tmp/usr/lib/mono/2.0/vbnc.exe
+debian/tmp/usr/lib/mono/2.0/vbnc.rsp
+debian/tmp/usr/lib/mono/2.0/vbnc.exe.mdb
