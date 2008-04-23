@@ -4,26 +4,14 @@
 #export DH_VERBOSE=1
 export MONO_SHARED_DIR=$(CURDIR)
 
-# shared library versions, option 1
-version=2.0.5
-major=2
-# option 2, assuming the library is created as src/.libs/libfoo.so.2.0.5 or so
-#version=`ls src/.libs/lib*.so.* | \
-# awk '{if (match($$0,/[0-9]+\.[0-9]+\.[0-9]+$$/)) print substr($$0,RSTART)}'`
-#major=`ls src/.libs/lib*.so.* | \
-# awk '{if (match($$0,/\.so\.[0-9]+$$/)) print substr($$0,RSTART+4)}'`
-
 config.status: configure
 	dh_testdir
 	./configure --prefix=/usr
 
 build: build-stamp
-build-stamp:  config.status
+build-stamp: config.status
 	dh_testdir
-
-	# Add here commands to compile the package.
 	$(MAKE)
-
 	touch $@
 
 clean:
@@ -38,31 +26,25 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-
-	# Add here commands to install the package into debian/tmp
 	$(MAKE) prefix=$(CURDIR)/debian/tmp/usr install
 
-
-# Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_install --list-missing
-	dh_installchangelogs ChangeLog
-	dh_installdocs
+	dh_install -i --list-missing
+	dh_installchangelogs -i ChangeLog
+	dh_installdocs -i
 	dh_clistrip -i --dbg-package=mono-basic-dbg
-	dh_fixperms
-	dh_clifixperms
-	dh_makeclilibs -r
-	dh_installdeb
-	dh_clideps -d
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	dh_fixperms -i
+	dh_clifixperms -i
+	dh_makeclilibs -i -r
+	dh_installdeb -i
+	dh_clideps -i -d
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
 
-# Build architecture-dependent files here.
 binary-arch: build install
-# We have nothing to do by default.
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

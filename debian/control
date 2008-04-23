@@ -1,9 +1,9 @@
 Source: mono-basic
-Priority: extra
+Priority: optional
 Maintainer: Debian Mono Group <pkg-mono-group@lists.alioth.debian.org>
 Uploaders: Matthias Jahn <jahn.matthias@freenet.de>
 Build-Depends: debhelper (>= 5), cli-common-dev (>= 0.4.4), mono-2.0-devel (>= 1.2.6), libmono-winforms2.0-cil (>= 1.2.6), libmono-i18n2.0-cil (>= 1.2.6)
-Standards-Version: 3.7.2
+Standards-Version: 3.7.3
 Section: devel
 
 Package: libmono-microsoft-visualbasic8.0-cil
@@ -25,8 +25,8 @@ Section: devel
 Architecture: all
 Depends: ${cli:Depends}
 Provides: visual-basic-8.0-compiler
-Description: Mono Visual Basic Compiler (VB.Net)
- This is the Mono Visual Basic.Net Compiler (vbnc), aimed at the specifications
+Description: Mono Visual Basic Compiler (VB.NET)
+ This is the Mono Visual Basic.NET Compiler (vbnc), aimed at the specifications
  / features of the Visual Basic 2005 compiler.
  A platform-independent compiler which produces CIL(Common Intermediate Language)
  binary executables.

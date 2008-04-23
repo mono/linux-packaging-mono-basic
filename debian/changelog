@@ -1,6 +1,5 @@
-mono-basic (1.2.6-1) UNRELEASED; urgency=low
+mono-basic (1.9-1) unstable; urgency=low
 
-  * Initial package not released
+  * Initial packaging.
 
  -- Matthias Jahn <jahn.matthias@freenet.de>  Fri, 21 Mar 2008 15:14:56 +0100
-
