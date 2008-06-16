@@ -1,7 +1,7 @@
 Source: mono-basic
 Priority: optional
 Maintainer: Debian Mono Group <pkg-mono-group@lists.alioth.debian.org>
-Uploaders: Matthias Jahn <jahn.matthias@freenet.de>
+Uploaders: Matthias Jahn <jahn.matthias@freenet.de>, Mirco Bauer <meebey@debian.org>
 Build-Depends: debhelper (>= 5),
  cli-common-dev (>= 0.4.4),
  mono-2.0-devel (>= 1.2.6),
