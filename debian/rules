@@ -4,6 +4,8 @@
 #export DH_VERBOSE=1
 export MONO_SHARED_DIR=$(CURDIR)
 
+DEB_CLI_API_VERSION = 1.9
+
 config.status: configure
 	dh_testdir
 	./configure --prefix=/usr
@@ -19,6 +21,7 @@ clean:
 	dh_testroot
 	rm -f build-stamp
 	rm -rf $(MONO_SHARED_DIR)/.wapi
+	$(MAKE) clean
 	dh_clean
 
 install: build
@@ -37,9 +40,9 @@ binary-indep: build install
 	dh_clistrip -i --dbg-package=mono-basic-dbg
 	dh_fixperms -i
 	dh_clifixperms -i
-	dh_makeclilibs -i -r
+	dh_makeclilibs -i -m $(DEB_CLI_API_VERSION)
 	dh_installdeb -i
-	dh_clideps -i -d
+	dh_clideps -i
 	dh_gencontrol -i
 	dh_md5sums -i
 	dh_builddeb -i
