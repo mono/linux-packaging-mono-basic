@@ -10,6 +10,20 @@ config.status: configure
 	dh_testdir
 	./configure --prefix=/usr
 
+upstream_version=$(shell uscan --dehs | sed -n 's/.*<upstream-version>\(.*\)<\/upstream-version>.*/\1/p')
+get-orig-source::
+	uscan --download-version $(upstream_version) --force-download --destdir . \
+		  --no-symlink
+	tar xvfj mono-basic-$(upstream_version).tar.bz2
+	cd mono-basic-$(upstream_version) && rm -f \
+		  vbruntime/Test/bin/nunit.framework.dll \
+          vbruntime/Test/bin/nunit.core.dll \
+		  vbruntime/Test/bin/nunit.util.dll \
+		  vbruntime/Test/bin/nunit-console.exe
+	tar cfvz mono-basic_$(upstream_version)+dfsg.orig.tar.gz \
+		     mono-basic-$(upstream_version)
+	rm -rf mono-basic-$(upstream_version).tar.bz2 mono-basic-$(upstream_version)
+
 build: build-stamp
 build-stamp: config.status
 	dh_testdir
