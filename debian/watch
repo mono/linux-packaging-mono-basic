@@ -1,2 +1,3 @@
 version=3
-http://ftp.novell.com/pub/mono/sources/mono-basic/ mono-basic-([.\d]+)\.tar\.bz2
+opts=dversionmangle=s/\+dfsg// \
+  http://ftp.novell.com/pub/mono/sources/mono-basic/ mono-basic-([.\d]+)\.tar\.bz2
