@@ -19,10 +19,12 @@ get-orig-source::
 		  vbruntime/Test/bin/nunit.framework.dll \
           vbruntime/Test/bin/nunit.core.dll \
 		  vbruntime/Test/bin/nunit.util.dll \
-		  vbruntime/Test/bin/nunit-console.exe
+		  vbruntime/Test/bin/nunit-console.exe \
+		  vbnc/vbnc/tests/Errors/2017-aspnet1.vb
+	mv mono-basic-$(upstream_version) mono-basic-$(upstream_version)+dfsg
 	tar cfvz mono-basic_$(upstream_version)+dfsg.orig.tar.gz \
-		     mono-basic-$(upstream_version)
-	rm -rf mono-basic-$(upstream_version).tar.bz2 mono-basic-$(upstream_version)
+		     mono-basic-$(upstream_version)+dfsg
+	rm -rf mono-basic-$(upstream_version).tar.bz2 mono-basic-$(upstream_version)+dfsg
 
 build: build-stamp
 build-stamp: config.status
@@ -35,6 +37,7 @@ clean:
 	dh_testroot
 	rm -f build-stamp
 	rm -rf $(MONO_SHARED_DIR)/.wapi
+	rm -f build/config.make
 	$(MAKE) clean
 	dh_clean
 

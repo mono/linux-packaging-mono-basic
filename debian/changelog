@@ -19,4 +19,18 @@ mono-basic (1.9+dfsg-1) unstable; urgency=low
   * Added get-orig-source target in debian/rules.
   * Add myself to uploaders.
 
- -- Jelmer Vernooij <jelmer@samba.org>  Thu, 10 Jul 2008 13:09:22 +0200
+  [ Jo Shields ]
+  * debian/control:
+    + Add myself to uploaders.
+    + Bump standards version to 3.8.0 (no changes)
+  * debian/rules:
+    + Explicitly remove build/config.make in "clean" target, as it
+      is left behind by "make clean"
+    + Another file removed in get-orig-source for DFSG version:
+      vbnc/vbnc/tests/Errors/2017-aspnet1.vb
+    + Alter get-orig-source to append "+dfsg" to source tarball's
+      directory
+  * debian/changelog:
+    + Document bootstrap binaries in class/lib/bootstrap/
+
+ -- Jo Shields <directhex@apebox.org>  Wed, 20 Aug 2008 19:25:22 +0100
