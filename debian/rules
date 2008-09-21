@@ -54,7 +54,9 @@ binary-indep: build install
 	dh_install -i --list-missing
 	dh_installchangelogs -i ChangeLog
 	dh_installdocs -i
+	dh_installman
 	dh_clistrip -i --dbg-package=mono-basic-dbg
+	dh_compress
 	dh_fixperms -i
 	dh_clifixperms -i
 	dh_makeclilibs -i -m $(DEB_CLI_API_VERSION)

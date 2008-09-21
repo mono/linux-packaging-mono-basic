@@ -44,7 +44,9 @@ Description: Mono Visual Basic Compiler (VB.NET)
  bytecode (aka assemblies), and a class library.
 
 Package: mono-basic-dbg
+Priority: extra
 Section: devel
+Depends: mono-vbnc (= ${binary:Version}), libmono-microsoft-visualbasic8.0-cil (= ${binary:Version})
 Architecture: all
 Description: Mono Visual Basic, debugging symbols
  This package contains debugging symbols of the mono-vbnc and

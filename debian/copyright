@@ -23,7 +23,7 @@ Only the resulting binaries are included in packages - not the versions
 used for bootstrapping.
 
 Visual Basic.NET Compiler (vbnc/*)
-  Upstream Author(s): 
+  Upstream Authors: 
       Rolf Bjarne Kvinge <RKvinge@novell.com>
       Wade Berrier  <wberrier@novell.com>
   Copyright:
@@ -44,7 +44,7 @@ Visual Basic.NET Compiler (vbnc/*)
       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 Visual Basic 2005 runtime libraries for Mono (runtime/*)
-  Upstream Author(s): 
+  Upstream Authors: 
       Rolf Bjarne Kvinge <RKvinge@novell.com>
       Wade Berrier  <wberrier@novell.com>
       Ravi Pratap (ravi@ximian.com)

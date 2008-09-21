@@ -1,3 +1,26 @@
+mono-basic (1.9+dfsg-3) unstable; urgency=low
+
+  * debian/control:
+    + Clean dbg-package-missing-depends lintian error by explicitly
+      making the dbg package depend on identical versions of the
+      mono-vbnc and libmono-microsoft-visualbasic8.0-cil packages
+  * debian/mono-vbnc.manpages:
+    + Clean binary-without-manpage lintian error by including simple
+      manpage override file for mono-vbnc package
+  * debian/man/vbnc.1:
+    + Clean binary-without-manpage lintian error by copying vbnc.1
+      from mono source tarball
+  * debian/rules:
+    + Clean binary-without-manpage lintian error by including 
+      dh_installman
+    + Clean changelog-file-not-compressed lintian error by including 
+      dh_compress
+  * debian/changelog:
+    + Clean copyright-lists-upstream-authors-with-dh_make-boilerplate
+      lintian error by removing unneeded brackets
+
+ -- Jo Shields <directhex@apebox.org>  Sun, 21 Sep 2008 23:44:18 +0100
+
 mono-basic (1.9+dfsg-2) unstable; urgency=low
 
   * debian/control:
