@@ -1,12 +1,13 @@
 Source: mono-basic
 Priority: optional
 Maintainer: Debian Mono Group <pkg-mono-group@lists.alioth.debian.org>
-Uploaders: Matthias Jahn <jahn.matthias@freenet.de>, Mirco Bauer <meebey@debian.org>, Jelmer Vernooij <jelmer@samba.org>, Jo Shields <directhex@apebox.org>
+Uploaders: Mirco Bauer <meebey@debian.org>, Jo Shields <directhex@apebox.org>
 Build-Depends: debhelper (>= 5),
  cli-common-dev (>= 0.4.4),
- mono-2.0-devel (>= 1.2.6),
- libmono-winforms2.0-cil (>= 1.2.6),
- libmono-i18n2.0-cil (>= 1.2.6)
+ libmono-winforms2.0-cil (>= 1.9),
+ libmono-system2.0-cil (>= 1.9)
+ libmono-corlib2.0-cil (>= 1.9)
+ libmono-i18n2.0-cil (>= 1.9)
 Standards-Version: 3.8.0
 Section: devel
 

@@ -4,7 +4,7 @@
 #export DH_VERBOSE=1
 export MONO_SHARED_DIR=$(CURDIR)
 
-DEB_CLI_API_VERSION = 1.9
+DEB_CLI_API_VERSION = 2.0
 
 config.status: configure
 	dh_testdir
@@ -17,7 +17,7 @@ get-orig-source::
 	tar xvfj mono-basic-$(upstream_version).tar.bz2
 	cd mono-basic-$(upstream_version) && rm -f \
 		  vbruntime/Test/bin/nunit.framework.dll \
-          vbruntime/Test/bin/nunit.core.dll \
+  	          vbruntime/Test/bin/nunit.core.dll \
 		  vbruntime/Test/bin/nunit.util.dll \
 		  vbruntime/Test/bin/nunit-console.exe \
 		  vbnc/vbnc/tests/Errors/2017-aspnet1.vb
