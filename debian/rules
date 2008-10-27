@@ -19,8 +19,7 @@ get-orig-source::
 		  vbruntime/Test/bin/nunit.framework.dll \
   	          vbruntime/Test/bin/nunit.core.dll \
 		  vbruntime/Test/bin/nunit.util.dll \
-		  vbruntime/Test/bin/nunit-console.exe \
-		  vbnc/vbnc/tests/Errors/2017-aspnet1.vb
+		  vbruntime/Test/bin/nunit-console.exe
 	mv mono-basic-$(upstream_version) mono-basic-$(upstream_version)+dfsg
 	tar cfvz mono-basic_$(upstream_version)+dfsg.orig.tar.gz \
 		     mono-basic-$(upstream_version)+dfsg
