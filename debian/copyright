@@ -8,7 +8,6 @@ Some files were removed to comply with the DFSG:
       vbruntime/Test/bin/nunit.core.dll
       vbruntime/Test/bin/nunit.util.dll
       vbruntime/Test/bin/nunit-console.exe
-      vbnc/vbnc/tests/Errors/2017-aspnet1.vb
 A DFSG-compliant source package may be obtained using 
       debian/rules get-orig-source
 
