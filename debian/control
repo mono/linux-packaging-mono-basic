@@ -5,8 +5,8 @@ Uploaders: Mirco Bauer <meebey@debian.org>, Jo Shields <directhex@apebox.org>
 Build-Depends: debhelper (>= 5),
  cli-common-dev (>= 0.4.4),
  libmono-winforms2.0-cil (>= 1.9),
- libmono-system2.0-cil (>= 1.9)
- libmono-corlib2.0-cil (>= 1.9)
+ libmono-system2.0-cil (>= 1.9),
+ libmono-corlib2.0-cil (>= 1.9),
  libmono-i18n2.0-cil (>= 1.9)
 Standards-Version: 3.8.0
 Section: devel
