@@ -3,14 +3,6 @@ Fri, 21 Mar 2008 15:14:56 +0100.
 
 It was downloaded from http://mono-project.com
 
-Some files were removed to comply with the DFSG:
-      vbruntime/Test/bin/nunit.framework.dll
-      vbruntime/Test/bin/nunit.core.dll
-      vbruntime/Test/bin/nunit.util.dll
-      vbruntime/Test/bin/nunit-console.exe
-A DFSG-compliant source package may be obtained using 
-      debian/rules get-orig-source
-
 The compiler needs to bootstrap using the pre-build binary 
 class/lib/bootstrap/vbnc.exe, which requires 
 class/lib/bootstrap/Microsoft.VisualBasic.dll in order to operate.
