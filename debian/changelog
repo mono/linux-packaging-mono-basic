@@ -1,4 +1,4 @@
-mono-basic (2.4-1) UNRELEASED; urgency=low
+mono-basic (2.4-1) unstable; urgency=low
 
   * New upstream release
   * Dropping +dfsg, only documented bootstrap binaries remain
