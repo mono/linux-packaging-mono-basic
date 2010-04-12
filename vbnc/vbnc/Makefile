@@ -17,6 +17,7 @@ DISTFILES = \
 	vbnc.sln  		\
 	vbnc.vbnc.rsp		\
 	source/vbnc.vbproj	\
+	source/vbnc9.vbproj	\
 	bin/vbnc.rsp            \
 	source/Resources/Errors.resx \
 	source/vbnc.rsp		\
@@ -33,8 +34,8 @@ vbnc.Errors.resources: source/Resources/Errors.resx
 vbnc.vbnc.rsp: source/vbnc.rsp
 	cp source/vbnc.rsp vbnc.vbnc.rsp
 
-vbnc.exe.sources: vbnc.vbnc.rsp source/vbnc.vbproj vbnc.Errors.resources
-	MONO_PATH="../../class/lib/bootstrap$(PLATFORM_PATH_SEPARATOR)$$MONO_PATH" mono ../../tools/extract-source/extract-source.exe -s:source/vbnc.vbproj -d:vbnc.exe.sources -m:l -b:source/ -x:r
+vbnc.exe.sources: vbnc.vbnc.rsp source/vbnc9.vbproj vbnc.Errors.resources
+	MONO_PATH="../../class/lib/bootstrap$(PLATFORM_PATH_SEPARATOR)$$MONO_PATH" mono ../../tools/extract-source/extract-source.exe -s:source/vbnc9.vbproj -d:vbnc.exe.sources -m:l -b:source/ -x:r
 
 install-local: install-extras version.tmp
 install-extras: 

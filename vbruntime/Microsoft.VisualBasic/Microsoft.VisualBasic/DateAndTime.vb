@@ -38,12 +38,18 @@ Imports System.Globalization
 Imports Microsoft.VisualBasic.CompilerServices
 
 Namespace Microsoft.VisualBasic
-    Public Module DateAndTime
-        Public Property DateString() As String
+    <StandardModule()> _
+    Public NotInheritable Class DateAndTime
+#If Moonlight = False Then
+        Public Shared Property DateString() As String
+#Else
+        Public Shared ReadOnly Property DateString() As String
+#End If
             Get
                 Return DateTime.Today.ToString("MM-dd-yyyy")
             End Get
 
+#If Moonlight = False Then
             Set(ByVal Value As String)
                 Dim formats() As String = {"M-d-yyyy", "M-d-y", "M/d/yyyy", "M/d/y"}
 
@@ -57,18 +63,25 @@ Namespace Microsoft.VisualBasic
                     Throw New InvalidCastException(String.Format("Cast from string {0} to type 'Date' is not valid.", Value))
                 End Try
             End Set
+#End If
         End Property
 
-        Public Property Today() As System.DateTime
+#If Moonlight = False Then
+        Public Shared Property Today() As System.DateTime
+#Else
+        Public Shared ReadOnly Property Today() As System.DateTime
+#End If
             Get
                 Return DateTime.Today
             End Get
+#If Moonlight = False Then
             Set(ByVal Value As System.DateTime)
                 OSSpecific.OSDriver.Driver.SetDate(Value)
             End Set
+#End If
         End Property
 
-        Public ReadOnly Property Timer() As Double
+        Public Shared ReadOnly Property Timer() As Double
             Get
                 Dim DTNow As DateTime = DateTime.Now
 
@@ -77,13 +90,17 @@ Namespace Microsoft.VisualBasic
             End Get
         End Property
 
-        Public ReadOnly Property Now() As System.DateTime
+        Public Shared ReadOnly Property Now() As System.DateTime
             Get
                 Return DateTime.Now
             End Get
         End Property
 
-        Public Property TimeOfDay() As System.DateTime
+#If Moonlight = False Then
+        Public Shared Property TimeOfDay() As System.DateTime
+#Else
+        Public Shared ReadOnly Property TimeOfDay() As System.DateTime
+#End If
             Get
                 Dim TSpan As TimeSpan = DateTime.Now.TimeOfDay
 
@@ -91,15 +108,22 @@ Namespace Microsoft.VisualBasic
                  TSpan.Minutes, TSpan.Seconds, _
                  TSpan.Milliseconds)
             End Get
+#If Moonlight = False Then
             Set(ByVal Value As System.DateTime)
                 OSSpecific.OSDriver.Driver.SetTime(Value)
             End Set
+#End If
         End Property
 
-        Public Property TimeString() As String
+#If Moonlight = False Then
+        Public Shared Property TimeString() As String
+#Else
+        Public Shared ReadOnly Property TimeString() As String
+#End If
             Get
                 Return DateTime.Now.ToString("HH:mm:ss")
             End Get
+#If Moonlight = False Then
             Set(ByVal Value As String)
                 Dim formats() As String = {"hh:mm:ss tt", "H:mm:ss tt", "HH:mm:ss", "H:mm:ss", "h:mm:ss", "hh:mm:ss", "hh:mm", "hh:mm tt", "h:mm", "h:mm tt", "h:m", "h:m tt"}
 
@@ -113,10 +137,11 @@ Namespace Microsoft.VisualBasic
                     Throw New InvalidCastException(String.Format("Cast from string {0} to type '{1}' is not valid.", Value, "Date"))
                 End Try
             End Set
+#End If
         End Property
 
         ' Methods
-        Public Function DateAdd(ByVal Interval As DateInterval, _
+        Public Shared Function DateAdd(ByVal Interval As DateInterval, _
         ByVal Number As Double, ByVal DateValue As System.DateTime) As System.DateTime
             Dim value As Integer
 
@@ -144,7 +169,7 @@ Namespace Microsoft.VisualBasic
             End Select
         End Function
 
-        Friend Function GetDayRule(ByVal StartOfWeek As FirstDayOfWeek, ByVal DayRule As DayOfWeek) As DayOfWeek
+        Friend Shared Function GetDayRule(ByVal StartOfWeek As FirstDayOfWeek, ByVal DayRule As DayOfWeek) As DayOfWeek
             Select Case StartOfWeek
                 Case FirstDayOfWeek.System
                     Return DayRule
@@ -167,7 +192,7 @@ Namespace Microsoft.VisualBasic
             End Select
         End Function
 
-        Friend Function GetWeekRule(ByVal StartOfYear As FirstWeekOfYear, ByVal WeekRule As CalendarWeekRule) As CalendarWeekRule
+        Friend Shared Function GetWeekRule(ByVal StartOfYear As FirstWeekOfYear, ByVal WeekRule As CalendarWeekRule) As CalendarWeekRule
 
             Select Case StartOfYear
                 Case FirstWeekOfYear.System
@@ -183,16 +208,16 @@ Namespace Microsoft.VisualBasic
             End Select
         End Function
 
-        Public Function DateDiff(ByVal Interval As DateInterval, _
+        Public Shared Function DateDiff(ByVal Interval As DateInterval, _
         ByVal Date1 As System.DateTime, ByVal Date2 As System.DateTime, _
-        Optional ByVal StartOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
-        Optional ByVal StartOfYear As FirstWeekOfYear = FirstWeekOfYear.Jan1) As Long
+        Optional ByVal DayOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
+        Optional ByVal WeekOfYear As FirstWeekOfYear = FirstWeekOfYear.Jan1) As Long
 
             Dim YearMonths As Integer
             Dim YearQuarters As Integer
             Dim WeekRule As CalendarWeekRule = CalendarWeekRule.FirstDay
             Dim DayRule As DayOfWeek = DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek
-			Dim WeekDiff as Long
+            Dim WeekDiff As Long
 
             Select Case Interval
                 Case DateInterval.Year
@@ -205,17 +230,17 @@ Namespace Microsoft.VisualBasic
                     Return Date2.Month - Date1.Month + YearMonths
                 Case DateInterval.WeekOfYear
                     WeekDiff = Convert.ToInt64(Date2.Subtract(Date1).Days \ 7)
-                    DayRule = GetDayRule(StartOfWeek, DayRule)
-                    if (Date2.DayOfWeek >= DayRule And Date1.DayOfWeek < DayRule)
-                        return WeekDiff + 1
-                    Else if (Date2.DayOfWeek >= DayRule And Date1.DayOfWeek > Date2.DayOfWeek)
-                        return WeekDiff + 1
-                    Else if (Date1.DayOfWeek >= DayRule And Date2.DayOfWeek < DayRule)
-                        return WeekDiff
-                    Else if (Date2.DayOfWeek < Date1.DayOfWeek)
-                        return WeekDiff + 1
+                    DayRule = GetDayRule(DayOfWeek, DayRule)
+                    If (Date2.DayOfWeek >= DayRule And Date1.DayOfWeek < DayRule) Then
+                        Return WeekDiff + 1
+                    ElseIf (Date2.DayOfWeek >= DayRule And Date1.DayOfWeek > Date2.DayOfWeek) Then
+                        Return WeekDiff + 1
+                    ElseIf (Date1.DayOfWeek >= DayRule And Date2.DayOfWeek < DayRule) Then
+                        Return WeekDiff
+                    ElseIf (Date2.DayOfWeek < Date1.DayOfWeek) Then
+                        Return WeekDiff + 1
                     Else
-                        return WeekDiff
+                        Return WeekDiff
                     End If
                 Case DateInterval.Weekday
                     Return Convert.ToInt64(((Date2.Subtract(Date1)).Days \ 7))
@@ -233,7 +258,7 @@ Namespace Microsoft.VisualBasic
             End Select
         End Function
 
-        Friend Function ConvertWeekDay(ByVal Day As DayOfWeek, ByVal Offset As Integer) As Integer
+        Friend Shared Function ConvertWeekDay(ByVal Day As DayOfWeek, ByVal Offset As Integer) As Integer
             If (Offset = 0) Then
                 Return CType(Day + 1, Integer)
             End If
@@ -278,11 +303,11 @@ Namespace Microsoft.VisualBasic
 
         End Function
 
-        Public Function DatePart( _
+        Public Shared Function DatePart( _
         ByVal Interval As Microsoft.VisualBasic.DateInterval, _
         ByVal DateValue As System.DateTime, _
-        Optional ByVal StartOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
-        Optional ByVal StartOfYear As FirstWeekOfYear = FirstWeekOfYear.Jan1) As Integer
+        Optional ByVal FirstDayOfWeekValue As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
+        Optional ByVal FirstWeekOfYearValue As FirstWeekOfYear = FirstWeekOfYear.Jan1) As Integer
 
             Dim WeekRule As CalendarWeekRule = CalendarWeekRule.FirstDay
             Dim DayRule As DayOfWeek = DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek
@@ -296,11 +321,11 @@ Namespace Microsoft.VisualBasic
                 Case DateInterval.Month
                     Return DateValue.Month
                 Case DateInterval.WeekOfYear
-                    DayRule = GetDayRule(StartOfWeek, DayRule)
-                    WeekRule = GetWeekRule(StartOfYear, WeekRule)
+                    DayRule = GetDayRule(FirstDayOfWeekValue, DayRule)
+                    WeekRule = GetWeekRule(FirstWeekOfYearValue, WeekRule)
                     Return CurCalendar.GetWeekOfYear(DateValue, WeekRule, DayRule)
                 Case DateInterval.Weekday
-                    Return ConvertWeekDay(DateValue.DayOfWeek, StartOfWeek)
+                    Return ConvertWeekDay(DateValue.DayOfWeek, FirstDayOfWeekValue)
                 Case DateInterval.DayOfYear
                     Return DateValue.DayOfYear
                 Case DateInterval.Day
@@ -316,7 +341,7 @@ Namespace Microsoft.VisualBasic
             End Select
         End Function
 
-        Friend Function DateIntervalFromString( _
+        Friend Shared Function DateIntervalFromString( _
                         ByVal Interval As String) As DateInterval
             Select Case Interval
                 Case "yyyy"
@@ -344,7 +369,7 @@ Namespace Microsoft.VisualBasic
             End Select
         End Function
 
-        Public Function DateAdd(ByVal Interval As String, _
+        Public Shared Function DateAdd(ByVal Interval As String, _
         ByVal Number As Double, ByVal DateValue As System.Object) As System.DateTime
 
             If (DateValue Is Nothing) Then
@@ -357,10 +382,10 @@ Namespace Microsoft.VisualBasic
             Return DateAdd(DateIntervalFromString(Interval), Number, CType(DateValue, DateTime))
         End Function
 
-        Public Function DateDiff(ByVal Interval As String, _
+        Public Shared Function DateDiff(ByVal Interval As String, _
         ByVal Date1 As System.Object, ByVal Date2 As System.Object, _
-        Optional ByVal StartOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
-        Optional ByVal StartOfYear As FirstWeekOfYear = FirstWeekOfYear.Jan1) As System.Int64
+        Optional ByVal DayOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
+        Optional ByVal WeekOfYear As FirstWeekOfYear = FirstWeekOfYear.Jan1) As System.Int64
 
             If (Date1 Is Nothing) Then
                 Throw New ArgumentNullException("Date1", "Value can not be null.")
@@ -376,14 +401,14 @@ Namespace Microsoft.VisualBasic
             End If
 
             Return DateDiff(DateIntervalFromString(Interval), CType(Date1, DateTime), _
-                                                CType(Date2, DateTime), StartOfWeek, StartOfYear)
+                                                CType(Date2, DateTime), DayOfWeek, WeekOfYear)
 
         End Function
 
-        Public Function DatePart(ByVal Interval As String, _
+        Public Shared Function DatePart(ByVal Interval As String, _
         ByVal DateValue As System.Object, _
-        Optional ByVal StartOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
-        Optional ByVal StartOfYear As FirstWeekOfYear = FirstWeekOfYear.Jan1) As System.Int32
+        Optional ByVal DayOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday, _
+        Optional ByVal WeekOfYear As FirstWeekOfYear = FirstWeekOfYear.Jan1) As System.Int32
 
             If (DateValue Is Nothing) Then
                 Throw New ArgumentNullException("DateValue", "Value can not be null.")
@@ -394,11 +419,11 @@ Namespace Microsoft.VisualBasic
 
 
             Return DatePart(DateIntervalFromString(Interval), _
-                    CType(DateValue, DateTime), StartOfWeek, StartOfYear)
+                    CType(DateValue, DateTime), DayOfWeek, WeekOfYear)
 
         End Function
 
-        Public Function DateSerial(ByVal Year As Integer, _
+        Public Shared Function DateSerial(ByVal Year As Integer, _
                                         ByVal Month As Integer, _
                                         ByVal Day As Integer) As System.DateTime
             Dim _date As DateTime
@@ -420,7 +445,7 @@ Namespace Microsoft.VisualBasic
             Return _date
         End Function
 
-        Public Function TimeSerial(ByVal Hour As Integer, _
+        Public Shared Function TimeSerial(ByVal Hour As Integer, _
                                         ByVal Minute As Integer, _
                                         ByVal Second As Integer) As System.DateTime
             Dim day As Integer = 1
@@ -464,7 +489,7 @@ Namespace Microsoft.VisualBasic
             Return New DateTime(1, 1, day, Hour, Minute, Second)
         End Function
 
-        Public Function DateValue(ByVal StringDate As String) As System.DateTime
+        Public Shared Function DateValue(ByVal StringDate As String) As System.DateTime
             Try
                 Dim d As DateTime = DateTime.Parse(StringDate, _
                 System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat, DateTimeStyles.NoCurrentDateDefault)
@@ -475,7 +500,7 @@ Namespace Microsoft.VisualBasic
             End Try
         End Function
 
-        Public Function TimeValue(ByVal StringTime As String) As System.DateTime
+        Public Shared Function TimeValue(ByVal StringTime As String) As System.DateTime
             Try
                 Return DateTime.MinValue.Add(DateTime.Parse(StringTime).TimeOfDay)
             Catch exception As FormatException
@@ -483,36 +508,36 @@ Namespace Microsoft.VisualBasic
             End Try
         End Function
 
-        Public Function Year(ByVal DateValue As System.DateTime) As Integer
+        Public Shared Function Year(ByVal DateValue As System.DateTime) As Integer
             Return DateValue.Year
         End Function
 
-        Public Function Month(ByVal DateValue As System.DateTime) As Integer
+        Public Shared Function Month(ByVal DateValue As System.DateTime) As Integer
             Return DateValue.Month
         End Function
 
-        Public Function Day(ByVal DateValue As System.DateTime) As Integer
+        Public Shared Function Day(ByVal DateValue As System.DateTime) As Integer
             Return DateValue.Day
         End Function
 
-        Public Function Hour(ByVal TimeValue As System.DateTime) As Integer
+        Public Shared Function Hour(ByVal TimeValue As System.DateTime) As Integer
             Return TimeValue.Hour
         End Function
 
-        Public Function Minute(ByVal TimeValue As System.DateTime) As Integer
+        Public Shared Function Minute(ByVal TimeValue As System.DateTime) As Integer
             Return TimeValue.Minute
         End Function
 
-        Public Function Second(ByVal TimeValue As System.DateTime) As Integer
+        Public Shared Function Second(ByVal TimeValue As System.DateTime) As Integer
             Return TimeValue.Second
         End Function
 
-        Public Function Weekday(ByVal DateValue As System.DateTime, _
-        Optional ByVal StartOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday) As Integer
-            Return DatePart(DateInterval.Weekday, DateValue, StartOfWeek, FirstWeekOfYear.System)
+        Public Shared Function Weekday(ByVal DateValue As System.DateTime, _
+        Optional ByVal DayOfWeek As FirstDayOfWeek = FirstDayOfWeek.Sunday) As Integer
+            Return DatePart(DateInterval.Weekday, DateValue, DayOfWeek, FirstWeekOfYear.System)
         End Function
 
-        Public Function MonthName(ByVal Month As Integer, _
+        Public Shared Function MonthName(ByVal Month As Integer, _
         Optional ByVal Abbreviate As Boolean = False) As System.String
             'LAMESPEC: MSDN states that in 12-month calendar the 
             '13 month should return empty string, but exception is thrown instead
@@ -526,7 +551,7 @@ Namespace Microsoft.VisualBasic
             End If
         End Function
 
-        Public Function WeekdayName(ByVal Weekday As Integer, _
+        Public Shared Function WeekdayName(ByVal Weekday As Integer, _
         Optional ByVal Abbreviate As System.Boolean = False, _
         Optional ByVal FirstDayOfWeekValue As FirstDayOfWeek = FirstDayOfWeek.System) As System.String
 
@@ -549,5 +574,5 @@ Namespace Microsoft.VisualBasic
                 Return CultureInfo.CurrentCulture.DateTimeFormat.GetDayName(CType(Weekday, DayOfWeek))
             End If
         End Function
-    End Module
+    End Class
 End Namespace
