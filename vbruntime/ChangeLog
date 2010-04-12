@@ -1,0 +1,30 @@
+2008-02-12  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Make.cmd, InitPaths.cmd: Find resgen too.
+
+2007-05-09  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* 2005VB.sln: Update.
+
+2007-05-09  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* 2005VB.sln: Update.
+
+2007-03-01  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Make.cmd: Added
+	* 2005VB_test.sln: Added
+	* 2005VB.sln: Updated (added test projects).
+
+2007-01-25  Wade Berrier  <wberrier@novell.com>
+
+	* Makefile: spaces -> tab
+
+2007-01-25  Wade Berrier  <wberrier@novell.com>
+
+	* Makefile: Add VB.build.bat to DISTFILES to be able to build
+	on win32 from a 'make dist' tarball
+
+2007-01-25  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Updated and fixed the batch build files for new source files.

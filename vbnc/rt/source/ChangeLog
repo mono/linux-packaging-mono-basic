@@ -1,0 +1,115 @@
+2008-05-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Added support for having a list of known failures,
+	and ignoring the tests in it.
+
+2008-03-07  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Tests.vb: Order directories and files.
+
+2008-03-07  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* AssemblyInfo.vb: Updated.
+	* FileTabPage.vb: Handle unix-style eols too.
+
+2007-12-14  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: Strip invalid characters from log filenames.
+	* Tests.vb: Sort files (NTFS does it automatically).
+
+2007-08-13  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* VerificationBase.vb, Test.vb, ExternalProcessVerification.vb,
+	  AssemblyInfo.vb: Implement testing of warnings. The compilation
+	  succeeds, but they still have to print out the correct warning number.
+
+2007-08-08  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: Add DirectoriesToSkip and DontExecute variables.
+
+2007-07-27  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* rt.vbproj: Update.
+	* frmMain.vb, frmMain.Designer.vb: Added a context menu entry to create
+	  an error test from a failed test.
+
+2007-07-26  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: GetOldResults: if OutputPath doesn't exist, create it.
+	* frmMain.vb: Fix path, don't rely on current directory.
+	* rt.vbproj: Flush.
+
+2007-07-26  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: Added References, update ParseResponseFile to get References
+	  as well (only references with some kind of path are added). For AC
+	  and PEVerify verifications add the references to their dependent
+	  files.
+	* Helper.vb: Fix line endings and add ParseLine (copied from vbnc).
+	* ExternalProcessExecutor.vb: Added DependentFiles, they are copied to
+	  the working directory before executing the program, then deleted
+	  again.
+
+2007-07-26  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* VerificationBase.vb, Test.vb, frmMain.vb, ExternalProcessExecutor.vb:
+	  Minor fixes.
+	* Helper.vb: eol-fix.
+	* rt.vbproj: Update.
+	* Test.Results.vb: Added a Skipped test result.
+
+2007-04-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* ExternalProcessExecutor.vb: Handle exceptions while executing process instead of crashing.
+	* TestList.vb: Don't inherit from List anymore, instead use a list and a hashtable. Fixes issues where the list and hashtable would get out of sync.
+
+2007-03-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: Added GetTargetExtension and a field for this information.
+	
+2007-03-02  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: Change the logic that determines if the test is negative or not: Now all tests that starts with at least 4 numbers are negative.
+
+2007-03-01  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: Don't do test executable verification if we don't have the vbc compiler.
+
+2007-03-01  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Test.vb: Create the output directory if it doesn't exist.
+
+2007-02-20  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* EnhancedProgressBar.vb, frmMain.vb, Settings.vb, TestExecutor.vb:
+	  Some changes to work around vbnc bugs.
+
+2007-02-20  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* frmMain.vb: Remove references to ListView.StateImageIndex, doesn't
+	  seem to be implemented in winforms yet.
+
+2007-02-13  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+ 	* Test.vb: Don't test the selfcompiled executable (since it is supposed
+	  to fail with no commandline arguments). Also update the logic to
+	  determine the target of the test to support both / and -.
+	* ExternalProcessVerification.vb, ExternalProcessExecutor.vb: An
+	  execution now fails if the executable is not found.
+	* frmMain.vb, frmMain.Designer.vb: Update references to My.Settings.
+	* Settings.vb: Change MySettings to save settings in the registry
+	  instead of using the default settings provider, it causes problems
+	  when used with files on shared drives.
+
+2007-02-01  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Test.vb: 
+	- Some directory separator fixes for Linux.
+	- It's now possible to specifiy a few options for the test directly on the test (to remove dependency on Parent, which isn't there when used by rt-console).
+	* Helper.vb:
+	- Created and moved a few functions here that are shared with rt-console.
+	* Tests.vb:
+	- Tests can now optionally be loaded recursively or not.
+	* ExternalProcessExecutor.vb:
+	- Use "mono" as executable when running on Mono.
+

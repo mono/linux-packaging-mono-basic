@@ -1,0 +1,28 @@
+2007-08-13  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* library.make: If there's a specific sources file for a profile,
+	just use it, there's no need for more complex support.
+
+2007-03-15  Wade Berrier  <wberrier@novell.com>
+
+	* rules.make: revert to using automake's install-sh (ie: sunos
+	doesn't have an install that accepts these args)
+
+2005-10-22  Atsushi Enomoto  <atsushi@ximian.com>
+
+	* rules.make : target dll-sources (formerly updated-dll-sources).
+
+2005-10-23  Atsushi Enomoto  <atsushi@ximian.com>
+
+	* library.make : updated-dll-sources now supports *_test.dll.sources
+	  generation as well.
+
+2005-09-27  Atsushi Enomoto <atsushi@ximain.com>
+
+	library.make :
+	added "update-dll-sources" target (for easy source list regeneration).
+
+2005-09-27  Atsushi Enomoto <atsushi@ximain.com>
+
+	initial checkin. Mostly copied from mcs/build.
+

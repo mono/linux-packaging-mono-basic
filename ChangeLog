@@ -1,0 +1,37 @@
+2008-12-12  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* man: Added.
+	* configure, Makefile: version bump -> 2.3, 
+	  added support for man pages.
+ 
+2008-03-24  Wade Berrier  <wberrier@novell.com>
+
+	* class/Makefile: add mono.snk to DIST to fix build
+
+2008-01-30  Wade Berrier  <wberrier@novell.com>
+
+	* configure: version bump -> 1.9
+
+2007-08-08  Wade Berrier  <wberrier@novell.com>
+
+	* configure: version bump -> 1.2.6
+
+2007-07-24  Wade Berrier  <wberrier@novell.com>
+
+	* configure: version bump -> 1.2.5
+
+2007-04-19  Wade Berrier  <wberrier@novell.com>
+
+	* configure: version bump -> 1.2.4
+
+2007-04-06  Wade Berrier  <wberrier@novell.com>
+
+	* Makefile: use bzip2 instead of gzip for 'make dist'
+
+2007-03-15  Wade Berrier  <wberrier@novell.com>
+
+	* Makefile: remove install-local to get rid of warnings
+
+2007-03-01  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Make.cmd: Added.
