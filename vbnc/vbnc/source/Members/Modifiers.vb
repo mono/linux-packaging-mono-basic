@@ -1,0 +1,147 @@
+' 
+' Visual Basic.Net Compiler
+' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' 
+' This library is free software; you can redistribute it and/or
+' modify it under the terms of the GNU Lesser General Public
+' License as published by the Free Software Foundation; either
+' version 2.1 of the License, or (at your option) any later version.
+' 
+' This library is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+' Lesser General Public License for more details.
+' 
+' You should have received a copy of the GNU Lesser General Public
+' License along with this library; if not, write to the Free Software
+' Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+' 
+
+Public Structure Modifiers
+    Private m_ModifierMask As ModifierMasks
+
+    Overloads Shared Function IsKS(ByVal KS As KS, ByVal Mask As ModifierMasks) As Boolean
+        If KS > KS.WriteOnly Then Return False
+        Dim modifier As ModifierMasks = KSToMask(KS)
+        Return (modifier And Mask) = modifier
+    End Function
+
+    Shared Function KSToMask(ByVal Modifier As KS) As ModifierMasks
+        Return CType(1 << Modifier, ModifierMasks)
+    End Function
+
+    ReadOnly Property Empty() As Boolean
+        Get
+            Return m_ModifierMask = 0
+        End Get
+    End Property
+
+    Sub New(ByVal Mask As ModifierMasks)
+        m_ModifierMask = Mask
+    End Sub
+
+    Sub New(ByVal Modifiers As Modifiers)
+        m_ModifierMask = Modifiers.m_ModifierMask
+    End Sub
+
+    ReadOnly Property Mask() As ModifierMasks
+        Get
+            Return m_ModifierMask
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Adds a modifier to the list if the modifier isn't there already.
+    ''' </summary>
+    ''' <param name="Modifier"></param>
+    ''' <remarks></remarks>
+    Public Sub AddModifier(ByVal Modifier As KS)
+        m_ModifierMask = m_ModifierMask Or KSToMask(Modifier)
+    End Sub
+
+    ''' <summary>
+    ''' Adds a modifier to the list if the modifier isn't there already.
+    ''' </summary>
+    ''' <param name="Modifier"></param>
+    ''' <remarks></remarks>
+    Public Sub AddModifiers(ByVal Modifier As ModifierMasks)
+        m_ModifierMask = m_ModifierMask Or Modifier
+    End Sub
+
+    ''' <summary>
+    ''' Returns true if the modifier Publis is set, or any other modifiers (Private, Friend, Protected) 
+    ''' is not set.
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    ReadOnly Property IsPublic() As Boolean
+        Get
+            Dim mask As ModifierMasks = ModifierMasks.AccessModifiers
+            Return mask = ModifierMasks.Public OrElse mask = 0
+        End Get
+    End Property
+
+    ReadOnly Property AccessibilityMask() As ModifierMasks
+        Get
+            Return m_ModifierMask And (ModifierMasks.Public Or ModifierMasks.Private Or ModifierMasks.Friend Or ModifierMasks.Protected)
+        End Get
+    End Property
+
+    ReadOnly Property [Is](ByVal Modifier As ModifierMasks) As Boolean
+        Get
+            Return (m_ModifierMask And Modifier) = Modifier
+        End Get
+    End Property
+
+    ReadOnly Property IsAny(ByVal Modifier As ModifierMasks) As Boolean
+        Get
+            Return (m_ModifierMask And Modifier) > 0
+        End Get
+    End Property
+
+    Function GetMethodAttributeScope() As MethodAttributes
+        If Me.Is(ModifierMasks.Public) Then
+            Return MethodAttributes.Public
+        ElseIf Me.Is(ModifierMasks.Friend) Then
+            If Me.Is(ModifierMasks.Protected) Then
+                Return MethodAttributes.FamORAssem
+            Else
+                Return MethodAttributes.Assembly
+            End If
+        ElseIf Me.Is(ModifierMasks.Protected) Then
+            Return MethodAttributes.Family
+        ElseIf Me.Is(ModifierMasks.Private) Then
+            Return MethodAttributes.Private
+        Else
+            Return MethodAttributes.Public
+        End If
+    End Function
+
+    Function GetFieldAttributeScope(ByVal TypeDeclaration As TypeDeclaration) As Reflection.FieldAttributes
+        If Me.Is(ModifierMasks.Public) Then
+            Return Reflection.FieldAttributes.Public
+        ElseIf Me.Is(ModifierMasks.Friend) Then
+            If Me.Is(ModifierMasks.Protected) Then
+                Return Reflection.FieldAttributes.FamORAssem
+            Else
+                Return Reflection.FieldAttributes.Assembly
+            End If
+        ElseIf Me.Is(ModifierMasks.Protected) Then
+            Return Reflection.FieldAttributes.Family
+        ElseIf Me.Is(ModifierMasks.Private) Then
+            Return Reflection.FieldAttributes.Private
+        ElseIf Me.Is(ModifierMasks.Dim) OrElse Me.Is(ModifierMasks.Const) Then
+            If TypeOf TypeDeclaration Is StructureDeclaration Then
+                Return FieldAttributes.Public
+            Else
+                Return FieldAttributes.Private
+            End If
+        ElseIf TypeOf TypeDeclaration Is EnumDeclaration Then
+            Return FieldAttributes.Public
+        Else
+            Return FieldAttributes.Private
+        End If
+    End Function
+
+End Structure

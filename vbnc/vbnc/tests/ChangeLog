@@ -1,0 +1,246 @@
+2008-12-31  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Errors/30456.vb:
+	* Bugs/30456-bug-456326.vb: Added test cases for r122291.
+
+2008-11-17  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Errors/30059.vb, Errors/30060.vb, Errors/30060-1.vb,
+	  Errors/30060-10.vb, Errors/30060-12.vb, Errors/30060-11.vb,
+	  Errors/30060-13.vb, Errors/30060-14.vb, Errors/30060-16.vb,
+	  Errors/30060-15.vb, Errors/30060-17.vb, Errors/30060-18.vb,
+	  Errors/30060-2.vb, Errors/30060-19.vb, Errors/30060-20.vb,
+	  Errors/30060-21.vb, Errors/30060-22.vb, Errors/30060-23.vb,
+	  Errors/30060-24.vb, Errors/30060-25.vb, Errors/30060-3.vb,
+	  Errors/30060-4.vb, Errors/30060-5.vb, Errors/30060-6.vb,
+	  Errors/30060-7.vb, Errors/30060-8.vb, Errors/30311-1.vb,
+	  Errors/30060-9.vb, Errors/30311-10.vb, Errors/30311-11.vb,
+	  Errors/30311-12.vb, Errors/30311-13.vb, Errors/30311-14.vb,
+	  Errors/30311-15.vb, Errors/30311-16.vb, Errors/30311-17.vb,
+	  Errors/30311-18.vb, Errors/30311-19.vb, Errors/30311-2.vb,
+	  Errors/30311-20.vb, Errors/30311-22.vb, Errors/30311-21.vb,
+	  Errors/30311-23.vb, Errors/30311-24.vb, Errors/30311-25.vb,
+	  Errors/30311-26.vb, Errors/30311-27.vb, Errors/30311-28.vb,
+	  Errors/30311-29.vb, Errors/30311-3.vb, Errors/30311-30.vb,
+	  Errors/30311-31.vb, Errors/30311-33.vb, Errors/30311-34.vb,
+	  Errors/30311-32.vb, Errors/30311-35.vb, Errors/30311-4.vb,
+	  Errors/30311-5.vb, Errors/30311-6.vb, Errors/30311-7.vb,
+	  Errors/30311-8.vb, Errors/30311-9.vb, Errors/30439.response,
+	  Errors/30439.vb, Errors/30439-1.vb, Errors/30532.vb,
+	  Errors/30533.vb, Errors/32006.vb, Errors/32006-1.vb,
+	  Errors/32006-2.vb, Errors/32006-3.vb, Errors/32006-4.vb,
+	  Errors/32006-5.vb, Errors/32006-6.vb, Errors/32006-7.vb,
+	  Errors/32007.vb, Errors/32007-1.vb, Errors/32007-2.vb,
+	  Errors/32007-3.vb, Errors/32007-4.vb, Errors/32007-5.vb,
+	  Errors/32007-6.vb: Implement constant conversion. Fixes #444828.
+
+2008-11-17  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-444811.vb: Properly handle external method declarations
+	  which doesn't specify neither Ansi, Unicode nor Auto. Fixes
+	  #444811.
+
+2008-11-17  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-444120.vb: Parse Alias clauses properly. Fixes #444120.
+
+2008-11-17  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-444993.vb: Don't show an error for 'Exit Sub' in a
+	  constructor. Fixes #444993.
+
+2008-11-17  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-445479.vb: Emit unsigned comparison when comparing unsigned
+	  int values. Fixes #445479.
+
+2008-10-24  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-392456.vb, CompileTime/ForEach2.vb, Errors/30070.vb,
+	  Errors/30070-1.vb, Errors/30451-1.vb, KnownFailures.txt: Don't
+	  verify the expression after 'Next' to much. Fixes #392456.
+
+2008-10-24  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-438683.vb: Parser: fix parsing of Not expressions followed
+	  by AndAlso/OrElse expressions.
+
+2008-10-24  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Resources/Resources5.resources, Resources/Resources5.response,
+	  Resources/Resources5.vb: Added Resources5 test case.
+
+2008-09-22  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-428340.vb: Added test case for #428340.
+
+2008-03-15  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-359234-ProtectedDefaultBaseCtor.response,
+	  Bugs/bug-359234-ProtectedDefaultBaseCtor.vb: Added.
+
+2008-03-13  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Errors/30506-1.vb, Errors/30506-2.vb, Errors/30506-3.vb,
+	  Errors/30506-4.vb, Errors/30506-5.vb, Errors/30506-6.vb,
+	  Errors/30590.vb: Added.
+
+2008-03-12  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Errors/30206.vb, Errors/30207.vb, Errors/30225.vb, Errors/30225-1.vb,
+	  Errors/30225-2.vb, Errors/30574.vb, Errors/30620.vb, Errors/30640.vb:
+	  Added.
+
+2008-03-12  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* CompileTime2/LessGeneric2.vb: Fix this test.
+	* CompileTime2/OptionStrict1.vb: Added.
+
+2008-03-07  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-325331.vb: Added.
+
+2008-03-01  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* SelfTest/SelfCompile.files.linux,
+	  VBRunTime/Microsoft.VisualBasic.files.windows,
+	  VBRunTime/Microsoft.VisualBasic.files.linux: Updated.
+	* CompileTime/ConditionalCompilation1.vb: Added.
+
+2008-02-12  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* SelfTest/SelfCompile.files.linux: Updated.
+	* CompileTime2/LessGeneric2.vb, CompileTime2/LessGeneric1.vb: Added.
+
+2007-11-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-333962.vb: Added.
+
+2007-11-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/30180-bug-325340.vb: Implemented 30180. Fixes #325340.
+
+2007-11-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* SelfTest/vbnc.Errors.resources: Remove all uses of Helper.NotImplemented,
+	  Helper.NotImplementedYet and Helper.AddError. Replaced with reported
+	  warnings/errors.
+
+2007-11-05  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* CompileTime/Constraint1.vb, CompileTime2/Constraint1.vb,
+	  CompileTime2/DefaultProperty4.vb, CompileTime2/DefaultProperty5.vb,
+	  CompileTime2/DefaultProperty6.vb, Errors/32101.vb, Errors/32102.vb,
+	  Errors/32103.vb, Errors/32104.vb, Errors/32105.vb, Errors/32106.vb: More
+	  tests.
+
+2007-11-05  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Errors/31509.resources, Errors/31509.response, Errors/31509.vb: Added.
+
+2007-11-05  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* SelfTest/vbnc.Errors.resources: Updated.
+	* CompileTime/PropertyAccess5.vb, CompileTime/PropertyAccess5.response:
+	  Added.
+	* 1Declarations/ArrayType8.vb, Errors/30311.vb, Errors/30337.vb: Fixed
+	  eol-style.
+
+2007-10-15  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-333403.vb, Bugs/bug-333403.rsp, My/bug-333403.rsp,
+	  My/bug-333403.vb: Added.
+
+2007-10-15  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/30451-bug-332869.vb: Added.
+
+2007-10-15  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs/bug-332868.vb, Errors/32046.vb, Errors/32085.vb: Added.
+
+2007-08-14  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Makefile: Add a hack for tests to execute on cygwin.
+
+2007-08-13  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Errors: More tests.
+
+2007-08-07  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* All: More tests, general updates, svn property fixes, etc.
+
+2007-07-17  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* All: More tests, general updates, svn property fixes, etc.
+
+2007-05-19  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Makefile: Make sure the runtime is built as weel before running the tests.
+
+2007-05-08  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Bugs: More tests.
+
+2007-05-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* CompileTime, CompileTime2, NUnitTests, My, SelfTest, Generated, Bugs, Mono, VBRunTime, Errors: More tests and general updates.
+
+2007-04-16  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* My: Added, contains tests for the My namespace.
+	* Unfixable: Added a few tests.
+	* Bugs: More tests.
+	* CompileTime: Even more tests.
+	* CompileTime2: Still more tests.
+	* SelfTest: Updated sources.
+
+2007-04-16  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* Makefile: Use PLATFORM_PATH_SEPARATOR so that build succeeds on Windows.
+
+2007-03-01  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Bugs: More tests.
+	* VBRunTime/Microsoft.VisualBasic.*: Updated.
+
+2007-02-28  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Makefile: Update DISTFILES to include all test files.
+	* Readme.txt: Updated.
+
+2007-02-23  Wade Berrier  <wberrier@novell.com>
+	
+	* Makefile: Adjust MONO_PATH to use newly built runtime assembly (otherwise, Microsoft.VisualBasic
+	had to be installed on the system for these tests to run)
+
+2007-02-13  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+	
+	* 1Declarations: Add more tests with BOMs.
+	* SelfCompile/rerun.sh: Send any arguments given to the script to the compiler.
+
+2007-02-13  Wade Berrier  <wberrier@novell.com>
+
+	* Makefile: use make friendly vars, add dist-local stanza to fix 'make dist'
+
+2007-02-13  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Makefile: Added, it's now possible to do 'make test' to run all the tests.
+	* Bugs: More tests.
+	* CompileTime: More tests.
+
+2007-02-13  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+	
+	* RunTime: Remove all Implicit* and Explicit* tests, they are now generated automatically.
+	* SelfTest: Add a couple of scripts to run the test from the commandline both on Windows and Linux.
+	* Generated: Added, all scripts to generate tests are put here. Added Conversions.vb to generate the Explicit and Implicit tests earlier in Runtime.
+	* CompileTime: Renamed the tests starting with # so that they run correctly on Linux as well.
+	* Bugs: Added, every bug report should have a corresponding test here.
+	* Errors: Added, every compiler message should have a corresponding test here.	
+	* VBRunTime: Added a script to update the sources for the test.
+
+2007-02-01  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* all.rsp (all directories): Fixed case of imports.
+	* (all directories): Set better svn ignore properties and add testoutput.

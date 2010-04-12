@@ -1,0 +1,31 @@
+2007-08-13  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* FileSystemOperationUIQuestion.vb: More dependencies are implemented now.
+
+2007-08-13  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* FileSystemOperationUIQuestion.vb, UICancelOption.vb,
+	  MalformedLineException.vb, SpecialDirectories.vb, SearchOption.vb,
+	  RecycleOption.vb, DeleteDirectoryOption.vb, FileSystemOperationUI.vb,
+	  FileSystem.vb, FieldType.vb, FileSystemOperation.vb, UIOption.vb:
+	  Changed all uses of NET_2_0 to NET_VER >= 2.0, deleted NET_1_0, NET_1_1
+	  and NET_2_0.
+
+2007-05-30  Rolf Bjarne Kvinge <RKvinge@novell.com> 
+
+	* MalformedLineException.vb: Don't rely on Exception's ToString
+	  handling, do it all ourselves.
+
+2007-03-01  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* FileSystemOperationUI.vb:
+	* FileSystemOperationUIQuestion.vb: 
+	* TextFieldParser.vb: CorCompare work.
+
+2007-01-15  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Added DeleteDirectoryOption.vb, FieldType.vb, FileSystem.vb,
+	FileSystemOperation.vb, FileSystemOperationUI.vb, 
+	FileSystemOperationUIQuestion.vb, MalformedLineException.vb,
+	RecycleOption.vb, SearchOption.vb, SpecialDirectories.vb, 
+	TextFieldParser.vb, UICancelOption.vb, UIOption.vb
