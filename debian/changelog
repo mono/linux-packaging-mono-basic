@@ -1,6 +1,8 @@
 mono-basic (2.6.2-1) UNRELEASED; urgency=low
 
   * New upstream release
+  * debian/control:
+    + No-change bump to Standards 3.8.4
 
  -- Jo Shields <directhex@apebox.org>  Mon, 12 Apr 2010 23:30:34 +0100
 
