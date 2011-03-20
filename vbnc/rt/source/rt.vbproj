@@ -1,8 +1,9 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C24CC77B-ED7F-4A02-9206-B9EB480EFB7D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -11,34 +12,40 @@
     <AssemblyName>rt</AssemblyName>
     <MyType>WindowsFormsWithCustomSubMain</MyType>
     <OptionStrict>On</OptionStrict>
-    <PublishUrl>http://localhost/Regression Tester</PublishUrl>
+    <FallbackCulture>en-US</FallbackCulture>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
-    <FallbackCulture>en-US</FallbackCulture>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
-    <UpdateUrlEnabled>false</UpdateUrlEnabled>
-    <ApplicationVersion>1.0.0.*</ApplicationVersion>
+    <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>keyfile.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <IncrementalBuild>true</IncrementalBuild>
     <OutputPath>..\bin</OutputPath>
     <DocumentationFile>rt.xml</DocumentationFile>
-    <NoWarn>
-    </NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
     <OutputType>WinExe</OutputType>
     <AssemblyName>rt</AssemblyName>
@@ -46,41 +53,26 @@
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <Optimize>False</Optimize>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants>GUI</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>On</OptionStrict>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>False</DebugSymbols>
-    <DefineDebug>false</DefineDebug>
-    <DefineTrace>true</DefineTrace>
-    <IncrementalBuild>false</IncrementalBuild>
-    <Optimize>True</Optimize>
-    <OutputPath>..\bin</OutputPath>
-    <DocumentationFile>rt.xml</DocumentationFile>
-    <NoWarn>
-    </NoWarn>
-    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
-    <OutputType>WinExe</OutputType>
-    <AssemblyName>rt</AssemblyName>
-    <RootNamespace>rt</RootNamespace>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DefineConstants>
-    </DefineConstants>
-    <WarningLevel>4</WarningLevel>
-    <OptionExplicit>On</OptionExplicit>
-    <OptionStrict>On</OptionStrict>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    <Reference Include="System.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    <Reference Include="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-    <Reference Include="System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+    <Reference Include="Mono.Cecil.VB, Version=0.6.8.8607, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\vbnc\bin\Mono.Cecil.VB.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+    <Reference Include="System.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+    <Reference Include="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+    <Reference Include="System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -89,12 +81,13 @@
     <Import Include="System.Drawing" />
     <Import Include="System.Diagnostics" />
     <Import Include="System.Windows.Forms" />
+    <Import Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyCompare.vb" />
     <Compile Include="AssemblyInfo.vb" />
-    <Compile Include="CommandLine.vb" />
-    <Compile Include="CompilerHelper.vb" />
+    <Compile Include="CecilCompare.vb" />
+    <Compile Include="CecilComparer.vb" />
+    <Compile Include="ConsoleRunner.vb" />
     <Compile Include="EnhancedProgressBar.Designer.vb">
       <DependentUpon>EnhancedProgressBar.vb</DependentUpon>
     </Compile>
@@ -103,23 +96,16 @@
     </Compile>
     <Compile Include="ExternalProcessExecutor.vb" />
     <Compile Include="ExternalProcessVerification.vb" />
-    <Compile Include="FileComparer.vb" />
     <Compile Include="FileTabPage.Designer.vb">
       <DependentUpon>FileTabPage.vb</DependentUpon>
     </Compile>
     <Compile Include="FileTabPage.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="frmAssemblyDiff.Designer.vb">
-      <DependentUpon>frmAssemblyDiff.vb</DependentUpon>
+    <Compile Include="frmFiles.Designer.vb">
+      <DependentUpon>frmFiles.vb</DependentUpon>
     </Compile>
-    <Compile Include="frmAssemblyDiff.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmDiff.Designer.vb">
-      <DependentUpon>frmDiff.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmDiff.vb">
+    <Compile Include="frmFiles.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmMain.Designer.vb">
@@ -134,68 +120,39 @@
     <Compile Include="frmNewTest.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmTestEditor.Designer.vb">
-      <DependentUpon>frmTestEditor.vb</DependentUpon>
-    </Compile>
-    <Compile Include="frmTestEditor.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Helper.vb">
     </Compile>
     <Compile Include="ListViewItemComparer.vb" />
     <Compile Include="Main.vb" />
-    <Compile Include="OldResult.vb" />
     <Compile Include="Settings.vb" />
+    <Compile Include="Test.MyTypes.vb" />
     <Compile Include="Test.Results.vb" />
+    <Compile Include="Test.Targets.vb" />
     <Compile Include="Test.vb" />
     <Compile Include="TestExecutor.vb" />
-    <Compile Include="TestList.vb" />
     <Compile Include="Tests.vb" />
-    <Compile Include="TestStatistics.vb" />
     <Compile Include="TestView.vb" />
     <Compile Include="VerificationBase.vb" />
-    <Compile Include="XmlCompare.vb" />
-    <Compile Include="XMLVerifier.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="FileTabPage.resx">
       <SubType>Designer</SubType>
       <DependentUpon>FileTabPage.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmAssemblyDiff.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmAssemblyDiff.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmDiff.resx">
-      <DependentUpon>frmDiff.vb</DependentUpon>
-      <SubType>Designer</SubType>
+    <EmbeddedResource Include="frmFiles.resx">
+      <DependentUpon>frmFiles.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmNewTest.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>frmNewTest.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmTestEditor.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>frmTestEditor.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="keyfile.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <AppDesigner Include="My Project\" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperFile Include="Microsoft.Net.Framework.2.0">
-      <InProject>False</InProject>
-      <ProductName>.NET Framework 2.0</ProductName>
-      <Install>true</Install>
-    </BootstrapperFile>
+    <None Include="ChangeLog" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />

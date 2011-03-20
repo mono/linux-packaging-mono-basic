@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -74,6 +74,7 @@ Imports Microsoft.VisualBasic
 '/nologo                 Do not display compiler copyright banner.
 '/quiet                  Quiet output mode.
 '/verbose                Display verbose messages.
+'/trace                  Output trace messages (vbnc extension)
 
 '                        - ADVANCED -
 '/baseaddress:<number>   The base address for a library or module (hex).
@@ -137,11 +138,6 @@ Public Class CommandLine
         End Get
     End Property
 
-#If DEBUG Then
-    Private m_bDumping As Boolean
-    Private m_StopAfter As String
-#End If
-
 #Region "Properties"
 
     ' - OUTPUT FILE -
@@ -158,6 +154,13 @@ Public Class CommandLine
     ''' /target:module          Create a module that can be added to an assembly.
     ''' </summary>
     Private m_strTarget As Targets
+
+    ''' <summary>
+    ''' /doc[+|-]               Generates XML documentation file.
+    ''' /doc:(file)             Generates XML documentation file to (file).
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private m_strDoc As String
 
     ' - INPUT FILES -
 
@@ -297,10 +300,10 @@ Public Class CommandLine
     Private m_bNoConfig As Boolean
 
     ''' <summary>
-    ''' 
+    ''' /trace                  Output trace messages (vbnc extension)
     ''' </summary>
     ''' <remarks></remarks>
-    Private m_NoVBRuntimeRef As Boolean
+    Private m_bTrace As Boolean
 
     ' - ADVANCED -
 
@@ -358,6 +361,8 @@ Public Class CommandLine
     ''' /utf8output[+|-]        Emit compiler output in UTF8 character encoding.
     ''' </summary>
     Private m_bUTF8Output As Boolean
+
+    Private m_VBRuntime As String = "Microsoft.VisualBasic.dll"
 
     ''' <summary>
     ''' /vbversion:[7|7.1|8]    Which version of the VB language to target. 7 and 7.1 will emit v1.0 assemblies (not supported yet), and 8 will emit v2.0 assemblies. Default is latest (8).
@@ -568,6 +573,16 @@ Public Class CommandLine
         End Get
     End Property
 
+    ''' <summary>
+    ''' /optioninfer[+|-]       Allow type inference of variables.
+    ''' </summary>
+    ''' <remarks></remarks>
+    ReadOnly Property OptionInfer As OptionInferTypes
+        Get
+            Return m_eOptionInfer
+        End Get
+    End Property
+
     ' - MISCELLANEOUS -
 
     ''' <summary>
@@ -615,9 +630,21 @@ Public Class CommandLine
         End Get
     End Property
 
-    ReadOnly Property NoVBRuntimeRef() As Boolean
+    ''' <summary>
+    ''' /trace                  Output trace messages (vbnc extension)
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    ReadOnly Property Trace As Boolean
         Get
-            Return m_NoVBRuntimeRef
+            Return m_bTrace
+        End Get
+    End Property
+
+    ReadOnly Property VBRuntime() As String
+        Get
+            Return m_VBRuntime
         End Get
     End Property
 
@@ -732,19 +759,6 @@ Public Class CommandLine
         End Get
     End Property
 
-#If DEBUG Then
-    ReadOnly Property Dumping() As Boolean
-        Get
-            Return m_bDumping
-        End Get
-    End Property
-    ReadOnly Property StopAfter() As String
-        Get
-            If m_StopAfter Is Nothing Then m_StopAfter = ""
-            Return m_StopAfter
-        End Get
-    End Property
-#End If
 #End Region
 
     ReadOnly Property AllArgumentsAsArray() As String()
@@ -792,9 +806,14 @@ Public Class CommandLine
             result = ParseInternal(CommandLine) AndAlso result
 
             If m_bNoConfig = False Then
-                Dim defaultrspfile As String
-                defaultrspfile = IO.Path.Combine(IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly.Location), "vbnc.rsp")
-                If IO.File.Exists(defaultrspfile) = False Then
+                Dim defaultrspfile As String = Nothing
+                Dim compiler_path As String = System.Reflection.Assembly.GetExecutingAssembly.Location
+                If compiler_path = String.Empty Then
+                    compiler_path = System.Reflection.Assembly.GetEntryAssembly.Location
+                End If
+                defaultrspfile = IO.Path.Combine(IO.Path.GetDirectoryName(compiler_path), "vbnc.rsp")
+
+                If defaultrspfile Is Nothing OrElse IO.File.Exists(defaultrspfile) = False Then
                     Try
                         Using resources As System.IO.Stream = Reflection.Assembly.GetExecutingAssembly.GetManifestResourceStream("vbnc.vbnc.rsp")
                             If resources IsNot Nothing Then
@@ -826,7 +845,7 @@ Public Class CommandLine
     ''' </summary>
     Private Function ParseResponseFile(ByVal Filename As String) As Boolean
         If m_lstResponseFiles.Contains(Filename) Then
-            Compiler.Report.ShowMessage(Messages.VBNC2014, Filename)
+            Compiler.Report.ShowMessage(Messages.VBNC2014, Span.CommandLineSpan, Filename)
             Return False
         Else
             m_lstResponseFiles.Add(Filename)
@@ -845,7 +864,7 @@ Public Class CommandLine
             Compiler.Report.WriteLine("IO.File.Exists(" & Filename & ") => " & IO.File.Exists(Filename).ToString)
             Compiler.Report.WriteLine("IO.File.Exists(" & IO.Path.GetFullPath(Filename) & ") >= " & IO.File.Exists(IO.Path.GetFullPath(Filename)).ToString)
 #End If
-            Compiler.Report.ShowMessage(Messages.VBNC2001, Filename)
+            Compiler.Report.ShowMessage(Messages.VBNC2001, Span.CommandLineSpan, Filename)
             Return False
         End If
 
@@ -854,7 +873,7 @@ Public Class CommandLine
         Try
             strLines = IO.File.ReadAllLines(Filename)
         Catch ex As IO.IOException
-            Compiler.Report.ShowMessage(Messages.VBNC2007, Filename)
+            Compiler.Report.ShowMessage(Messages.VBNC2007, Span.CommandLineSpan, Filename)
             Return False
         End Try
 
@@ -910,7 +929,7 @@ Public Class CommandLine
                     Case "module"
                         m_strTarget = Targets.Module
                     Case Else
-                        Compiler.Report.SaveMessage(Messages.VBNC2019, "target", strValue)
+                        Compiler.Report.SaveMessage(Messages.VBNC2019, Span.CommandLineSpan, "target", strValue)
                         result = False
                 End Select
                 ' - INPUT FILES -
@@ -962,7 +981,7 @@ Public Class CommandLine
                         m_eDebugInfo = DebugTypes.Full
                     Case Else
                         'TODO: AddError 2014 (saved).
-                        Compiler.Report.SaveMessage(Messages.VBNC2019, strName, strValue)
+                        Compiler.Report.SaveMessage(Messages.VBNC2019, Span.CommandLineSpan, strName, strValue)
                         result = False
                 End Select
                 ' - ERRORS AND WARNINGS -
@@ -980,7 +999,7 @@ Public Class CommandLine
                     If str.Contains("=") = False Then str = str & "=True"
                     Dim strSplit() As String = Split(str, "=")
                     If strSplit.GetUpperBound(0) <> 1 Then
-                        Compiler.Report.ShowMessage(Messages.VBNC90017, str)
+                        Compiler.Report.ShowMessage(Messages.VBNC90017, Span.CommandLineSpan, str)
                         result = False
                     Else
                         m_lstDefine.Add(New Define(Compiler, strSplit(0), strSplit(1)))
@@ -1004,7 +1023,6 @@ Public Class CommandLine
                 Console.WriteLine("Warning: Option Strict Off will probably fail.")
                 m_eOptionStrict = OptionStrictTypes.Off
             Case "optioninfer+", "optioninfer"
-                Console.WriteLine("Warning: Option Infer On does not work yet.")
                 m_eOptionInfer = OptionInferTypes.On
             Case "optioninfer-"
                 m_eOptionInfer = OptionInferTypes.Off
@@ -1019,7 +1037,7 @@ Public Class CommandLine
                     Case Else
                         result = False
                         'TODO: AddError 2014 (saved).
-                        Compiler.Report.SaveMessage(Messages.VBNC2019, strName, strValue)
+                        Compiler.Report.SaveMessage(Messages.VBNC2019, Span.CommandLineSpan, strName, strValue)
                 End Select
                 ' - MISCELLANEOUS -
             Case "help", "?"
@@ -1034,6 +1052,8 @@ Public Class CommandLine
                 m_bVerbose = False
             Case "noconfig"
                 m_bNoConfig = True
+            Case "trace"
+                m_bTrace = True
                 ' - ADVANCED -
             Case "baseaddress"
                 m_strBaseAddress = strValue
@@ -1041,13 +1061,13 @@ Public Class CommandLine
                 m_strBugReport = strValue
             Case "codepage"
                 If strValue = "" Then
-                    Compiler.Report.ShowMessage(Messages.VBNC2006, "codepage", "<number>")
+                    Compiler.Report.ShowMessage(Messages.VBNC2006, Span.CommandLineSpan, "codepage", "<number>")
                     result = False
                 Else
                     Try
                         m_Encoding = System.Text.Encoding.GetEncoding(Integer.Parse(strValue, Globalization.NumberStyles.AllowLeadingWhite Or Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture))
                     Catch
-                        Compiler.Report.ShowMessage(Messages.VBNC2016, strValue)
+                        Compiler.Report.ShowMessage(Messages.VBNC2016, Span.CommandLineSpan, strValue)
                         result = False
                     End Try
                 End If
@@ -1072,22 +1092,23 @@ Public Class CommandLine
             Case "netcf"
                 m_bNetCF = True
                 result = False
-                Compiler.Report.ShowMessage(Messages.VBNC90016, ".NET Compact Framework")
+                Compiler.Report.ShowMessage(Messages.VBNC90016, Span.CommandLineSpan, ".NET Compact Framework")
             Case "sdkpath"
                 m_strSDKPath = strValue
             Case "utf8output+", "utf8output"
                 m_bUTF8Output = True
             Case "utf8output-"
                 m_bUTF8Output = False
-#If DEBUG Then
-            Case "dump"
-                m_bDumping = True
-                m_StopAfter = strValue
-#End If
             Case "novbruntimeref"
-                m_NoVBRuntimeRef = True
+                m_VBRuntime = Nothing
+            Case "vbruntime-"
+                m_VBRuntime = Nothing
+            Case "vbruntime+"
+                m_VBRuntime = "Microsoft.VisualBasic.dll"
+            Case "vbruntime"
+                m_VBRuntime = strValue
             Case "errorreport"
-                result = Compiler.Report.SaveMessage(Messages.VBNC99998, "/errorreport isn't implemented yet.") AndAlso result
+                result = Compiler.Report.SaveMessage(Messages.VBNC99998, Span.CommandLineSpan, "/errorreport isn't implemented yet.") AndAlso result
             Case "vbversion"
                 Select Case strValue
                     Case "7"
@@ -1099,9 +1120,17 @@ Public Class CommandLine
                     Case Else
                         Helper.AddWarning("Unknown vb version: " & strValue & ", will use default vbversion (8)")
                 End Select
+            Case "doc-"
+                m_strDoc = Nothing
+            Case "doc+"
+                m_strDoc = String.Empty
+                Compiler.Report.SaveMessage(Messages.VBNC99998, Span.CommandLineSpan, "Support for /doc+ has not been implemented. No documentation file will be generated.")
+            Case "doc"
+                m_strDoc = strValue
+                Compiler.Report.SaveMessage(Messages.VBNC99998, Span.CommandLineSpan, "Support for /doc:<file> has not been implemented. No documentation file will be generated.")
             Case Else
                 'result = False 'OK since this is only a warning.
-                result = Compiler.Report.SaveMessage(Messages.VBNC2009, strName) AndAlso result
+                result = Compiler.Report.SaveMessage(Messages.VBNC2009, Span.CommandLineSpan, strName) AndAlso result
         End Select
         Return result
     End Function
@@ -1116,7 +1145,7 @@ Public Class CommandLine
 
         If strFiles Is Nothing OrElse strFiles.Length = 0 Then
             If IsPattern(File) = False Then
-                result = Compiler.Report.SaveMessage(Messages.VBNC2001, File) AndAlso result
+                result = Compiler.Report.SaveMessage(Messages.VBNC2001, Span.CommandLineSpan, File) AndAlso result
             End If
             Return result
         End If
@@ -1140,26 +1169,7 @@ Public Class CommandLine
         m_lstAllArgs.AddRange(Args)
         For Each s As String In Args
             If s.StartsWith("@") Then
-                Dim strResponseFile As String = s.Substring(1)
-                '#If DEBUG Then
-                'Hack for the testing to work in VS since the current directory is set to where the compiler
-                'is, not where the test is.
-                If strResponseFile.EndsWith("debug.rsp") AndAlso System.Diagnostics.Debugger.IsAttached Then
-                    strResponseFile = IO.Path.GetFullPath(strResponseFile)
-                    For Each str As String In IO.File.ReadAllLines(strResponseFile)
-                        For Each arg As String In Helper.ParseLine(str)
-                            If arg.StartsWith("@") Then
-                                Environment.CurrentDirectory = IO.Path.GetDirectoryName(arg.Substring(1))
-                                Exit For
-                            ElseIf arg.IndexOfAny(IO.Path.GetInvalidFileNameChars) = -1 AndAlso IO.File.Exists(arg) Then
-                                Environment.CurrentDirectory = IO.Path.GetDirectoryName(arg)
-                                Exit For
-                            End If
-                        Next
-                    Next
-                End If
-                '#End If
-                result = ParseResponseFile(strResponseFile) AndAlso result
+                result = ParseResponseFile(s.Substring(1)) AndAlso result
                 Continue For
             End If
 
@@ -1247,21 +1257,6 @@ Public Class CommandLine
             Return m_lstAllArgs
         End Get
     End Property
-
-#If DEBUG Then
-    Sub Dump()
-        Compiler.Report.WriteLine("Commandline dump:")
-        Compiler.Report.WriteLine(" FileNames:")
-        For Each file As CodeFile In m_lstFileNames
-            Compiler.Report.WriteLine("  " & file.FileName)
-        Next
-        Compiler.Report.WriteLine(" Arguments:")
-        For Each s As String In m_lstAllArgs
-            Compiler.Report.WriteLine("  " & s)
-        Next
-        Compiler.Report.WriteLine("End of commandline dump.")
-    End Sub
-#End If
 End Class
 
 

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,8 @@ Public Class LoopControlVariable
     Private m_TypeName As TypeName
     Private m_Expression As Expression
 
-    Private m_Declaration As VariableDeclaration
+    Private m_Declaration As LocalVariableDeclaration
+    Public MustInfer As Boolean
 
     ReadOnly Property Identifier() As Identifier
         Get
@@ -47,11 +48,11 @@ Public Class LoopControlVariable
 
     ReadOnly Property TypeName() As TypeName
         Get
-            Return m_typename
+            Return m_TypeName
         End Get
     End Property
 
-    ReadOnly Property Expression() As expression
+    ReadOnly Property Expression() As Expression
         Get
             Return m_Expression
         End Get
@@ -80,13 +81,13 @@ Public Class LoopControlVariable
         m_Expression = Expression
     End Sub
 
-    Function GetVariableDeclaration() As VariableDeclaration
+    Function GetVariableDeclaration() As LocalVariableDeclaration
         Return m_Declaration
     End Function
 
     ReadOnly Property IsVariableDeclaration() As Boolean
         Get
-            Return m_TypeName IsNot Nothing
+            Return m_TypeName IsNot Nothing OrElse m_Declaration IsNot Nothing
         End Get
     End Property
 
@@ -101,7 +102,7 @@ Public Class LoopControlVariable
         Helper.Assert(Info.RHSExpression IsNot Nothing)
         If m_Declaration IsNot Nothing Then
             Helper.Assert(m_Declaration.LocalBuilder IsNot Nothing)
-            result = Info.RHSExpression.Classification.GenerateCode(Info.Clone(Me, True, False, m_Declaration.LocalBuilder.LocalType)) AndAlso result
+            result = Info.RHSExpression.Classification.GenerateCode(Info.Clone(Me, True, False, m_Declaration.LocalBuilder.VariableType)) AndAlso result
             Emitter.EmitStoreVariable(Info, m_Declaration.LocalBuilder)
         Else
             result = m_Expression.GenerateCode(Info) AndAlso result
@@ -145,36 +146,58 @@ Public Class LoopControlVariable
         Return result
     End Function
 
-    ReadOnly Property VariableType() As Type
+    ReadOnly Property VariableType() As Mono.Cecil.TypeReference
         Get
             If m_Expression IsNot Nothing Then
                 Return m_Expression.ExpressionType
-            Else
+            ElseIf m_TypeName IsNot Nothing Then
                 Return m_TypeName.ResolvedType
+            Else
+                Return m_Declaration.VariableType
             End If
         End Get
     End Property
 
     Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
         Dim result As Boolean = True
+        Dim sne As SimpleNameExpression
 
         If m_Expression IsNot Nothing Then
-            result = m_Expression.ResolveExpression(Info) AndAlso result
+            sne = TryCast(m_Expression, SimpleNameExpression)
+            If sne IsNot Nothing Then
+                sne.InferEnabled = Me.IsOptionInferOn
+                If sne.ResolveExpression(Info) = False Then
+                    If sne.InferPossible Then
+                        MustInfer = True
+                        result = True 'So far so good
+                    Else
+                        result = False
+                    End If
+                End If
+            Else
+                result = m_Expression.ResolveExpression(Info) AndAlso result
 
-            Dim iie As InvocationOrIndexExpression = TryCast(m_Expression, InvocationOrIndexExpression)
-            If iie IsNot Nothing AndAlso iie.IsLateBoundArray Then
-                Return Compiler.Report.ShowMessage(Messages.VBNC30039, Location) AndAlso result
+                Dim iie As InvocationOrIndexExpression = TryCast(m_Expression, InvocationOrIndexExpression)
+                If iie IsNot Nothing AndAlso iie.IsLateBoundArray Then
+                    Return Compiler.Report.ShowMessage(Messages.VBNC30039, Location) AndAlso result
+                End If
             End If
         Else
             'result = m_Identifier.Resolve AndAlso result
             'result = m_ArrayNameModifier.Resolve AndAlso result
             result = m_TypeName.ResolveTypeReferences AndAlso result
-            m_Declaration = New VariableDeclaration(Me, Nothing, New Modifiers(), m_Identifier, False, m_TypeName, Nothing, Nothing)
+            m_Declaration = New LocalVariableDeclaration(Me, New Modifiers(), m_Identifier, False, m_TypeName, Nothing, Nothing)
             result = m_Declaration.ResolveTypeReferences() AndAlso result
-            result = m_Declaration.ResolveMember(ResolveInfo.Default(Info.Compiler)) AndAlso result
-            result = m_Declaration.ResolveCode(info) AndAlso result
+            'result = m_Declaration.ResolveMember(ResolveInfo.Default(Info.Compiler)) AndAlso result
+            result = m_Declaration.ResolveCode(Info) AndAlso result
         End If
 
         Return result
     End Function
+
+    Public Sub CreateInferredVariable(ByVal Type As TypeReference)
+        m_Declaration = New LocalVariableDeclaration(Me)
+        m_Declaration.Init(New Modifiers(), m_Identifier.Identifier, Type)
+        m_Expression = Nothing
+    End Sub
 End Class

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -35,20 +35,23 @@ Public Class EndStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        Dim ilgen As ILGenerator = Me.FindFirstParent(Of IMethod).ILGenerator
-        ilgen.EmitCall(OpCodes.Call, Compiler.TypeCache.MS_VB_CS_ProjectData__EndApp, Nothing)
+        Emitter.EmitCall(Info, Compiler.TypeCache.MS_VB_CS_ProjectData__EndApp)
 
         Return result
     End Function
 
     Public Overrides Function ResolveStatement(ByVal Info As ResolveInfo) As Boolean
+        Dim m As Object
+        Dim method As IMethod
+
         Compiler.Helper.AddCheck("End statements may not be used in programs that are not executable (for example, DLLs). ")
+
+        m = FindMethod()
+        method = TryCast(m, IMethod)
+        If method IsNot Nothing Then
+            method.CecilBuilder.ImplAttributes = Mono.Cecil.MethodImplAttributes.NoInlining Or Mono.Cecil.MethodImplAttributes.NoOptimization
+        End If
+
         Return True
     End Function
-
-#If DEBUG Then
-    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-        dumper.WriteLine("End")
-    End Sub
-#End If
 End Class

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -20,15 +20,15 @@
 Public Class OrExpression
     Inherits BinaryExpression
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
-            Dim result As Type
-            Dim lType, rType As Type
+            Dim result As Mono.Cecil.TypeReference
+            Dim lType, rType As Mono.Cecil.TypeReference
 
             lType = Me.LeftType
             rType = Me.RightType
 
-            If Helper.CompareType(lType, rType) AndAlso lType.IsEnum Then
+            If Helper.CompareType(lType, rType) AndAlso Helper.IsEnum(Compiler, lType) Then
                 result = lType
             Else
                 result = MyBase.ExpressionType()
@@ -86,18 +86,18 @@ Public Class OrExpression
                 Return Nothing
             Else
 
-                Dim tlvalue, trvalue As Type
+                Dim tlvalue, trvalue As Mono.Cecil.TypeReference
                 Dim clvalue, crvalue As TypeCode
-                tlvalue = lvalue.GetType
+                tlvalue = CecilHelper.GetType(Compiler, lvalue)
                 clvalue = Helper.GetTypeCode(Compiler, tlvalue)
-                trvalue = rvalue.GetType
+                trvalue = CecilHelper.GetType(Compiler, rvalue)
                 crvalue = Helper.GetTypeCode(Compiler, trvalue)
 
                 If clvalue = TypeCode.Boolean AndAlso crvalue = TypeCode.Boolean Then
-                    Return CBool(lvalue) Or CBool(rvalue)
+                    Return CBool(lvalue) OrElse CBool(rvalue)
                 End If
 
-                Dim smallest As Type
+                Dim smallest As Mono.Cecil.TypeReference
                 Dim csmallest As TypeCode
                 smallest = Compiler.TypeResolution.GetSmallestIntegralType(tlvalue, trvalue)
                 Helper.Assert(smallest IsNot Nothing)

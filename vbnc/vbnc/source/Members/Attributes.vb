@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -37,10 +37,11 @@ Public Class Attributes
         Return result
     End Function
 
-    Function IsDefined(ByVal AttributeType As Type) As Boolean
+    Function IsDefined(ByVal AttributeType As Mono.Cecil.TypeReference) As Boolean
         Dim result As Boolean = False
 
         For Each att As Attribute In Me
+            If AttributeType Is Nothing Then Return False
             If Helper.CompareType(att.AttributeType, AttributeType) Then
                 result = True
                 Exit For
@@ -56,7 +57,7 @@ Public Class Attributes
     ''' <param name="AttributeType"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Function FindAttributes(ByVal AttributeType As Type) As Generic.List(Of Attribute)
+    Function FindAttributes(ByVal AttributeType As Mono.Cecil.TypeReference) As Generic.List(Of Attribute)
         Dim result As Generic.List(Of Attribute) = Nothing
 
         If AttributeType Is Nothing Then Return Nothing

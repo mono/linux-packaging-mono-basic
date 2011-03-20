@@ -347,7 +347,7 @@ Namespace Microsoft.VisualBasic.CompilerServices
                             Dim index As Integer = args.Length - 1
                             Dim pcount As Integer = CType(args(args.Length - 1), Array).Length
                             Dim arr As Object = args(index)
-                            ReDim Preserve preparedArguments(index + pcount - 1)
+                            preparedArguments = DirectCast (Utils.CopyArray (preparedArguments, new Object (index + pcount - 1) {}), Object ())
                             For i As Integer = 0 To pcount - 1
                                 preparedArguments(index + i) = CType(arr, Array).GetValue(i)
                             Next
@@ -469,78 +469,70 @@ Namespace Microsoft.VisualBasic.CompilerServices
             If type1.IsPrimitive And type2.IsPrimitive Then
                 Select Case Type.GetTypeCode(type2)
                     Case TypeCode.Boolean
-                        Return CBool(value)
+                        Return Conversions.ToBoolean(value)
                     Case TypeCode.Byte
-                        Return CByte(value)
-#If NET_VER >= 2.0 Then
+                        Return Conversions.ToByte(value)
                     Case TypeCode.SByte
-                        Return CSByte(value)
-#End If
+                        Return Conversions.ToSByte(value)
                     Case TypeCode.Char
-                        Return CChar(value)
+                        Return Conversions.ToChar(value)
                     Case TypeCode.DateTime
-                        Return CDate(value)
+                        Return Conversions.ToDate(value)
                     Case TypeCode.Double
-                        Return CDbl(value)
+                        Return Conversions.ToDouble(value)
                     Case TypeCode.Decimal
-                        Return (CDec(value))
+                        Return Conversions.ToDecimal(value)
                     Case TypeCode.Int32
-                        Return CInt(value)
+                        Return Conversions.ToInteger(value)
                     Case TypeCode.Int16
-                        Return CShort(value)
+                        Return Conversions.ToShort(value)
                     Case TypeCode.Int64
-                        Return CLng(value)
-#If NET_VER >= 2.0 Then
+                        Return Conversions.ToLong(value)
                     Case TypeCode.UInt32
-                        Return CUInt(value)
+                        Return Conversions.ToUInteger(value)
                     Case TypeCode.UInt16
-                        Return CUShort(value)
+                        Return Conversions.ToUShort(value)
                     Case TypeCode.UInt64
-                        Return CULng(value)
-#End If
+                        Return Conversions.ToULong(value)
                     Case TypeCode.Single
-                        Return CSng(value)
+                        Return Conversions.ToSingle(value)
                 End Select
                 Return Convert.ChangeType(value, type2, CultureInfo.CurrentCulture)
             Else
                 If type2 Is GetType(String) Then
-                    Return CStr(value)
+                    Return StringType.FromObject(value)
                 End If
 
                 If type1 Is GetType(String) And type2.IsPrimitive Then
                     Select Case Type.GetTypeCode(type2)
                         Case TypeCode.Boolean
-                            Return CBool(value)
+                            Return Conversions.ToBoolean(value)
                         Case TypeCode.Byte
-                            Return CByte(value)
-#If NET_VER >= 2.0 Then
+                            Return Conversions.ToByte(value)
                         Case TypeCode.SByte
-                            Return CSByte(value)
-#End If
+                            Return Conversions.ToSByte(value)
                         Case TypeCode.Char
-                            Return CChar(value)
+                            Return Conversions.ToChar(value)
                         Case TypeCode.DateTime
-                            Return CDate(value)
+                            Return Conversions.ToDate(value)
                         Case TypeCode.Double
-                            Return CDbl(value)
+                            Return Conversions.ToDouble(value)
                         Case TypeCode.Decimal
-                            Return (CDec(value))
+                            Return Conversions.ToDecimal(value)
                         Case TypeCode.Int32
-                            Return CInt(value)
+                            Return Conversions.ToInteger(value)
                         Case TypeCode.Int16
-                            Return CShort(value)
+                            Return Conversions.ToShort(value)
                         Case TypeCode.Int64
-                            Return CLng(value)
-#If NET_VER >= 2.0 Then
+                            Return Conversions.ToLong(value)
                         Case TypeCode.UInt32
-                            Return CUInt(value)
+                            Return Conversions.ToUInteger(value)
                         Case TypeCode.UInt16
-                            Return CUShort(value)
+                            Return Conversions.ToUShort(value)
                         Case TypeCode.UInt64
-                            Return CULng(value)
-#End If
+                            Return Conversions.ToULong(value)
                         Case TypeCode.Single
-                            Return CSng(value)
+                            Return Conversions.ToSingle(value)
                     End Select
                 End If
             End If
@@ -843,7 +835,7 @@ Namespace Microsoft.VisualBasic.CompilerServices
                 Return Nothing
             End If
 
-            ReDim Preserve match(matchCount - 1)
+            match = DirectCast (Utils.CopyArray(match, new MethodBase (matchCount - 1) {}), MethodBase ())
             Return match
         End Function
 
@@ -946,7 +938,7 @@ Namespace Microsoft.VisualBasic.CompilerServices
                     ' thre are more that 1 narrowing methods and this is the best
                     Throw New AmbiguousMatchException
                 End If
-                ReDim Preserve filteredMethods(methodsCount - 1)
+                filteredMethods = DirectCast(Utils.CopyArray(filteredMethods, New MethodBase(methodsCount - 1) {}), MethodBase())
                 Return filteredMethods
             End If
         End Function

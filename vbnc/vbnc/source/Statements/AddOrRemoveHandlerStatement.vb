@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -53,15 +53,15 @@ Public Class AddOrRemoveHandlerStatement
         m_Event = [Event]
         m_IsAddHandler = IsAddHandler
 
-        Dim eventInfo As EventInfo = m_Event.Classification.AsEventAccess.EventInfo
+        Dim o As Object = CType(CecilHelper.FindDefinition(m_Event.Classification.AsEventAccess.EventType), Mono.Cecil.TypeDefinition).Methods(0).Parameters
+
+        Dim eventInfo As Mono.Cecil.EventReference = m_Event.Classification.AsEventAccess.EventInfo
         Dim objCreation As New DelegateOrObjectCreationExpression(Me)
         Dim methodPointer As New AddressOfExpression(Me)
         methodPointer.Init(EventHandler, InstanceExpression)
-        objCreation.Init(eventInfo.EventHandlerType, New ArgumentList(objCreation, methodPointer))
+        objCreation.Init(eventInfo.EventType, New ArgumentList(objCreation, methodPointer))
         result = objCreation.ResolveExpression(ResolveInfo.Default(Compiler)) AndAlso result
         m_EventHandler = objCreation
-
-        Helper.Assert(result)
     End Sub
 
     ReadOnly Property [Event]() As Expression
@@ -83,7 +83,7 @@ Public Class AddOrRemoveHandlerStatement
     Friend Overloads Function GenerateCode(ByVal Info As EmitInfo, ByVal IsAddHandler As Boolean) As Boolean
         Dim result As Boolean = True
 
-        Dim handler As MethodInfo
+        Dim handler As Mono.Cecil.MethodReference
 
         '1 - Load the instance expression of the event (m_Event)
         '    (first argument to the add/remove method - the this pointer)
@@ -102,15 +102,15 @@ Public Class AddOrRemoveHandlerStatement
         Helper.Assert(m_Event.Classification.IsEventAccessClassification)
         Helper.Assert(m_EventHandler.Classification.IsValueClassification)
 
-        Dim evt As EventInfo = m_Event.Classification.AsEventAccess.EventInfo
+        Dim evt As Mono.Cecil.EventDefinition = CecilHelper.FindDefinition(m_Event.Classification.AsEventAccess.EventInfo)
 
         If IsAddHandler Then
-            handler = evt.GetAddMethod()
+            handler = evt.AddMethod
         Else
-            handler = evt.GetRemoveMethod()
+            handler = evt.RemoveMethod
         End If
 
-        If handler.IsStatic = False Then
+        If Helper.IsShared(handler) = False Then
             result = m_Event.Classification.AsEventAccess.GenerateCode(Info) AndAlso result
         End If
         result = m_EventHandler.Classification.GenerateCode(Info.Clone(Me, True, False, m_EventHandler.ExpressionType)) AndAlso result
@@ -128,7 +128,9 @@ Public Class AddOrRemoveHandlerStatement
         result = m_Event.ResolveExpression(Info) AndAlso result
         result = m_EventHandler.ResolveExpression(info) AndAlso result
 
-        Dim delegatetp As Type = m_Event.Classification.AsEventAccess.Type
+        If result = False Then Return result
+
+        Dim delegatetp As Mono.Cecil.TypeReference = m_Event.Classification.AsEventAccess.Type
 
         If m_EventHandler.Classification.IsMethodPointerClassification Then
             'result = m_EventHandler.Classification.AsMethodPointerClassification.Resolve(delegatetp) AndAlso result
@@ -146,14 +148,4 @@ Public Class AddOrRemoveHandlerStatement
         Compiler.Helper.AddCheck("The second argument's type must be the delegate type associated with the event access.")
         Return result
     End Function
-
-#If DEBUG Then
-    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write(VB.IIf(m_IsAddHandler, "AddHandler ", "RemoveHandler ").ToString)
-        m_Event.Dump(Dumper)
-        Dumper.Write(", ")
-        m_EventHandler.Dump(Dumper)
-        Dumper.WriteLine("")
-    End Sub
-#End If
 End Class

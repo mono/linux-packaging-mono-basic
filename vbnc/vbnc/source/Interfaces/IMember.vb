@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 ''' <remarks></remarks>
 Public Interface IMember
     Inherits IAttributableNamedDeclaration, IModifiable
-    ReadOnly Property MemberDescriptor() As MemberInfo
+    ReadOnly Property MemberDescriptor() As Mono.Cecil.MemberReference
     ReadOnly Property IsShared() As Boolean
     Property DeclaringType() As TypeDeclaration
 End Interface

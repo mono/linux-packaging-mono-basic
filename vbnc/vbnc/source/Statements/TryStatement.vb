@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ Public Class TryStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        EndLabel = Info.ILGen.BeginExceptionBlock()
+        EndLabel = Emitter.EmitBeginExceptionBlock(Info)
 
         result = CodeBlock.GenerateCode(Info) AndAlso result
 

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -45,14 +45,18 @@ Public Class ImportsClauses
     ''' <returns></returns>
     ''' <remarks></remarks>
     Function GetModules(ByVal FromWhere As BaseObject) As TypeList
-        Dim result As New TypeList
+        Dim result As TypeList = Nothing
         For Each imp As ImportsClause In Me
             If imp.IsNamespaceClause Then
                 Dim ns As ImportsNamespaceClause = imp.AsNamespaceClause
                 If ns.IsTypeImport Then
                     'A type cannot contain a module, nothing to do here.
                 ElseIf ns.IsNamespaceImport Then
-                    result.AddRange(FromWhere.Compiler.TypeManager.GetModulesByNamespace(ns.NamespaceImported.ToString).TypesAsArray)
+                    Dim modules As TypeDictionary = FromWhere.Compiler.TypeManager.GetModulesByNamespace(ns.NamespaceImported.ToString)
+                    If modules IsNot Nothing AndAlso modules.Count > 0 Then
+                        If result Is Nothing Then result = New TypeList
+                        result.AddRange(modules.TypesAsArray)
+                    End If
                 Else
                     Continue For 'This import was not resolved correctly, don't use it.
                 End If

@@ -261,19 +261,20 @@ endif
 
 # The library
 
-$(build_lib): $(response) $(BUILT_SOURCES) $(BUILT_FILES) $(the_lib_dir)
+$(build_lib): $(response) $(BUILT_SOURCES) $(BUILT_FILES)
+	@mkdir -p $(the_lib_dir)
 ifdef LIBRARY_USE_INTERMEDIATE_FILE
 	$(LIBRARY_COMPILE) $(LIBRARY_FLAGS) $(LIB_MCS_FLAGS) -target:library -out:$(LIBRARY_NAME) $(BUILT_SOURCES_cmdline) @$(response)
 	$(SN) $(SNFLAGS) $(LIBRARY_NAME) $(LIBRARY_SNK)
-	mv $(LIBRARY_NAME) $@
-	test ! -f $(LIBRARY_NAME).mdb || mv $(LIBRARY_NAME).mdb $@.mdb
+	mv -f $(LIBRARY_NAME) $@
+	test ! -f $(LIBRARY_NAME).mdb || mv -f $(LIBRARY_NAME).mdb $@.mdb
 else
+	@echo "VBNC   [$(PROFILE)] $(LIBRARY)"
 	$(LIBRARY_COMPILE) $(LIBRARY_FLAGS) $(LIB_MCS_FLAGS) -target:library -out:$@ $(BUILT_SOURCES_cmdline) @$(response)
 	$(SN) $(SNFLAGS) $@ $(LIBRARY_SNK)
 endif
 
-$(makefrag): $(sourcefile)
-	@echo Creating $@ ...
+$(makefrag): $(sourcefile) $(depsdir)
 	@sed 's,^,$(build_lib): ,' $< >$@
 
 ifneq ($(response),$(sourcefile))
@@ -329,6 +330,3 @@ updated-dll-sources:
 	echo "../../build/common/MonoTODOAttribute.cs" >> $(LIBRARY).sources
 	ls */*.cs >> $(LIBRARY).sources
 	cd Test; ls */*.cs > ../$(LIBRARY:.dll=_test.dll).sources; cd ..
-
-$(the_lib_dir):
-	mkdir -p $(the_lib_dir)

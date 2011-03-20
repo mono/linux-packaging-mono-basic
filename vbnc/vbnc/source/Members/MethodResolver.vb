@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -88,16 +88,16 @@ Public Class MethodResolver
         End Get
     End Property
 
-    ReadOnly Property MethodDeclaringType() As Type
+    ReadOnly Property MethodDeclaringType() As Mono.Cecil.TypeReference
         Get
             Return m_InitialCandidates(0).Member.DeclaringType
         End Get
     End Property
 
-    Sub Init(ByVal InitialGroup As Generic.List(Of MemberInfo), ByVal Arguments As ArgumentList, ByVal TypeArguments As TypeArgumentList)
+    Sub Init(ByVal InitialGroup As Generic.List(Of Mono.Cecil.MemberReference), ByVal Arguments As ArgumentList, ByVal TypeArguments As TypeArgumentList)
         m_Candidates = New Generic.List(Of MemberCandidate)(InitialGroup.Count)
         For i As Integer = 0 To InitialGroup.Count - 1
-            Dim member As MemberInfo = InitialGroup(i)
+            Dim member As Mono.Cecil.MemberReference = InitialGroup(i)
             m_Candidates.Add(New MemberCandidate(Me, member))
         Next
 
@@ -134,8 +134,8 @@ Public Class MethodResolver
     ReadOnly Property CandidatesLeft() As Integer
         Get
             Dim result As Integer
-            For Each member As MemberCandidate In m_Candidates
-                If member IsNot Nothing Then result += 1
+            For i As Integer = 0 To m_Candidates.Count - 1
+                If m_Candidates(i) IsNot Nothing Then result += 1
             Next
             Return result
         End Get
@@ -153,15 +153,20 @@ Public Class MethodResolver
 
         If result Then
             Helper.Assert(CandidatesLeft = 1 OrElse IsLateBound)
+
             If IsLateBound Then
                 m_ResolvedCandidate = Nothing
             Else
                 For Each member As MemberCandidate In m_Candidates
-                    If member IsNot Nothing Then
-                        m_ResolvedCandidate = member
-                        m_ResolvedCandidate.SelectOutputArguments()
+                    If member Is Nothing Then Continue For
+
+                    If IsValidCandidate(member) = False Then
+                        result = Compiler.Report.ShowMessage(Messages.VBNC30657, Parent.Location, member.Member.Name)
                         Exit For
                     End If
+                    m_ResolvedCandidate = member
+                    m_ResolvedCandidate.SelectOutputArguments()
+                    Exit For
                 Next
             End If
         End If
@@ -201,9 +206,9 @@ Public Class MethodResolver
         If ShowErrors AndAlso CandidatesLeft = 0 Then
             If m_InitialCandidates.Length = 1 Then
                 Dim argsGiven, argsRequired As Integer
-                Dim params() As ParameterInfo
+                Dim params As Mono.Collections.Generic.Collection(Of ParameterDefinition)
                 params = Helper.GetParameters(Compiler, m_InitialCandidates(0).Member)
-                argsRequired = params.Length
+                argsRequired = params.Count
                 argsGiven = m_Arguments.Length
                 If argsGiven >= argsRequired Then
                     Return Compiler.Report.ShowMessage(Messages.VBNC30057, Parent.Location, m_InitialCandidates(0).ToString())
@@ -218,12 +223,26 @@ Public Class MethodResolver
             End If
         End If
 
+        InferTypeArguments()
+        Log("After inferring type arguments, there are " & CandidatesLeft & " candidates left.")
+        If CandidatesLeft = 0 Then
+            'Type infer code shows the error message if it's supposed to show errors
+            Return False
+        End If
+
         If CandidatesLeft <= 1 Then Return CandidatesLeft = 1
 
         RemoveNarrowingExceptObject()
         Log("After removing narrowing (except object) candidates, there are " & CandidatesLeft & " candidates left.")
         If ShowErrors AndAlso CandidatesLeft = 0 Then
-            Helper.AddError(Me.m_Parent, "No non-narrowing (except object): " & Parent.Location.ToString(Compiler))
+            Helper.AddError(Me.m_Parent, String.Format("After removing narrowing (except object) candidates for method '{0}', nothing was found", Me.m_InitialCandidates(0).Member.Name))
+            Helper.AddError(Me.m_Parent, String.Format("Tried to select using invocation list: '{0}' of {1} initial candidates", Me.ArgumentsTypesAsString, m_InitialCandidates.Length))
+            Dim reported As Integer = 0
+            For i As Integer = 0 To m_InitialCandidates.Length - 1
+                reported += 1
+                Dim mi As Mono.Cecil.MemberReference = m_InitialCandidates(i).Member
+                Helper.AddError(Me.m_Parent, String.Format("Candidate #{0}: {1} {2}", reported, mi.Name, Helper.ToString(Me.m_Parent, Helper.GetParameters(Me.m_Parent, mi))))
+            Next
         End If
 
         If CandidatesLeft <= 1 Then Return CandidatesLeft = 1
@@ -233,7 +252,7 @@ Public Class MethodResolver
         If CandidatesLeft = 1 Then
             Return True
         ElseIf CandidatesLeft = 0 Then
-            If Caller.Location.File(Compiler).IsOptionStrictOn = False Then
+            If Parent.Location.File(Compiler).IsOptionStrictOn = False Then
                 m_IsLateBound = True
                 Return True
             End If
@@ -255,76 +274,187 @@ Public Class MethodResolver
 
         SelectLessGeneric()
         Log("After selecting the less generic candidates, there are " & CandidatesLeft & " candidates left.")
-        If ShowErrors AndAlso CandidatesLeft <> 1 Then
-            Helper.AddError(Me.m_Parent, "No less generic: " & Parent.Location.ToString(Compiler))
+        If CandidatesLeft = 1 Then
+            Return True
         End If
 
+        RemoveInvalid()
+
+        If ShowErrors AndAlso CandidatesLeft <> 1 Then
+            If CandidatesLeft > 1 Then
+                Helper.AddError(Me.m_Parent, String.Format("After selecting the less generic method for method '{0}', there are still {1} candidates left", Me.m_InitialCandidates(0).Member.Name, CandidatesLeft))
+                Helper.AddError(Me.m_Parent, String.Format("Tried to select using invocation list: '{0}'", Me.ArgumentsTypesAsString))
+                Dim reported As Integer = 0
+                For i As Integer = 0 To m_Candidates.Count - 1
+                    If m_Candidates(i) Is Nothing Then Continue For
+                    reported += 1
+                    Dim mi As Mono.Cecil.MemberReference = m_InitialCandidates(i).Member
+                    Helper.AddError(Me.m_Parent, String.Format("Candidate #{0}: {1} {2}", reported, mi.Name, Helper.ToString(Me.m_Parent, Helper.GetParameters(Me.m_Parent, mi))))
+                Next
+            Else
+                Helper.AddError(Me.m_Parent, String.Format("After selecting the less generic method for method '{0}', nothing was found", Me.m_InitialCandidates(0).Member.Name))
+            End If
+        End If
 
         Return CandidatesLeft = 1
     End Function
 
+    Function IsValidCandidate(ByVal candidate As MemberCandidate) As Boolean
+        If CecilHelper.IsValidType(candidate.ReturnType) = False Then Return False
+        For j As Integer = 0 To candidate.DefinedParametersTypes.Length - 1
+            If CecilHelper.IsValidType(candidate.DefinedParametersTypes(j)) = False Then Return False
+        Next
+        Return True
+    End Function
+
+    Sub RemoveInvalid()
+        For i As Integer = 0 To m_Candidates.Count - 1
+            Dim m As MemberCandidate = m_Candidates(i)
+            If m Is Nothing Then Continue For
+            If IsValidCandidate(m) = False Then m_Candidates(i) = Nothing
+        Next
+    End Sub
+
+    Private Function ContainsGenericParameters(ByVal Type As TypeReference, ByVal Find As Mono.Collections.Generic.Collection(Of GenericParameter)) As Boolean
+        Dim elementType As TypeReference
+        Dim tg As GenericParameter
+        Dim git As GenericInstanceType
+
+        If Type Is Nothing Then Return False
+
+        tg = TryCast(Type, GenericParameter)
+        If tg IsNot Nothing AndAlso Find.Contains(tg) Then Return True
+
+        git = TryCast(Type, GenericInstanceType)
+        If git IsNot Nothing AndAlso git.HasGenericArguments Then
+            For i As Integer = 0 To Find.Count - 1
+                If git.GenericArguments.Contains(Find(i)) Then Return True
+            Next
+        End If
+
+        elementType = Type.GetElementType()
+        If elementType IsNot Nothing AndAlso elementType IsNot Type Then
+            Return ContainsGenericParameters(elementType, Find)
+        End If
+
+        Return False
+    End Function
+
     Sub SelectLessGeneric()
-        'Find less generic methods
-        'Dim expandedArgumentTypes(m_Candidates.Count - 1)() As Type
+        '
+        'A member M is determined to be less generic than a member N as follows:
+        '1.	If, for each pair of matching parameters Mj and Nj, Mj is less or equally 
+        '   generic than Nj with respect to type parameters on the method, and at least 
+        '   one Mj is less generic with respect to type parameters on the method.
+        '2.	Otherwise, if for each pair of matching parameters Mj and Nj, Mj is less or equally generic than Nj 
+        '   with respect to type parameters on the type, and at least one Mj is less generic with respect to 
+        '   type parameters on the type, then M is less generic than N.
+        '
+        'A parameter M is considered to be equally generic to a parameter N if their types Mt and Nt
+        'both refer to type parameters or both don't refer to type parameters.
+        'M is considered to be less generic than N if Mt does not refer to a type parameter and Nt does.
+        '
 
-        'For i As Integer = 0 To m_Candidates.Count - 1
-        '    If m_Candidates(i) Is Nothing Then Continue For
+        Dim gpType As Mono.Collections.Generic.Collection(Of GenericParameter) = Nothing
+        Dim gp() As Mono.Collections.Generic.Collection(Of GenericParameter) = Nothing
 
-        '    For j As Integer = i + 1 To m_Candidates.Count - 1
-        '        If m_Candidates(j) Is Nothing Then Continue For
+        For i As Integer = 0 To m_Candidates.Count - 1
+            If m_Candidates(i) Is Nothing Then Continue For
 
-        '        Dim candidateI As MemberCandidate = m_Candidates(i)
-        '        Dim candidateJ As MemberCandidate = m_Candidates(j)
+            For j As Integer = i + 1 To m_Candidates.Count - 1
+                If m_Candidates(j) Is Nothing Then Continue For
 
-        '        Helper.Assert(candidateI.ExactArguments IsNot Nothing)
-        '        Helper.Assert(candidateJ.ExactArguments IsNot Nothing)
+                Dim candidateI As MemberCandidate = m_Candidates(i)
+                Dim candidateJ As MemberCandidate = m_Candidates(j)
+                Dim parametersI As Mono.Collections.Generic.Collection(Of ParameterDefinition) = Helper.GetOriginalParameters(candidateI.Member)
+                Dim parametersJ As Mono.Collections.Generic.Collection(Of ParameterDefinition) = Helper.GetOriginalParameters(candidateJ.Member)
+                Dim paramCount As Integer = Math.Min(parametersI.Count, parametersJ.Count)
+                Dim gpI As Mono.Collections.Generic.Collection(Of GenericParameter)
+                Dim gpJ As Mono.Collections.Generic.Collection(Of GenericParameter)
+                Dim timesLessGenericI As Integer
+                Dim timesLessGenericJ As Integer
 
-        '        Dim a, b As Boolean
+                'Not sure if the # of parameters can be different between I and J here
+                If paramCount = 0 Then Continue For
 
-        '        If expandedArgumentTypes(i) Is Nothing Then
-        '            expandedArgumentTypes(i) = candidateI.TypesInInvokedOrder() ' Helper.GetExpandedTypes(Compiler, candidateI.InputParameters, Arguments.Count)
-        '        End If
-        '        If expandedArgumentTypes(j) Is Nothing Then
-        '            expandedArgumentTypes(j) = candidateJ.TypesInInvokedOrder() 'Helper.GetExpandedTypes(Compiler, candidateJ.InputParameters, Arguments.Count)
-        '        End If
+                If gp Is Nothing Then ReDim gp(m_Candidates.Count - 1)
 
-        '        a = Helper.IsFirstMoreApplicable(Compiler, Arguments.Arguments, expandedArgumentTypes(i), expandedArgumentTypes(j))
-        '        b = Helper.IsFirstMoreApplicable(Compiler, Arguments.Arguments, expandedArgumentTypes(j), expandedArgumentTypes(i))
+                gpI = gp(i)
+                gpJ = gp(j)
 
-        '        If a = b Then ' AndAlso b = False Then
-        '            'It is possible for M and N to have the same signature if one or both contains an expanded 
-        '            'paramarray parameter. In that case, the member with the fewest number of arguments matching
-        '            'expanded paramarray parameters is considered more applicable. 
-        '            Dim iParamArgs, jParamArgs As Integer
+                If gpI Is Nothing Then
+                    gp(i) = Helper.GetGenericParameters(candidateI.Member)
+                    gpI = gp(i)
+                End If
+                If gpJ Is Nothing Then
+                    gp(j) = Helper.GetGenericParameters(candidateJ.Member)
+                    gpJ = gp(j)
+                End If
 
-        '            If candidateI.IsParamArrayCandidate Then
-        '                iParamArgs = candidateI.ParamArrayExpression.ArrayElementInitalizer.Initializers.Count + 1
-        '            End If
-        '            If candidateJ.IsParamArrayCandidate Then
-        '                jParamArgs = candidateJ.ParamArrayExpression.ArrayElementInitalizer.Initializers.Count + 1
-        '            End If
-        '            If jParamArgs > iParamArgs Then
-        '                a = True : b = False
-        '            ElseIf iParamArgs > jParamArgs Then
-        '                b = True : a = False
-        '            End If
-        '            Helper.Assert(iParamArgs <> jParamArgs OrElse (iParamArgs = 0 AndAlso jParamArgs = 0), MethodName)
-        '        End If
+                '1.	If, for each pair of matching parameters Mj and Nj, Mj is less or equally 
+                '   generic than Nj with respect to type parameters on the method, and at least 
+                '   one Mj is less generic with respect to type parameters on the method.
 
-        '        If a Xor b Then
-        '            If a = False Then
-        '                Log("NOT MOST APPLICABLE: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidateI.DefinedParametersTypes), ArgumentsTypesAsString)
-        '                m_Candidates(i) = Nothing
-        '                Exit For
-        '            Else
-        '                Log("NOT MOST APPLICABLE: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidateJ.DefinedParametersTypes), ArgumentsTypesAsString)
-        '                m_Candidates(j) = Nothing
-        '            End If
-        '        Else
-        '            Log("EQUALLY APPLICABLE: Method call to '{0}{1}' with arguments '{2}' and with arguments '{3}'", ArgumentsTypesAsString, Helper.ToString(candidateI.DefinedParametersTypes), Helper.ToString(candidateJ.DefinedParametersTypes))
-        '        End If
-        '    Next
-        'Next
+                For p As Integer = 0 To paramCount - 1
+                    Dim paramI As ParameterDefinition = parametersI(p)
+                    Dim paramJ As ParameterDefinition = parametersJ(p)
+                    Dim containsI As Boolean = ContainsGenericParameters(paramI.ParameterType, gpI)
+                    Dim containsJ As Boolean = ContainsGenericParameters(paramJ.ParameterType, gpJ)
+
+                    If containsI = False AndAlso containsJ = True Then
+                        timesLessGenericI += 1
+                    ElseIf containsI = True AndAlso containsJ = False Then
+                        timesLessGenericJ += 1
+                    End If
+                Next
+
+                If timesLessGenericI > 0 AndAlso timesLessGenericJ = 0 Then
+                    Log("MORE METHOD GENERIC: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidateJ.DefinedParametersTypes), ArgumentsTypesAsString)
+                    m_Candidates(j) = Nothing
+                    Exit For
+                ElseIf timesLessGenericI = 0 AndAlso timesLessGenericJ > 0 Then
+                    Log("MORE METHOD GENERIC: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidateI.DefinedParametersTypes), ArgumentsTypesAsString)
+                    m_Candidates(i) = Nothing
+                    Exit For
+                End If
+
+                '2.	Otherwise, if for each pair of matching parameters Mj and Nj, Mj is less or equally generic than Nj 
+                '   with respect to type parameters on the type, and at least one Mj is less generic with respect to 
+                '   type parameters on the type, then M is less generic than N.
+                timesLessGenericI = 0
+                timesLessGenericJ = 0
+
+                If gpType Is Nothing Then
+                    gpType = CecilHelper.FindDefinition(m_Candidates(i).Member.DeclaringType).GenericParameters
+                End If
+
+                'Not sure if the # of parameters can be different between I and J here
+                For p As Integer = 0 To paramCount - 1
+                    Dim paramI As ParameterDefinition = parametersI(p)
+                    Dim paramJ As ParameterDefinition = parametersJ(p)
+                    Dim containsI As Boolean = ContainsGenericParameters(paramI.ParameterType, gpType)
+                    Dim containsJ As Boolean = ContainsGenericParameters(paramJ.ParameterType, gpType)
+
+                    If containsI = False AndAlso containsJ = True Then
+                        timesLessGenericI += 1
+                    ElseIf containsI = True AndAlso containsJ = False Then
+                        timesLessGenericJ += 1
+                    End If
+                Next
+
+                If timesLessGenericI > 0 AndAlso timesLessGenericJ = 0 Then
+                    Log("MORE TYPE GENERIC: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidateJ.DefinedParametersTypes), ArgumentsTypesAsString)
+                    m_Candidates(j) = Nothing
+                    Exit For
+                ElseIf timesLessGenericI = 0 AndAlso timesLessGenericJ > 0 Then
+                    Log("MORE TYPE GENERIC: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidateI.DefinedParametersTypes), ArgumentsTypesAsString)
+                    m_Candidates(i) = Nothing
+                    Exit For
+                End If
+
+                Log("EQUALLY GENERIC: Method call to '{0}{1}' with arguments '{2}' and with arguments '{3}'", ArgumentsTypesAsString, Helper.ToString(candidateI.DefinedParametersTypes), Helper.ToString(candidateJ.DefinedParametersTypes))
+            Next
+        Next
     End Sub
 
     Sub RemoveInaccessible()
@@ -338,6 +468,26 @@ Public Class MethodResolver
                 m_Candidates(i) = Nothing
             Else
                 Log("ACCESSIBLE    : Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidate.DefinedParametersTypes), ArgumentsTypesAsString)
+            End If
+        Next
+    End Sub
+
+    Sub InferTypeArguments()
+        If m_TypeArguments IsNot Nothing AndAlso m_TypeArguments.Count > 0 Then
+            Log("Type arguments specified, not inferring them")
+            Return
+        End If
+
+        For i As Integer = 0 To m_Candidates.Count - 1
+            Dim candidate As MemberCandidate = m_Candidates(i)
+
+            If candidate Is Nothing Then Continue For
+
+            If candidate.InferTypeArguments = False Then
+                Log("TYPE INFERENCE FAILED: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidate.DefinedParametersTypes), ArgumentsTypesAsString)
+                m_Candidates(i) = Nothing
+            Else
+                Log("TYPE INFERENCE PASSED: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidate.DefinedParametersTypes), ArgumentsTypesAsString)
             End If
         Next
     End Sub
@@ -358,7 +508,7 @@ Public Class MethodResolver
 
             If candidate Is Nothing Then Continue For
 
-            If candidate.IsApplicable = False Then
+            If candidate.DefineApplicability = False Then
                 Log("NOT APPLICABLE: Method call to '{0}{1}' with arguments '{2}'", Helper.ToString(candidate.DefinedParametersTypes), ArgumentsTypesAsString)
                 m_Candidates(i) = Nothing
             Else
@@ -399,7 +549,7 @@ Public Class MethodResolver
 
     Sub SelectMostApplicable()
         'Find most applicable methods.
-        Dim expandedArgumentTypes(m_Candidates.Count - 1)() As Type
+        Dim expandedArgumentTypes(m_Candidates.Count - 1)() As Mono.Cecil.TypeReference
 
         For i As Integer = 0 To m_Candidates.Count - 1
             If m_Candidates(i) Is Nothing Then Continue For
@@ -473,28 +623,28 @@ Public Class MethodResolver
         End Get
     End Property
 
-    ReadOnly Property ResolvedMember() As MemberInfo
+    ReadOnly Property ResolvedMember() As Mono.Cecil.MemberReference
         Get
             If m_ResolvedCandidate Is Nothing Then Return Nothing
             Return m_ResolvedCandidate.Member
         End Get
     End Property
 
-    ReadOnly Property ResolvedMethod() As MethodInfo
+    ReadOnly Property ResolvedMethod() As Mono.Cecil.MethodReference
         Get
-            Return TryCast(ResolvedMember, MethodInfo)
+            Return TryCast(ResolvedMember, Mono.Cecil.MethodReference)
         End Get
     End Property
 
-    ReadOnly Property ResolvedConstructor() As ConstructorInfo
+    ReadOnly Property ResolvedConstructor() As Mono.Cecil.MethodReference
         Get
-            Return TryCast(ResolvedMember, ConstructorInfo)
+            Return TryCast(ResolvedMember, Mono.Cecil.MethodReference)
         End Get
     End Property
 
-    ReadOnly Property ResolvedProperty() As PropertyInfo
+    ReadOnly Property ResolvedProperty() As Mono.Cecil.PropertyReference
         Get
-            Return TryCast(ResolvedMember, PropertyInfo)
+            Return TryCast(ResolvedMember, Mono.Cecil.PropertyReference)
         End Get
     End Property
 
@@ -509,13 +659,14 @@ Public Class MethodResolver
 End Class
 
 Public Class MemberCandidate
-    Private m_Member As MemberInfo
-    Private m_DefinedParameters As ParameterInfo()
-    Private m_DefinedParametersTypes As Type()
+    Private m_Member As Mono.Cecil.MemberReference
+    Private m_DefinedParameters As Mono.Collections.Generic.Collection(Of ParameterDefinition)
+    Private m_DefinedParametersTypes As Mono.Cecil.TypeReference()
     Private m_Parent As MethodResolver
+    Private m_ReturnType As TypeReference
 
     Private m_ExactArguments As Generic.List(Of Argument)
-    Private m_TypesInInvokedOrder As Type()
+    Private m_TypesInInvokedOrder As Mono.Cecil.TypeReference()
 
     Private m_IsParamArray As Boolean
 
@@ -523,12 +674,12 @@ Public Class MemberCandidate
         Return Helper.ToString(m_Parent.Parent, m_Member)
     End Function
 
-    Sub New(ByVal Parent As MethodResolver, ByVal Member As MemberInfo)
+    Sub New(ByVal Parent As MethodResolver, ByVal Member As Mono.Cecil.MemberReference)
         m_Parent = Parent
         m_Member = Member
     End Sub
 
-    ReadOnly Property TypesInInvokedOrder() As Type()
+    ReadOnly Property TypesInInvokedOrder() As Mono.Cecil.TypeReference()
         Get
             Return m_TypesInInvokedOrder
         End Get
@@ -540,17 +691,24 @@ Public Class MemberCandidate
         End Get
     End Property
 
-    ReadOnly Property DefinedParameters() As ParameterInfo()
+    ReadOnly Property DefinedParameters() As Mono.Collections.Generic.Collection(Of ParameterDefinition)
         Get
             If m_DefinedParameters Is Nothing Then m_DefinedParameters = Helper.GetParameters(Compiler, Member)
             Return m_DefinedParameters
         End Get
     End Property
 
-    ReadOnly Property DefinedParametersTypes() As Type()
+    ReadOnly Property DefinedParametersTypes() As Mono.Cecil.TypeReference()
         Get
             If m_DefinedParametersTypes Is Nothing Then m_DefinedParametersTypes = Helper.GetTypes(DefinedParameters)
             Return m_DefinedParametersTypes
+        End Get
+    End Property
+
+    ReadOnly Property ReturnType As TypeReference
+        Get
+            If m_ReturnType Is Nothing Then m_ReturnType = Helper.GetReturnType(m_Member)
+            Return m_ReturnType
         End Get
     End Property
 
@@ -560,7 +718,7 @@ Public Class MemberCandidate
         End Get
     End Property
 
-    ReadOnly Property Member() As MemberInfo
+    ReadOnly Property Member() As Mono.Cecil.MemberReference
         Get
             Return m_Member
         End Get
@@ -593,13 +751,11 @@ Public Class MemberCandidate
 
     ReadOnly Property IsAccessible() As Boolean
         Get
-            Return Helper.IsAccessible(Compiler, Resolver.Caller, m_Member)
-        End Get
-    End Property
-
-    ReadOnly Property IsApplicable() As Boolean
-        Get
-            Return DefineApplicability()
+            If Resolver.Caller Is Nothing Then
+                Return Helper.IsAccessibleExternal(Compiler, m_Member)
+            Else
+                Return Helper.IsAccessible(Compiler, Resolver.Caller.CecilType, m_Member)
+            End If
         End Get
     End Property
 
@@ -616,18 +772,30 @@ Public Class MemberCandidate
     End Property
 
     Private Function IsNarrowingInternal(ByVal ExceptObject As Boolean) As Boolean
-        For j As Integer = 0 To InputParameters.Length - 1
+        For j As Integer = 0 To InputParameters.Count - 1
             Dim arg As Argument
-            Dim param As ParameterInfo
+            Dim param As Mono.Cecil.ParameterDefinition
+            Dim IsConvertible As Boolean
+            Dim elementType As Mono.Cecil.TypeReference
+            Dim initializer As Expression
 
             param = InputParameters(j)
             arg = ExactArguments(j)
 
             If ExceptObject AndAlso Helper.CompareType(arg.Expression.ExpressionType, Compiler.TypeCache.System_Object) Then Continue For
 
-            Dim IsConvertible As Boolean
-            'IsConvertible = Helper.IsConvertible(Compiler, arg, param)
-            IsConvertible = Compiler.TypeResolution.IsImplicitlyConvertible(arg, arg.Expression.ExpressionType, param.ParameterType)
+            If m_IsParamArray AndAlso j = InputParameters.Count - 1 AndAlso ParamArrayExpression IsNot Nothing Then
+                'To match the automatically created array for the paramarray parameter each argument has to be 
+                'implicitly convertible to the element type of the paramarray parameter type.
+                IsConvertible = True
+                elementType = CType(param.ParameterType, Mono.Cecil.ArrayType).ElementType
+                For k As Integer = 0 To ParamArrayExpression.ArrayElementInitalizer.Initializers.Count - 1
+                    initializer = ParamArrayExpression.ArrayElementInitalizer.Initializers(k).AsRegularInitializer
+                    IsConvertible = IsConvertible AndAlso Compiler.TypeResolution.IsImplicitlyConvertible(arg, initializer.ExpressionType, elementType)
+                Next
+            Else
+                IsConvertible = Compiler.TypeResolution.IsImplicitlyConvertible(arg, arg.Expression.ExpressionType, param.ParameterType)
+            End If
 
             If IsConvertible = False Then
                 Return True
@@ -649,22 +817,412 @@ Public Class MemberCandidate
         End Get
     End Property
 
-    ReadOnly Property InputParameters() As ParameterInfo()
+    ReadOnly Property InputParameters() As Mono.Collections.Generic.Collection(Of ParameterDefinition)
         Get
             Return DefinedParameters
         End Get
     End Property
 
-    ReadOnly Property ParamArrayParameter() As ParameterInfo
+    ReadOnly Property ParamArrayParameter() As Mono.Cecil.ParameterDefinition
         Get
             If m_IsParamArray = False Then Return Nothing
-            Return m_DefinedParameters(m_DefinedParameters.Length - 1)
+            Return m_DefinedParameters(m_DefinedParameters.Count - 1)
         End Get
     End Property
 
+    Private Sub CollectGenericParameters(ByVal Type As GenericInstanceType, ByVal Find As Mono.Collections.Generic.Collection(Of GenericParameter), ByRef collected As Generic.List(Of GenericParameter))
+        Dim elementType As GenericInstanceType
+
+        If Type Is Nothing Then Return
+
+        If Type.HasGenericArguments Then
+            For i As Integer = 0 To Find.Count - 1
+                If Type.GenericArguments.Contains(Find(i)) Then
+                    If collected Is Nothing Then collected = New Generic.List(Of GenericParameter)
+                    If collected.Contains(Find(i)) Then Continue For
+                    collected.Add(Find(i))
+                End If
+            Next
+        End If
+
+        elementType = TryCast(Type.GetElementType(), GenericInstanceType)
+        If elementType IsNot Nothing AndAlso elementType IsNot Type Then
+            CollectGenericParameters(elementType, Find, collected)
+        End If
+    End Sub
+
+    Function InferTypeArguments() As Boolean
+        Dim GenericParameters As Mono.Collections.Generic.Collection(Of GenericParameter)
+        Dim methodDef As MethodDefinition = TryCast(m_Member, MethodDefinition)
+        Dim methodRef As MethodReference
+
+        If methodDef Is Nothing Then
+            methodRef = TryCast(m_Member, MethodReference)
+            If methodRef IsNot Nothing Then
+                methodDef = CecilHelper.FindDefinition(methodRef)
+            End If
+        End If
+
+        If methodDef IsNot Nothing Then
+            If Not methodDef.HasGenericParameters Then Return True
+            GenericParameters = methodDef.GenericParameters
+        Else
+            Return True
+        End If
+
+        If DefinedParameters.Count <> Arguments.Count Then
+            If m_Parent.ShowErrors Then Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Parent.Location)
+            Return False
+        End If
+
+        '* Generate a dependency graph *
+        ' Given a set of arguments A1, A2, …, AN, a set of matching parameters P1, P2, …, PN and a set of method type parameters 
+        ' T1, T2, …, TN, the dependencies between the arguments and method type parameters are first collected as follows:
+
+        Dim A_deps() As Generic.List(Of GenericParameter) = Nothing
+        Dim A_dep As Generic.List(Of GenericParameter)
+
+        For i As Integer = 0 To Arguments.Count - 1
+            Dim An As Argument = Arguments(i)
+            Dim Pn As ParameterDefinition = m_DefinedParameters(i)
+            Dim git As GenericInstanceType
+            Dim gp As GenericParameter
+
+            '•	If AN is the Nothing literal, no dependencies are generated.
+            If TypeOf An.Expression Is NothingConstantExpression Then Continue For
+
+            git = TryCast(Pn.ParameterType, GenericInstanceType)
+            gp = TryCast(Pn.ParameterType, GenericParameter)
+
+            '•	If AN is a lambda method and the type of PN is a constructed delegate type 
+            '   or System.Linq.Expressions.Expression(Of T), where T is a constructed delegate type,
+            '   •	If the type of a lambda method parameter will be inferred from the type of the corresponding parameter PN, and the type of the parameter depends on a method type parameter TN, then AN has a dependency on TN.
+            '   •	If the type of a lambda method parameter is specified and the type of the corresponding parameter PN depends on a method type parameter TN, then TN has a dependency on AN.
+            '   •	If the return type of PN depends on a method type parameter TN, then TN has a dependency on AN.
+            '* Lambda methods haven't been implemented yet *
+
+            '•	If AN is a method pointer and the type of PN is a constructed delegate type,
+            '   •	If the return type of PN depends on a method type parameter TN, then TN has a dependency on AN.
+            If An.Expression.Classification.IsMethodPointerClassification AndAlso Helper.IsDelegate(Compiler, Pn.ParameterType) AndAlso git IsNot Nothing Then
+                Dim invokeMethod As MethodReference = Helper.GetInvokeMethod(Compiler, Pn.ParameterType)
+                A_dep = Nothing
+                CollectGenericParameters(TryCast(invokeMethod.ReturnType, GenericInstanceType), GenericParameters, A_dep)
+                If A_dep IsNot Nothing Then
+                    If A_deps Is Nothing Then ReDim A_deps(Arguments.Count - 1)
+                    A_deps(i) = A_dep
+                End If
+                Continue For
+            End If
+
+            '•	If PN is a constructed type and the type of PN depends on a method type parameter TN, then TN has a dependency on AN.
+            If git IsNot Nothing Then
+                A_dep = Nothing
+                CollectGenericParameters(git, GenericParameters, A_dep)
+                If A_dep IsNot Nothing Then
+                    If A_deps Is Nothing Then ReDim A_deps(Arguments.Count - 1)
+                    A_deps(i) = A_dep
+                End If
+                Continue For
+            ElseIf gp IsNot Nothing AndAlso GenericParameters.Contains(gp) Then
+                If A_deps Is Nothing Then ReDim A_deps(Arguments.Count - 1)
+                A_dep = New Generic.List(Of GenericParameter)
+                A_dep.Add(gp)
+                A_deps(i) = A_dep
+                Continue For
+            End If
+
+            '•	Otherwise, no dependency is generated.
+        Next
+
+        ' After collecting dependencies, any arguments that have no dependencies are eliminated.
+        '* eliminated arguments are represented by null entries in the A_deps array
+
+        ' If any method type parameters have no outgoing dependencies (i.e. the method type parameter does not depend on an argument), then type inference fails. 
+        If A_deps Is Nothing Then
+            If m_Parent.ShowErrors Then Compiler.Report.ShowMessage(Messages.VBNC32050, Me.Parent.Location, GenericParameters(0).Name, Helper.ToString(Compiler, m_Member))
+            Return False '* No dependencies at all
+        End If
+        For i As Integer = 0 To GenericParameters.Count - 1
+            Dim found As Boolean = False
+            For a As Integer = 0 To A_deps.Length - 1
+                If A_deps(a) Is Nothing Then Continue For
+                If A_deps(a).Contains(GenericParameters(i)) Then
+                    found = True
+                    Exit For
+                End If
+            Next
+            If Not found Then
+                If m_Parent.ShowErrors Then Compiler.Report.ShowMessage(Messages.VBNC32050, Me.Parent.Location, GenericParameters(i).Name, Helper.ToString(Compiler, m_Member))
+                Return False '* GenericParameter(i) does not have a dependency
+            End If
+        Next
+
+        Dim hints As TypeHints()
+        ReDim hints(GenericParameters.Count - 1)
+
+        ' Otherwise, the remaining arguments and method type parameters are grouped into strongly connected components.
+        ' A strongly connected component is a set of arguments and method type parameters,
+        ' where any element in the component is reachable via dependencies on other elements.
+        ' The strongly connected components are then topologically sorted and processed in topological order:
+        '* Since we don't have lambda methods yet, we only have a tree of dependencies (method type parameters on arguments)
+        '* We'll always have one element in each the stronly connected component, so just look over each argument and each method type parameter
+
+        '•	If the strongly typed component contains only one element,
+        '   •	If the element has already been marked complete, skip it.
+        '   •	If the element is an argument, then add type hints from the argument to the method type parameters 
+        '       that depend on it and mark the element as complete. If the argument is a lambda method with parameters 
+        '       that still need inferred types, then infer Object for the types of those parameters.
+        For i As Integer = 0 To A_deps.Length - 1
+            Dim Ta As TypeReference
+            Dim Tp As TypeReference
+            If A_deps(i) Is Nothing Then Continue For
+
+            Ta = Arguments(i).Expression.ExpressionType
+            Tp = DefinedParameters(i).ParameterType
+            For a As Integer = 0 To A_deps(i).Count - 1
+                Dim Tg As GenericParameter = A_deps(i)(a)
+                Dim aI As Integer = GenericParameters.IndexOf(Tg)
+                Dim hint As TypeHints = hints(aI)
+
+                If hints(aI) Is Nothing Then
+                    hint = New TypeHints(Me)
+                    hints(aI) = hint
+                End If
+
+                If hint.GenerateHint(GenericParameters, Ta, DefinedParameters(i)) = False Then
+                    If m_Parent.ShowErrors Then Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Parent.Location)
+                    Return False
+                End If
+
+            Next
+            '       If the argument is a lambda method with parameters 
+            '       that still need inferred types, then infer Object for the types of those parameters.
+            '* no lambda method support yet *
+        Next
+
+        '   •	If the element is a method type parameter, then infer the method type parameter to be the dominant
+        '       type among the argument type hints and mark the element as complete. If a type hint has an array element 
+        '       restriction on it, then only conversions that are valid between arrays of the given type are considered 
+        '       (i.e. covariant and intrinsic array conversions). If a type hint has a generic argument restriction on it, 
+        '       then only identity conversions are considered. If no dominant type can be chosen, inference fails. 
+        '       If any lambda method argument types depend on this method type parameter, the type is propagated to the lambda method.
+        Dim m_InferredTypeArguments As New Mono.Collections.Generic.Collection(Of TypeReference)(GenericParameters.Count)
+        For i As Integer = 0 To GenericParameters.Count - 1
+            Dim hint As TypeHints = hints(i)
+            Dim types As Generic.List(Of TypeReference)
+            Dim dominantType As TypeReference
+            Dim generic_argument_restriction As Boolean
+            Dim array_element_restriction As Boolean
+            types = New Generic.List(Of TypeReference)(hint.Hints.Count)
+
+            For h As Integer = 0 To hint.Hints.Count - 1
+                Dim hi As TypeHint = hint.Hints(h)
+                If hi.GenericArgumentRestriction Then
+                    generic_argument_restriction = True
+                ElseIf hi.ArrayElementRestriction Then
+                    array_element_restriction = True
+                End If
+
+                Dim found As Boolean
+                For t As Integer = 0 To types.Count - 1
+                    If Helper.CompareType(types(t), hi.Hint) Then
+                        found = True
+                        Exit For
+                    End If
+                Next
+                If Not found Then types.Add(hi.Hint)
+            Next
+
+            If types.Count = 0 Then
+                If m_Parent.ShowErrors Then Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Parent.Location)
+                Return False
+            End If
+
+            If generic_argument_restriction Then
+                'all types must be identical
+                dominantType = types(0)
+                For t As Integer = 1 To types.Count - 1
+                    If Helper.CompareType(types(t), dominantType) = False Then
+                        If m_Parent.ShowErrors Then Compiler.Report.ShowMessage(Messages.VBNC36657, Me.Parent.Location, Helper.ToString(Compiler, m_Member))
+                        Return False
+                    End If
+                Next
+            ElseIf array_element_restriction Then
+                Return Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Parent.Location, "Type argument inference with array element restriction")
+            Else
+                dominantType = Helper.GetDominantType(Compiler, types)
+            End If
+
+            If dominantType Is Nothing Then
+                If m_Parent.ShowErrors Then Compiler.Report.ShowMessage(Messages.VBNC36651, Me.Parent.Location, Helper.ToString(Compiler, m_Member))
+                Return False
+            End If
+            m_InferredTypeArguments.Add(dominantType)
+        Next
+
+        '•	If the strongly typed component contains more than one element, then the component contains a cycle.
+        '   •	For each method type parameter that is an element in the component, if the method type parameter depends
+        '       on an argument that is not marked complete, convert that dependency into an assertion that will be 
+        '       checked at the end of the inference process.
+        '   •	Restart the inference process at the point at which the strongly typed components were determined.
+        '* This can't happen until lambda methods have been implemented, since only lambda methods can have a dependency 
+        '* from method type parameters to arguments, so until then this is just a tree of arguments to method type parameters, 
+        '* not a cyclic graph *
+
+        'If type inference succeeds for all of the method type parameters, then any dependencies that were changed 
+        'into assertions are checked. An assertion succeeds if the type of the argument is implicitly convertible 
+        'to the inferred type of the method type parameter. If an assertion fails, then type argument inference fails.
+        '* no assertions are added until lambda support has been implemented, so nothing to do here for now *
+
+        '* type inference succeeded, inflate our method *
+        Dim inflated_method As MethodReference = CecilHelper.GetCorrectMember(methodDef, m_InferredTypeArguments)
+        Dim gim As New GenericInstanceMethod(inflated_method)
+        gim.GenericArguments.AddRange(m_InferredTypeArguments)
+        m_Member = gim
+        m_DefinedParameters = Nothing
+        m_DefinedParametersTypes = Nothing
+        m_TypesInInvokedOrder = Nothing
+
+        If DefineApplicability() = False Then
+            Return Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Parent.Location, "Applicability changed after inferring type arguments")
+        End If
+
+        'The success of type inference does not, in and of itself, guarantee that the method is applicable.
+        Return True
+    End Function
+
+    Class TypeHint
+        Public Hint As TypeReference
+        Public ArrayElementRestriction As Boolean
+        Public GenericArgumentRestriction As Boolean
+    End Class
+
+    Class TypeHints
+        Private m_Candidate As MemberCandidate
+        Private m_Hints As New Generic.List(Of TypeHint)
+
+        ReadOnly Property Hints As Generic.List(Of TypeHint)
+            Get
+                Return m_Hints
+            End Get
+        End Property
+
+        Public Sub New(ByVal Candidate As MemberCandidate)
+            m_Candidate = Candidate
+        End Sub
+
+        Private Function InvolvesMethodTypeParameters(ByVal GenericParameters As Mono.Collections.Generic.Collection(Of GenericParameter), ByVal type As TypeReference) As Boolean
+            Dim elementType As GenericInstanceType
+            Dim genericParam As GenericParameter
+            Dim git As GenericInstanceType
+
+            If type Is Nothing Then Return False
+
+            genericParam = TryCast(type, GenericParameter)
+            If genericParam IsNot Nothing AndAlso GenericParameters.Contains(genericParam) Then Return True
+
+            git = TryCast(type, GenericInstanceType)
+            If git Is Nothing Then Return False
+
+            For i As Integer = 0 To GenericParameters.Count - 1
+                If git.GenericArguments.Contains(GenericParameters(i)) Then Return True
+            Next
+
+            elementType = TryCast(type.GetElementType(), GenericInstanceType)
+            If elementType IsNot type Then Return InvolvesMethodTypeParameters(GenericParameters, elementType)
+
+            Return False
+        End Function
+
+        Public Function GenerateHint(ByVal GenericParameters As Mono.Collections.Generic.Collection(Of GenericParameter), ByVal argument_type As TypeReference, ByVal parameter As ParameterDefinition) As Boolean
+            Return GenerateHint(GenericParameters, argument_type, parameter.ParameterType, parameter, False, False)
+        End Function
+
+        Private Function GenerateHint(ByVal GenericParameters As Mono.Collections.Generic.Collection(Of GenericParameter), ByVal argument_type As TypeReference, ByVal parameter_type As TypeReference, ByVal parameter As ParameterDefinition, ByVal array_element_restriction As Boolean, ByVal generic_argument_restriction As Boolean) As Boolean
+
+            'Given an argument type TA for an argument A and a parameter type TP for a parameter P, type hints are generated as follows:
+            '•	If TP does not involve any method type parameters then no hints are generated.
+            If InvolvesMethodTypeParameters(GenericParameters, parameter_type) = False Then Return True
+
+            '•	If TP and TA are array types of the same rank, then replace TA and TP with the element types of 
+            '   TA and TP and restart this process with an array element restriction.
+            Dim arrayA As ArrayType = TryCast(argument_type, ArrayType)
+            Dim arrayP As ArrayType = TryCast(parameter_type, ArrayType)
+            If arrayA IsNot Nothing AndAlso arrayP IsNot Nothing Then
+                If arrayA.Rank = arrayP.Rank Then
+                    Return GenerateHint(GenericParameters, arrayA.ElementType, arrayP.ElementType, parameter, True, generic_argument_restriction)
+                End If
+            End If
+
+            '•	If TP is a method type parameter, then TA is added as a type hint with the current restriction, if any.
+            Dim gp As GenericParameter = TryCast(parameter_type, GenericParameter)
+            If gp IsNot Nothing AndAlso GenericParameters.Contains(gp) Then
+                Dim hint As TypeHint = New TypeHint()
+                hint.ArrayElementRestriction = array_element_restriction
+                hint.GenericArgumentRestriction = generic_argument_restriction
+                hint.Hint = argument_type
+                m_Hints.Add(hint)
+                Return True
+            End If
+
+            '•	If A is a lambda method and TP is a constructed delegate type or System.Linq.Expressions.Expression(Of T), 
+            '   where T is a constructed delegate type, for each lambda method parameter type TL and corresponding 
+            '   delegate parameter type TD, replace TA with TL and TP with TD and restart the process with no restriction. 
+            '   Then replace TA with the return type of the lambda method and TP with the return type of the delegate type 
+            '   and restart the process with no restriction.
+            '* no lambda support yet *
+
+            '•	If A is a method pointer and TP is a constructed delegate type, use the parameter types of TP to determine 
+            '   which method pointed is most applicable to TP. If there is a method that is most applicable, replace TA with 
+            '   the return type of the method and TP with the return type of the delegate type and restart the process with 
+            '   no restriction.
+            '* TODO *
+
+            '•	Otherwise, TP must be a constructed type. Given TG, the generic type of TP,
+            '   •	If TA is TG, inherits from TG, or implements the type TG exactly once, then for each matching 
+            '       type argument TAX from TA and TPX from TP, replace TA with TAX and TP with TPX and restart 
+            '       the process with a generic argument restriction.
+            Dim tp_git As GenericInstanceType = TryCast(parameter_type, GenericInstanceType)
+            Dim ta_git As GenericInstanceType = TryCast(argument_type, GenericInstanceType)
+            If tp_git IsNot Nothing AndAlso ta_git IsNot Nothing Then
+                Dim restart As Boolean
+                Dim implement_count As Integer
+                Dim tp_td As TypeDefinition = CecilHelper.FindDefinition(tp_git)
+                Dim ta_td As TypeDefinition = CecilHelper.FindDefinition(ta_git)
+                Dim base As TypeReference = ta_td
+                Dim base_td As TypeDefinition
+                While base IsNot Nothing AndAlso restart = False
+                    If base Is tp_td Then restart = True
+                    base_td = CecilHelper.FindDefinition(base)
+                    If base_td.HasInterfaces Then
+                        For i As Integer = 0 To base_td.Interfaces.Count - 1
+                            If base_td.Interfaces(i) Is tp_git Then implement_count += 1
+                        Next
+                    End If
+
+                    base = base_td.BaseType
+                End While
+                If restart = False Then
+                    restart = implement_count = 1
+                End If
+                If restart Then
+                    For i As Integer = 0 To ta_git.GenericArguments.Count - 1
+                        If GenerateHint(GenericParameters, ta_git.GenericArguments(i), tp_git.GenericArguments(i), parameter, array_element_restriction, True) = False Then
+                            Return False
+                        End If
+                    Next
+                End If
+                Return True
+            End If
+
+            '•	Otherwise, type inference fails for the generic method.
+            Return False
+        End Function
+    End Class
+
     Sub ExpandParamArray()
-        If DefinedParameters.Length = 0 Then Return
-        If Helper.IsParamArrayParameter(Compiler, DefinedParameters(DefinedParameters.Length - 1)) = False Then Return
+        If DefinedParameters.Count = 0 Then Return
+        If Helper.IsParamArrayParameter(Compiler, DefinedParameters(DefinedParameters.Count - 1)) = False Then Return
 
         Dim candidate As New MemberCandidate(Resolver, m_Member)
         candidate.m_IsParamArray = True
@@ -672,21 +1230,21 @@ Public Class MemberCandidate
     End Sub
 
     Function DefineApplicability() As Boolean
-        Dim matchedParameters As Generic.List(Of ParameterInfo)
+        Dim matchedParameters As Generic.List(Of Mono.Cecil.ParameterReference)
         Dim exactArguments As Generic.List(Of Argument)
-        Dim method As MethodBase = TryCast(Member, MethodBase)
-        Dim prop As PropertyInfo = TryCast(Member, PropertyInfo)
+        Dim method As Mono.Cecil.MethodReference = TryCast(Member, Mono.Cecil.MethodReference)
+        Dim prop As Mono.Cecil.PropertyReference = TryCast(Member, Mono.Cecil.PropertyReference)
 
         Dim isLastParamArray As Boolean
         Dim paramArrayExpression As ArrayCreationExpression = Nothing
-        Dim inputParametersCount As Integer = InputParameters.Length
+        Dim inputParametersCount As Integer = InputParameters.Count
 
         isLastParamArray = m_IsParamArray
 
         '(if there are more arguments than parameters and the last parameter is not a 
         'paramarray parameter the method should not be applicable)
-        If Arguments.Count > InputParameters.Length Then
-            If InputParameters.Length < 1 Then
+        If Arguments.Count > InputParameters.Count Then
+            If InputParameters.Count < 1 Then
                 'LogResolutionMessage(Parent.Compiler, "N/A: 1")
                 Return False
             End If
@@ -696,7 +1254,7 @@ Public Class MemberCandidate
             End If
         End If
 
-        matchedParameters = New Generic.List(Of ParameterInfo)
+        matchedParameters = New Generic.List(Of Mono.Cecil.ParameterReference)
         exactArguments = New Generic.List(Of Argument)(Helper.CreateArray(Of Argument)(Nothing, inputParametersCount))
 
         ReDim m_TypesInInvokedOrder(Math.Max(Arguments.Count - 1, inputParametersCount - 1))
@@ -708,7 +1266,7 @@ Public Class MemberCandidate
             paramArrayExpression = New ArrayCreationExpression(paramArrayArg)
             paramArrayExpression.Init(ParamArrayParameter.ParameterType, New Expression() {})
 
-            paramArrayArg.Init(ParamArrayParameter.Position, paramArrayExpression)
+            paramArrayArg.Init(ParamArrayParameter.Sequence, paramArrayExpression)
             exactArguments(inputParametersCount - 1) = paramArrayArg
 
             m_TypesInInvokedOrder(inputParametersCount - 1) = ParamArrayParameter.ParameterType
@@ -744,7 +1302,7 @@ Public Class MemberCandidate
                     paramArrayExpression.ArrayElementInitalizer.AddInitializer(Arguments(j).Expression)
 
                     Helper.Assert(m_TypesInInvokedOrder(j) Is Nothing)
-                    m_TypesInInvokedOrder(j) = ParamArrayParameter.ParameterType.GetElementType
+                    m_TypesInInvokedOrder(j) = CecilHelper.GetElementType(ParamArrayParameter.ParameterType)
                 Next
                 Exit For
             Else
@@ -762,7 +1320,7 @@ Public Class MemberCandidate
                         Dim exp As Expression
                         Dim pArg As New PositionalArgument(Parent)
                         exp = Helper.GetOptionalValueExpression(pArg, InputParameters(i))
-                        pArg.Init(InputParameters(i).Position, exp)
+                        pArg.Init(InputParameters(i).Sequence, exp)
                         arg = pArg
                     End If
                 Else
@@ -774,7 +1332,7 @@ Public Class MemberCandidate
                     Helper.Assert(paramArrayExpression.ArrayElementInitalizer.Initializers.Count = 0)
                     paramArrayExpression.ArrayElementInitalizer.AddInitializer(arg.Expression)
                     'Helper.Assert(m_TypesInInvokedOrder(i) Is Nothing)
-                    m_TypesInInvokedOrder(i) = ParamArrayParameter.ParameterType.GetElementType
+                    m_TypesInInvokedOrder(i) = CecilHelper.GetElementType(ParamArrayParameter.ParameterType)
                 Else
                     If isLastParamArray Then exactArguments(i) = arg
                 End If
@@ -796,7 +1354,7 @@ Public Class MemberCandidate
             Dim matched As Boolean = False
             For j As Integer = 0 To inputParametersCount - 1
                 'Next, match each named argument to a parameter with the given name. 
-                Dim inputParam As ParameterInfo = InputParameters(j)
+                Dim inputParam As Mono.Cecil.ParameterReference = InputParameters(j)
                 If Helper.CompareName(inputParam.Name, namedArgument.Name) Then
                     If matchedParameters.Contains(inputParam) Then
                         'If one of the named arguments (...) matches an argument already matched with 
@@ -848,7 +1406,7 @@ Public Class MemberCandidate
                 Dim exp As Expression
                 Dim arg As New PositionalArgument(Parent)
                 exp = Helper.GetOptionalValueExpression(arg, InputParameters(i))
-                arg.Init(InputParameters(i).Position, exp)
+                arg.Init(InputParameters(i).Sequence, exp)
                 If isLastParamArray = False Then
                     Helper.Assert(m_TypesInInvokedOrder(i) Is Nothing)
                     m_TypesInInvokedOrder(i) = InputParameters(i).ParameterType
@@ -869,10 +1427,10 @@ Public Class MemberCandidate
         'Otherwise, the type arguments are filled in the place of the 
         'type parameters in the signature.
         Dim genericTypeArgumentCount As Integer
-        Dim genericTypeArguments As Type()
-        If method IsNot Nothing AndAlso method.IsGenericMethod Then
-            genericTypeArguments = method.GetGenericArguments()
-            genericTypeArgumentCount = genericTypeArguments.Length
+        Dim genericTypeArguments As Mono.Collections.Generic.Collection(Of TypeReference)
+        If method IsNot Nothing AndAlso CecilHelper.IsGenericMethod(method) Then
+            genericTypeArguments = CecilHelper.GetGenericArguments(method)
+            genericTypeArgumentCount = genericTypeArguments.Count
         ElseIf prop IsNot Nothing Then
             'property cannot be generic.
         End If
@@ -888,7 +1446,7 @@ Public Class MemberCandidate
                 Return False
             End If
 
-            Return m_Parent.Compiler.Report.ShowMessage(Messages.VBNC99997, m_Parent.Parent.Location)
+            'Return m_Parent.Compiler.Report.ShowMessage(Messages.VBNC99997, m_Parent.Parent.Location)
             'Helper.NotImplemented("Type argument matching")
         End If
 
@@ -897,7 +1455,7 @@ Public Class MemberCandidate
         Helper.AssertNotNothing(m_TypesInInvokedOrder)
 
         If ResolveUnresolvedExpressions() = False Then
-            Helper.ErrorRecoveryNotImplemented()
+            Return False
         End If
 
         Return True 'Method is applicable!!
@@ -908,12 +1466,13 @@ Public Class MemberCandidate
 
         For i As Integer = 0 To m_ExactArguments.Count - 1
             Dim exp As Expression
-            Dim expType As Type
+            Dim expType As Mono.Cecil.TypeReference
 
             exp = m_ExactArguments(0).Expression
             expType = exp.ExpressionType
 
             If Helper.CompareType(expType, Compiler.TypeCache.DelegateUnresolvedType) = False Then Continue For
+            If Helper.IsDelegate(Compiler, DefinedParameters(i).ParameterType) = False Then Return False
 
             Dim aoe As AddressOfExpression
             aoe = TryCast(exp, AddressOfExpression)
@@ -933,9 +1492,9 @@ Public Class MemberCandidate
         If IsParamArrayCandidate Then
             Dim ace As ArrayCreationExpression
             ace = ParamArrayExpression ' TryCast(OutputArguments.Item(OutputArguments.Count - 1).Expression, ArrayCreationExpression)
-            If ace IsNot Nothing AndAlso ace.IsResolved = False AndAlso Helper.IsParamArrayParameter(Compiler, InputParameters(InputParameters.Length - 1)) Then
+            If ace IsNot Nothing AndAlso ace.IsResolved = False AndAlso Helper.IsParamArrayParameter(Compiler, InputParameters(InputParameters.Count - 1)) Then
                 If ace.ResolveExpression(ResolveInfo.Default(Compiler)) = False Then
-                    Helper.ErrorRecoveryNotImplemented()
+                    Helper.ErrorRecoveryNotImplemented(Parent.Location)
                 End If
             End If
         End If

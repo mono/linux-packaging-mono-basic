@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ Public Class LabelDeclarationStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        Info.ILGen.MarkLabel(LabelBuilder)
+        Emitter.MarkLabel(Info, GetLabel(Info))
 
         Return result
     End Function
@@ -62,29 +62,16 @@ Public Class LabelDeclarationStatement
         Return result
     End Function
 
-    ReadOnly Property LabelBuilder() As Label
-        Get
-            If m_LabelBuilder.HasValue = False Then
-                m_LabelBuilder = Me.FindFirstParent(Of IMethod).ILGenerator.DefineLabel
-            End If
-            Return m_LabelBuilder.Value
-        End Get
-    End Property
+    Function GetLabel(ByVal Info As EmitInfo) As Label
+        If m_LabelBuilder.HasValue = False Then
+            m_LabelBuilder = Emitter.DefineLabel(Info)
+        End If
+        Return m_LabelBuilder.Value
+    End Function
 
     ReadOnly Property Label() As Token
         Get
             Return m_Label
         End Get
     End Property
-
-
-    '#If DEBUG Then
-    '    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-    '        Dim tmp As Integer = Dumper.IndentLevel
-    '        Dumper.IndentLevel = 0
-    '        m_Label.Dump(Dumper)
-    '        Dumper.WriteLine(":")
-    '        dumper.IndentLevel = tmp
-    '    End Sub
-    '#End If
 End Class

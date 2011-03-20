@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -37,10 +37,10 @@ Public Class FunctionDeclaration
         MyBase.New(Parent)
     End Sub
 
-    Sub New(ByVal Parent As TypeDeclaration, ByVal Name As String, ByVal MethodAttributes As MethodAttributes, ByVal ParameterTypes As Type(), ByVal ReturnType As Type, ByVal Location As Span)
+    Sub New(ByVal Parent As TypeDeclaration, ByVal Name As String, ByVal MethodAttributes As Mono.Cecil.MethodAttributes, ByVal ParameterTypes As Mono.Cecil.TypeReference(), ByVal ReturnType As Mono.Cecil.TypeReference, ByVal Location As Span)
         MyBase.New(Parent)
-        MyBase.Init(Nothing, New Modifiers(), New FunctionSignature(Me, Name, New ParameterList(Me, ParameterTypes), ReturnType, Location), CType(Nothing, MemberImplementsClause), Nothing)
-        MyBase.Attributes = MethodAttributes
+        MyBase.Init(New Modifiers(), New FunctionSignature(Me, Name, New ParameterList(Me, ParameterTypes), ReturnType, Location), CType(Nothing, MemberImplementsClause), Nothing)
+        MyBase.MethodAttributes = MethodAttributes
     End Sub
 
     Shared Shadows Function IsMe(ByVal tm As tm) As Boolean
@@ -56,4 +56,13 @@ Public Class FunctionDeclaration
             Return DirectCast(MyBase.Signature, FunctionSignature)
         End Get
     End Property
+
+    Public Overrides Function ResolveMember(ByVal Info As ResolveInfo) As Boolean
+        Dim result As Boolean = True
+
+        result = Signature.VerifyParameterNamesDoesntMatchFunctionName() AndAlso result
+        result = MyBase.ResolveMember(Info) AndAlso result
+
+        Return result
+    End Function
 End Class

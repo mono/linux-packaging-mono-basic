@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -30,9 +30,9 @@ Public Class CatchStatement
     Private m_TypeName As NonArrayTypeName
     Private m_When As Expression
 
-    Private m_ExceptionType As Type
+    Private m_ExceptionType As Mono.Cecil.TypeReference
 
-    Private m_VariableDeclaration As VariableDeclaration
+    Private m_VariableDeclaration As LocalVariableDeclaration
 
     ReadOnly Property Variable() As Identifier
         Get
@@ -84,14 +84,10 @@ Public Class CatchStatement
             Emitter.EmitBranch(Info, EndWhen)
 
             'Do the when clause.
-            Info.Stack.Push(Compiler.TypeCache.System_Exception)
             Emitter.MarkLabel(Info, DoWhenComparison)
             Emitter.EmitPop(Info, Compiler.TypeCache.System_Exception)
-            'result = m_When.GenerateCode(Info.Clone(True, False, Compiler.TypeCache.Boolean)) AndAlso result
-            result = CBoolExpression.GenerateCode(m_When, Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean)) AndAlso result
-            'Emitter.EmitConversion(Compiler.TypeCache.Boolean, Info)
+            result = m_When.GenerateCode(Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean)) AndAlso result
             Emitter.MarkLabel(Info, EndWhen)
-            Info.Stack.Pop(Compiler.TypeCache.System_Boolean)
             Emitter.EmitBeginCatch(Info, Nothing)
         Else
             Helper.Assert(m_ExceptionType IsNot Nothing)
@@ -145,12 +141,20 @@ Public Class CatchStatement
             m_ExceptionType = Compiler.TypeCache.System_Exception
         End If
         If m_Variable IsNot Nothing Then 'Token.IsSomething(m_Variable) Then
-            m_VariableDeclaration = New VariableDeclaration(Me, Nothing, m_Variable, False, m_TypeName, Nothing, Nothing)
+            m_VariableDeclaration = New LocalVariableDeclaration(Me, m_Variable, False, m_TypeName, Nothing, Nothing)
             result = m_VariableDeclaration.ResolveTypeReferences AndAlso result
             CodeBlock.Variables.Add(m_VariableDeclaration)
         End If
         If m_When IsNot Nothing Then result = m_When.ResolveExpression(Info) AndAlso result
         result = CodeBlock.ResolveCode(Info) AndAlso result
+
+        If m_When IsNot Nothing Then
+            m_When = Helper.CreateTypeConversion(Me, m_When, Compiler.TypeCache.System_Boolean, result)
+            If result = False Then
+                Helper.AddError(Me)
+                Return result
+            End If
+        End If
 
         Return result
     End Function

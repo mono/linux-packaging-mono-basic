@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ Public Class TypeName
     ''' <remarks></remarks>
     Private m_TypeName As ParsedObject
 
-    Private m_ResolvedType As Type
+    Private m_ResolvedType As Mono.Cecil.TypeReference
 
     Sub New(ByVal Parent As ParsedObject, Optional ByVal NonArrayTypeName As NonArrayTypeName = Nothing, Optional ByVal ArrayTypeName As ArrayTypeName = Nothing)
         MyBase.New(Parent)
@@ -44,7 +44,7 @@ Public Class TypeName
         End If
     End Sub
 
-    Sub New(ByVal Parent As ParsedObject, ByVal Type As Type)
+    Sub New(ByVal Parent As ParsedObject, ByVal Type As Mono.Cecil.TypeReference)
         MyBase.New(Parent)
         m_ResolvedType = Type
     End Sub
@@ -57,7 +57,7 @@ Public Class TypeName
         m_TypeName = ArrayTypeName
     End Sub
 
-    Sub Init(ByVal Type As Type)
+    Sub Init(ByVal Type As Mono.Cecil.TypeReference)
         m_ResolvedType = Type
     End Sub
 
@@ -73,6 +73,14 @@ Public Class TypeName
         End If
         Return result
     End Function
+
+    ReadOnly Property AsString() As String
+        Get
+            If TypeOf m_TypeName Is NonArrayTypeName Then Return AsNonArrayTypeName.Name
+            If TypeOf m_TypeName Is ArrayTypeName Then Return AsArrayTypeName.Name
+            Return DirectCast(m_TypeName, INameable).Name
+        End Get
+    End Property
 
     ReadOnly Property IsNonArrayTypeName() As Boolean
         Get
@@ -117,17 +125,6 @@ Public Class TypeName
         End Get
     End Property
 
-    ''' <summary>
-    ''' The name of this type.
-    ''' </summary>
-    ''' <value></value>
-    ''' <remarks></remarks>
-    ReadOnly Property Name() As String
-        Get
-            Return DirectCast(m_TypeName, INameable).Name
-        End Get
-    End Property
-
     ReadOnly Property TypeName() As ParsedObject
         Get
             Return m_TypeName
@@ -139,16 +136,28 @@ Public Class TypeName
     ''' </summary>
     ''' <value></value>
     ''' <remarks></remarks>
-    Public ReadOnly Property ResolvedType() As Type
+    Public ReadOnly Property ResolvedType() As Mono.Cecil.TypeReference
         Get
-            Helper.Assert(m_ResolvedType IsNot Nothing)
             Return m_ResolvedType
         End Get
     End Property
 
-    <Obsolete("No code to resolve here.")> Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
-        Helper.Assert(m_ResolvedType IsNot Nothing)
-        Return True
+    Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
+        Dim result As Boolean = True
+        Dim atn As ArrayTypeName
+        Dim natn As NonArrayTypeName
+
+        atn = TryCast(m_TypeName, ArrayTypeName)
+        If atn IsNot Nothing Then
+            result = atn.ResolveCode(Info) AndAlso result
+        Else
+            natn = TryCast(m_TypeName, NonArrayTypeName)
+            If natn IsNot Nothing Then
+                result = natn.ResolveCode(Info) AndAlso result
+            End If
+        End If
+
+        Return result
     End Function
 
     Public Overrides Function ResolveTypeReferences() As Boolean
@@ -170,14 +179,4 @@ Public Class TypeName
 
         Return result
     End Function
-
-    ''' <summary>
-    ''' Converts this type descriptor into a readable string representation (it's name, basically, with any ranks appended.)
-    ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Overrides Function ToString() As String
-        Return Name.ToString
-    End Function
-
 End Class

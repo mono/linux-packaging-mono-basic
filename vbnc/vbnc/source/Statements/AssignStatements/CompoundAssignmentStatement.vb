@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ Public MustInherit Class CompoundAssignmentStatement
 
         If InvocationExpression Is Nothing Then Return result
 
-        If InvocationExpression.Classification.IsVariableClassification AndAlso InvocationExpression.Expression.ExpressionType.IsArray Then
+        If InvocationExpression.Classification.IsVariableClassification AndAlso CecilHelper.IsArray(InvocationExpression.Expression.ExpressionType) Then
             result = ResolveIndexedStatement(Info, InvocationExpression) AndAlso result
         End If
 
@@ -48,11 +48,11 @@ Public MustInherit Class CompoundAssignmentStatement
             Dim arg As Argument = InvocationExpression.ArgumentList(i)
             Dim exp As Expression = arg.Expression
             Dim newExp As VariableExpression
-            Dim varDecl As VariableDeclaration
+            Dim varDecl As LocalVariableDeclaration
             Dim stmt As AssignmentStatement
 
-            varDecl = New VariableDeclaration(arg)
-            varDecl.Init(Nothing, Nothing, "VB$tmp", exp.ExpressionType)
+            varDecl = New LocalVariableDeclaration(arg)
+            varDecl.Init(Nothing, "VB$tmp", exp.ExpressionType)
             block.AddVariable(varDecl)
 
             newExp = New VariableExpression(arg, varDecl)
@@ -95,7 +95,7 @@ Public MustInherit Class CompoundAssignmentStatement
         'result = m_CompoundExpression.GenerateCode(Info.Clone(True, False, LSide.ExpressionType)) AndAlso result
 
         Dim lInfo As EmitInfo = Info.Clone(Me, m_CompoundExpression)
-        result = LSide.GenerateCode(lInfo) AndAlso result
+        result = LSide.Classification.GenerateCode(lInfo) AndAlso result
 
         Return result
     End Function

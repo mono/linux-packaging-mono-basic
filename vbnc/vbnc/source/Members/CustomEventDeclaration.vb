@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -34,8 +34,8 @@ Public Class CustomEventDeclaration
         MyBase.New(Parent)
     End Sub
 
-    Shadows Sub Init(ByVal Attributes As Attributes, ByVal Modifiers As Modifiers, ByVal Identifier As Identifier, ByVal TypeName As NonArrayTypeName, ByVal ImplementsClause As MemberImplementsClause)
-        MyBase.Init(Attributes, Modifiers, Identifier, ImplementsClause)
+    Shadows Sub Init(ByVal Modifiers As Modifiers, ByVal Identifier As Identifier, ByVal TypeName As NonArrayTypeName, ByVal ImplementsClause As MemberImplementsClause)
+        MyBase.Init(Modifiers, Identifier, ImplementsClause)
         m_Type = TypeName
     End Sub
 
@@ -57,7 +57,6 @@ Public Class CustomEventDeclaration
         Dim result As Boolean = True
 
         If m_Type IsNot Nothing Then
-            Helper.Assert(EventType Is Nothing)
             result = m_Type.ResolveTypeReferences AndAlso result
             EventType = m_Type.ResolvedType
         End If

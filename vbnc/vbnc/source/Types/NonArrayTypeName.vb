@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,8 @@ Public Class NonArrayTypeName
 
     Private m_TypeName As ParsedObject
 
-    Private m_ResolvedType As Type
+    Private m_ResolvedType As Mono.Cecil.TypeReference
+    Private m_IsNullable As Boolean
 
     Sub New(ByVal Parent As ParsedObject)
         MyBase.New(Parent)
@@ -47,9 +48,19 @@ Public Class NonArrayTypeName
         m_TypeName = TypeName
     End Sub
 
+    Property IsNullable As Boolean
+        Get
+            Return m_IsNullable
+        End Get
+        Set(ByVal value As Boolean)
+            m_IsNullable = value
+        End Set
+    End Property
+
     Function Clone(Optional ByVal NewParent As ParsedObject = Nothing) As NonArrayTypeName
         If NewParent Is Nothing Then NewParent = Me.Parent
         Dim result As New NonArrayTypeName(NewParent)
+        result.IsNullable = IsNullable
         If Me.IsConstructedTypeName Then
             result.Init(Me.AsConstructedTypeName.Clone)
         ElseIf Me.IsSimpleTypeName Then
@@ -60,13 +71,25 @@ Public Class NonArrayTypeName
         Return result
     End Function
 
+    ReadOnly Property AsString() As String
+        Get
+            Return ToString()
+        End Get
+    End Property
+
     ReadOnly Property IsResolved() As Boolean
         Get
             Return m_ResolvedType IsNot Nothing
         End Get
     End Property
 
-    ReadOnly Property ResolvedType() As Type 'Descriptor
+    ReadOnly Property ResolvedType() As Mono.Cecil.TypeReference 'Descriptor
+        Get
+            Return m_ResolvedType
+        End Get
+    End Property
+
+    ReadOnly Property ResolvedCecilType() As Mono.Cecil.TypeReference
         Get
             Return m_ResolvedType
         End Get
@@ -130,13 +153,40 @@ Public Class NonArrayTypeName
             Throw New InternalException(Me)
         End If
 
+        If m_IsNullable Then
+            If CecilHelper.IsValueType(m_ResolvedType) = False Then
+                Dim gp As GenericParameter = TryCast(m_ResolvedType, GenericParameter)
+                If gp Is Nothing OrElse gp.HasNotNullableValueTypeConstraint = False Then
+                    result = Compiler.Report.ShowMessage(Messages.VBNC33101, Me.Location, Helper.ToString(Me, m_ResolvedType))
+                End If
+            End If
+
+            Dim git As New GenericInstanceType(Compiler.TypeCache.System_Nullable1)
+            git.GenericArguments.Add(m_ResolvedType)
+            m_ResolvedType = git
+        End If
+
         Helper.Assert(m_ResolvedType IsNot Nothing OrElse result = False)
 
         Return result
     End Function
 
-    <Obsolete("No code to resolve here.")> Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
-        Return True
+    Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
+        Dim result As Boolean = True
+        Dim stn As SimpleTypeName
+        Dim ctn As ConstructedTypeName
+
+        stn = TryCast(m_TypeName, SimpleTypeName)
+        If stn IsNot Nothing Then
+            result = stn.ResolveCode(Info) AndAlso result
+        Else
+            ctn = TryCast(m_TypeName, ConstructedTypeName)
+            If ctn IsNot Nothing Then
+                result = ctn.ResolveCode(Info) AndAlso result
+            End If
+        End If
+
+        Return result
     End Function
 
     Overrides Function ToString() As String

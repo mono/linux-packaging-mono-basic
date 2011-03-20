@@ -1,6 +1,9 @@
 thisdir := .
 
-SUBDIRS := build man class tools vbnc vbruntime scripts
+SUBDIRS := build man class vbruntime
+net_4_0_SUBDIRS := tools vbnc scripts $(SUBDIRS)
+
+DIST_SUBDIRS := $(net_4_0_SUBDIRS)
 
 include build/rules.make
 
@@ -11,42 +14,6 @@ all-local $(STD_TARGETS:=-local):
 	@:
 
 DISTFILES = README configure mkinstalldirs install-sh LICENSE
-
-# fun specialty targets
-
-PROFILES = default net_2_0
-
-.PHONY: all-profiles $(STD_TARGETS:=-profiles)
-all-profiles $(STD_TARGETS:=-profiles): %-profiles: profiles-do--%
-	@:
-
-profiles-do--%:
-	$(MAKE) $(PROFILES:%=profile-do--%--$*)
-
-# The % below looks like profile-name--target-name
-profile-do--%:
-	$(MAKE) PROFILE=$(subst --, ,$*)
-
-# We don't want to run the tests in parallel.  We want behaviour like -k.
-profiles-do--run-test:
-	ret=:; $(foreach p,$(PROFILES), { $(MAKE) PROFILE=$(p) run-test || ret=false; }; ) $$ret
-
-# Orchestrate the bootstrap here.
-_boot_ = all clean install
-$(_boot_:%=profile-do--net_2_0--%):           profile-do--net_2_0--%:           profile-do--net_2_0_bootstrap--%
-$(_boot_:%=profile-do--net_2_0_bootstrap--%): profile-do--net_2_0_bootstrap--%: profile-do--default--%
-$(_boot_:%=profile-do--default--%):           profile-do--default--%:           profile-do--net_1_1_bootstrap--%
-$(_boot_:%=profile-do--net_1_1_bootstrap--%): profile-do--net_1_1_bootstrap--%: profile-do--basic--%
-
-testcorlib:
-	@cd class/corlib && $(MAKE) test run-test
-
-compiler-tests:
-	$(MAKE) TEST_SUBDIRS="tests errors" run-test-profiles
-
-test-installed-compiler:
-	$(MAKE) TEST_SUBDIRS="tests errors" PROFILE=default TEST_RUNTIME=mono MCS=mcs run-test
-	$(MAKE) TEST_SUBDIRS="tests errors" PROFILE=net_2_0 TEST_RUNTIME=mono MCS=gmcs run-test
 
 package := mono-basic-$(VERSION)
 
@@ -83,13 +50,9 @@ distcheck: dist-tarball
 	tar tjf $(package)/$(package).tar.bz2 |sed -e 's,/$$,,' |sort >distdist.list ; \
 	rm $(package)/$(package).tar.bz2 ; \
 	tar tjf $(package).tar.bz2 |sed -e 's,/$$,,' |sort >before.list ; \
-	find $(package) |egrep -v '(makefrag|response|config.make)' |sed -e 's,/$$,,' |sort >after.list ; \
+	find $(package) |egrep -v '(makefrag|config.make)' |sed -e 's,/$$,,' |sort >after.list ; \
 	cmp before.list after.list || exit 1 ; \
 	cmp before.list distdist.list || exit 1 ; \
 	rm -f before.list after.list distdist.list ; \
 	rm -rf $(package) InstallTest
-
-vbnc: vbnc.in Makefile
-	sed -e s,@prefix@,$(prefix),g < vbnc.in > $@.tmp
-	mv $@.tmp $@
 

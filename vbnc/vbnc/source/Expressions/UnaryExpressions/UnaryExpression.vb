@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ Public MustInherit Class UnaryExpression
     Inherits OperatorExpression
 
     Private m_Expression As Expression
-    Private m_ExpressionType As Type
+    Private m_ExpressionType As Mono.Cecil.TypeReference
 
     Public Overrides Function ResolveTypeReferences() As Boolean
         Return m_Expression.ResolveTypeReferences
@@ -86,12 +86,12 @@ Public MustInherit Class UnaryExpression
         operandType = Me.OperandTypeCode
 
         If operandType = TypeCode.Empty Then
-            Compiler.Report.ShowMessage(Messages.VBNC30487, Enums.GetKSStringAttribute(Me.Keyword).FriendlyValue, Expression.ExpressionType.Name)
+            Compiler.Report.ShowMessage(Messages.VBNC30487, Location, Enums.strSpecial(Me.Keyword), Helper.ToString(Expression, Expression.ExpressionType))
             result = False
         Else
             'If X is an intrinsic types, look up the result type in our operator tables and use that.
             'If X is not an intrinsic type, do overload resolution on the set of operators to be considered.
-            Dim destinationType As Type
+            Dim destinationType As Mono.Cecil.TypeReference
             Dim isRightIntrinsic As Boolean = Helper.GetTypeCode(Compiler, m_Expression.ExpressionType) <> TypeCode.Object OrElse Helper.CompareType(Compiler.TypeCache.System_Object, Me.m_Expression.ExpressionType)
 
             If isRightIntrinsic Then
@@ -105,13 +105,13 @@ Public MustInherit Class UnaryExpression
                 End If
                 Classification = New ValueClassification(Me)
             Else
-                Dim methods As New Generic.List(Of MethodInfo)
+                Dim methods As New Generic.List(Of Mono.Cecil.MethodReference)
                 Dim methodClassification As MethodGroupClassification
 
                 methods = Helper.GetUnaryOperators(Compiler, CType(Me.Keyword, UnaryOperators), Me.m_Expression.ExpressionType)
 
-                methodClassification = New MethodGroupClassification(Me, Nothing, New Expression() {Me.m_Expression}, methods.ToArray)
-                result = methodClassification.ResolveGroup(New ArgumentList(Me, New Expression() {Me.m_Expression}), Nothing) AndAlso result
+                methodClassification = New MethodGroupClassification(Me, Nothing, Nothing, New Expression() {Me.m_Expression}, methods.ToArray)
+                result = methodClassification.ResolveGroup(New ArgumentList(Me, New Expression() {Me.m_Expression})) AndAlso result
                 result = methodClassification.SuccessfullyResolved AndAlso result
                 m_ExpressionType = methodClassification.ResolvedMethodInfo.ReturnType
                 Classification = methodClassification
@@ -127,7 +127,7 @@ Public MustInherit Class UnaryExpression
         End Get
     End Property
 
-    ReadOnly Property OperandType() As Type
+    ReadOnly Property OperandType() As Mono.Cecil.TypeReference
         Get
             Return Compiler.TypeResolution.TypeCodeToType(OperandTypeCode)
         End Get
@@ -139,7 +139,7 @@ Public MustInherit Class UnaryExpression
         End Get
     End Property
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Return m_ExpressionType
         End Get

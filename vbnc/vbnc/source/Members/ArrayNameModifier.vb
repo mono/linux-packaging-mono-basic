@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -61,7 +61,7 @@ Public Class ArrayNameModifier
         Return result
     End Function
 
-    Function CreateArrayType(ByVal OriginalType As Type) As Type
+    Function CreateArrayType(ByVal OriginalType As Mono.Cecil.TypeReference) As Mono.Cecil.TypeReference
         If Me.IsArraySizeInitializationModifier Then
             Return Me.AsArraySizeInitializationModifier.CreateArrayType(OriginalType)
         ElseIf Me.IsArrayTypeModifiers Then

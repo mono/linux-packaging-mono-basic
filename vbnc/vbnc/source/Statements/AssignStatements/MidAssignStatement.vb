@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -61,10 +61,10 @@ Public Class MidAssignStatement
         Helper.Assert(m_Length Is Nothing OrElse m_Length.Classification.CanBeValueClassification)
         Helper.Assert(m_Source.Classification.CanBeValueClassification)
 
-        Dim tmpLocal As LocalBuilder = Nothing
+        Dim tmpLocal As Mono.Cecil.Cil.VariableDefinition = Nothing
         If m_Target.Classification.IsPropertyAccessClassification Then
             tmpLocal = Emitter.DeclareLocal(Info, Compiler.TypeCache.System_String, "MidTmp" & ObjectID.ToString)
-            result = m_Target.GenerateCode(Info.Clone(Me, True, False, tmpLocal.LocalType)) AndAlso result
+            result = m_Target.GenerateCode(Info.Clone(Me, True, False, tmpLocal.VariableType)) AndAlso result
             Emitter.EmitStoreVariable(Info, tmpLocal)
             Emitter.EmitLoadVariableLocation(Info, tmpLocal)
         Else
@@ -119,19 +119,5 @@ Public Class MidAssignStatement
     Shared Function IsMe(ByVal tm As tm) As Boolean
         Return tm.CurrentToken.Equals("Mid") AndAlso tm.PeekToken = KS.LParenthesis
     End Function
-#If DEBUG Then
-    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-        dumper.Write("Mid(")
-        m_Target.Dump(dumper)
-        dumper.Write(", ")
-        m_Start.Dump(Dumper)
-        If m_Length IsNot Nothing Then
-            dumper.Write(", ")
-            m_Length.Dump(Dumper)
-        End If
-        dumper.Write(") = ")
-        m_Source.Dump(Dumper)
-        Dumper.WriteLine("")
-    End Sub
-#End If
+
 End Class

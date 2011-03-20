@@ -40,13 +40,13 @@ WINTEST=-echo Linux environment.
 endif
 
 bin/nunit-console.exe:
-	wget -O bin/nunit-console.exe http://anonsvn.mono-project.com/viewvc/trunk/mono-basic/vbruntime/Test/bin/nunit-console.exe?revision=76123
+	wget --no-check-certificate -O bin/nunit-console.exe "http://github.com/mono/mono-basic/raw/70f26b5b6f3c16999cb3e0b5864df88752fe683a/vbruntime/Test/bin/nunit-console.exe"
 bin/nunit.framework.dll:
-	wget -O bin/nunit.framework.dll http://anonsvn.mono-project.com/viewvc/trunk/mono-basic/vbruntime/Test/bin/nunit.framework.dll?revision=76123
+	wget --no-check-certificate -O bin/nunit.framework.dll "http://github.com/mono/mono-basic/raw/70f26b5b6f3c16999cb3e0b5864df88752fe683a/vbruntime/Test/bin/nunit.framework.dll"
 bin/nunit.core.dll:
-	wget -O bin/nunit.core.dll http://anonsvn.mono-project.com/viewvc/trunk/mono-basic/vbruntime/Test/bin/nunit.core.dll?revision=76123
+	wget --no-check-certificate -O bin/nunit.core.dll "http://github.com/mono/mono-basic/raw/70f26b5b6f3c16999cb3e0b5864df88752fe683a/vbruntime/Test/bin/nunit.core.dll"
 bin/nunit.util.dll:
-	wget -O bin/nunit.util.dll http://anonsvn.mono-project.com/viewvc/trunk/mono-basic/vbruntime/Test/bin/nunit.util.dll?revision=76123
+	wget --no-check-certificate -O bin/nunit.util.dll "http://github.com/mono/mono-basic/raw/70f26b5b6f3c16999cb3e0b5864df88752fe683a/vbruntime/Test/bin//nunit.util.dll"
 
 init: bin/nunit-console.exe bin/nunit.framework.dll bin/nunit.core.dll bin/nunit.util.dll
 	cp bin/nunit-console$(NUNIT_VERSION).exe.config bin/nunit-console.exe.config
@@ -61,7 +61,7 @@ init: bin/nunit-console.exe bin/nunit.framework.dll bin/nunit.core.dll bin/nunit
 	MONO_PATH=$(MONO_VB_PATH) mono ../../tools/extract-source/extract-source.exe -s:2008VB_test_CS.csproj -d:2008VB_test_CS.dll.sources.win -m:w
 
 test-first:
-	cd ../Microsoft.VisualBasic && make && cp ../../class/lib/vbnc/Microsoft.VisualBasic.dll* ../Test/bin
+	cd ../Microsoft.VisualBasic && make && cp ../../class/lib/$(PROFILE)/Microsoft.VisualBasic.dll* ../Test/bin
 
 test-cs: test-first 2008VB_test_CS.dll.sources
 	$(CSCOMPILER) "-out:bin/2008VB_test_CS.dll" @2008VB_test_CS.dll.rsp @2008VB_test_CS.dll.sources -lib:bin $(CSDEFINES)
@@ -75,6 +75,9 @@ clean-local:
 	-rm -f bin/2008VB_test_VB.*
 	-rm -f bin/2008VB_test_CS.*
 	-rm -fR bin/data
+	-rm -f bin/nunit-console.exe bin/nunit.framework.dll bin/nunit.core.dll bin/nunit.util.dll bin/Microsoft.VisualBasic.dll*
+	-rm -fR bin/%temp%
+	-rm -f bin/TestResult.xml
 	
 run-test-cs: test-cs
 	-cd bin && mono --debug nunit-console.exe 2008VB_test_CS.dll /exclude:NotWorking /labels

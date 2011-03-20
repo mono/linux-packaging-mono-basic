@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -352,7 +352,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30038 = 30038
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Loop control variable cannot be a property or a late-bound indexed array."
     ''' VB   = "Loop control variable cannot be a property or a late-bound indexed array."
     ''' </summary>
     ''' <remarks></remarks>
@@ -716,7 +716,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30107 = 30107
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Expression is a type and cannot be used as an expression."
     ''' VB   = "'|1' is a type and cannot be used as an expression."
     ''' </summary>
     ''' <remarks></remarks>
@@ -744,7 +744,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30111 = 30111
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Expression is a namespace and cannot be used as an expression."
     ''' VB   = "'|1' is a namespace and cannot be used as an expression."
     ''' </summary>
     ''' <remarks></remarks>
@@ -800,21 +800,21 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30126 = 30126
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Attribute '{0}' is not valid: {1}"
     ''' VB   = "Attribute '|1' is not valid: |0"
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC30127 = 30127
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Security attribute '{0}' is not valid: {1}"
     ''' VB   = "Security attribute '|1' is not valid: |0"
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC30128 = 30128
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Assembly attribute '{0}' is not valid: {1}"
     ''' VB   = "Assembly attribute '|1' is not valid: |0"
     ''' </summary>
     ''' <remarks></remarks>
@@ -1031,7 +1031,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30181 = 30181
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Epxected type."
     ''' VB   = "Type expected."
     ''' </summary>
     ''' <remarks></remarks>
@@ -1374,7 +1374,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30249 = 30249
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Type '{0}' has no constructors."
     ''' VB   = "Type '|1' has no constructors."
     ''' </summary>
     ''' <remarks></remarks>
@@ -1696,7 +1696,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30333 = 30333
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'For' loop control variable cannot be of the type '{0}'"
     ''' VB   = "'For' loop control variable cannot be of type '|1'."
     ''' </summary>
     ''' <remarks></remarks>
@@ -1815,7 +1815,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30371 = 30371
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'New' cannot be used on an interface."
     ''' VB   = "'New' cannot be used on an interface."
     ''' </summary>
     ''' <remarks></remarks>
@@ -1962,7 +1962,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30401 = 30401
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Method '{0}' does not have the same signature as delegate '{1}'."
     ''' VB   = "Method '|1' does not have the same signature as delegate '|2'."
     ''' </summary>
     ''' <remarks></remarks>
@@ -2214,7 +2214,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30468 = 30468
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Reference to a non-shared member requires an object reference."
     ''' VB   = "Reference to a non-shared member requires an object reference."
     ''' </summary>
     ''' <remarks></remarks>
@@ -2284,7 +2284,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30490 = 30490
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Expression does not produce a value."
     ''' VB   = "Expression does not produce a value."
     ''' </summary>
     ''' <remarks></remarks>
@@ -2452,7 +2452,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30523 = 30523
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Property '{0}' is 'WriteOnly'."
     ''' VB   = "Property '|1' is 'WriteOnly'."
     ''' </summary>
     ''' <remarks></remarks>
@@ -2480,21 +2480,21 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30529 = 30529
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Parameter cannot have the same name as its defining function."
     ''' VB   = "Parameter cannot have the same name as its defining function."
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC30530 = 30530
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Conversion from 'Date' to 'Double' requires calling the 'Date.ToOADate' method."
     ''' VB   = "Conversion from 'Date' to 'Double' requires calling the 'Date.ToOADate' method."
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC30532 = 30532
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Conversion from 'Double' to 'Date' requires calling the 'Date.FromOADate' method."
     ''' VB   = "Conversion from 'Double' to 'Date' requires calling the 'Date.FromOADate' method."
     ''' </summary>
     ''' <remarks></remarks>
@@ -2578,7 +2578,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30561 = 30561
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'{0}' is ambiguous between declarations in Modules '{1}' and '{2}'."
     ''' VB   = "'|1' is ambiguous between declarations in Modules '|2' and '|3'."
     ''' </summary>
     ''' <remarks></remarks>
@@ -3131,7 +3131,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30656 = 30656
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'{0}' has a return type or a parameter type that are not supported."
     ''' VB   = "'|1' has a return type that is not supported or parameter types that are not supported."
     ''' </summary>
     ''' <remarks></remarks>
@@ -4244,6 +4244,13 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30920 = 30920
 
     ''' <summary>
+    ''' VBNC = "Type of '{0}' is ambiguous because the loop bounds and the step clause do not convert to the same type."
+    ''' VB   = "Type of 'i' is ambiguous because the loop bounds and the step clause do not convert to the same type."
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC30983 = 30983
+
+    ''' <summary>
     ''' VBNC = "CHANGEME"
     ''' VB   = "Unable to open module file '|1': |0"
     ''' </summary>
@@ -4685,7 +4692,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC31093 = 31093
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Implemnting class '{0}' cannot be found."
     ''' VB   = "Implementing class '|1' cannot be found."
     ''' </summary>
     ''' <remarks></remarks>
@@ -5175,21 +5182,21 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC32005 = 32005
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'Char' values cannot be converted to '{0}'. Use 'Microsoft.VisualBasic.AscW' to interpret a character as a Unicode value or 'Microsoft.VisualBasic.Val' to interpret it as a digit."
     ''' VB   = "'Char' values cannot be converted to '|1'. Use 'Microsoft.VisualBasic.AscW' to interpret a character as a Unicode value or 'Microsoft.VisualBasic.Val' to interpret it as a digit."
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC32006 = 32006
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'{0}' values cannot be converted to 'Char'. Use 'Microsoft.VisualBasic.ChrW' to interpret a numeric value as a Unicode character or first convert it to 'String' to produce a digit."
     ''' VB   = "'|1' values cannot be converted to 'Char'. Use 'Microsoft.VisualBasic.ChrW' to interpret a numeric value as a Unicode character or first convert it to 'String' to produce a digit."
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC32007 = 32007
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'{0}' is a delegate type. Delegate construction permits only a single AddressOf expression as an argument list. Often an AddressOf expression can be used instead of a delegate construction."
     ''' VB   = "'|1' is a delegate type. Delegate construction permits only a single AddressOf expression as an argument list. Often an AddressOf expression can be used instead of a delegate construction."
     ''' </summary>
     ''' <remarks></remarks>
@@ -5273,7 +5280,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC32021 = 32021
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Expression is an event, and cannot be called directly. Use a 'RaiseEvent' statement to raise an event."
     ''' VB   = "'|1' is an event, and cannot be called directly. Use a 'RaiseEvent' statement to raise an event."
     ''' </summary>
     ''' <remarks></remarks>
@@ -5427,7 +5434,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC32043 = 32043
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Type argument '{0}' does not inherit from or implement '{1}'."
     ''' VB   = "Type argument '|1' does not inherit from or implement '|2'."
     ''' </summary>
     ''' <remarks></remarks>
@@ -5469,7 +5476,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC32049 = 32049
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Type parameter '{0}' for '{1}' cannot be inferred."
     ''' VB   = "Type parameter '|1' cannot be determined."
     ''' </summary>
     ''' <remarks></remarks>
@@ -5621,6 +5628,20 @@ Public Enum Messages
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC32071 = 32071
+
+    ''' <summary>
+    ''' VBNC = "Type argument '{0}' must have a public parameterless instance constructor to satisfy the 'New' constraint for type parameter '{1}'."
+    ''' VB   = "(No corresponding vbc error)"
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC32083 = 32083
+
+    ''' <summary>
+    ''' VBNC = "Type parameter '{0}' must have either a 'New' constraint or a 'Structure' constraint to satisfy the 'New' constraint for type parameter '{1}'."
+    ''' VB   = "(No corresponding vbc error)"
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC32084 = 32084
 
     ''' <summary>
     ''' VBNC = "Arguments cannot be passed when calling a type parameter constructor."
@@ -6064,6 +6085,41 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC33036 = 33036
 
     ''' <summary>
+    ''' VBNC = "Type '{0}' must be a value type or a type argument constrained to 'Structure' in order to be used with 'Nullable' or nullable modifier '?'. "
+    ''' VB   = "(No corresponding vbc error)"
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC33101 = 33101
+
+    ''' <summary>
+    ''' VBNC = "'If' operator requires either two or three operands."
+    ''' VB   = "'If' operator requires either two or three operands."
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC33104 = 33104
+
+    ''' <summary>
+    ''' VBNC = "Cannot infer a common type for the second and third operands of the 'If' operator. One must have a widening conversion to the other."
+    ''' VB   = "Cannot infer a common type for the second and third operands of the 'If' operator. One must have a widening conversion to the other."
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC33106 = 33106
+
+    ''' <summary>
+    ''' VBNC = "First operand in a binary 'If' expression must be nullable or a reference type."
+    ''' VB   = "First operand in a binary 'If' expression must be nullable or a reference type."
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC33107 = 33107
+
+    ''' <summary>
+    ''' VBNC = "Cannot infer a common type for the first and second operands of the binary 'If' operator. One must have a widening conversion to the other."
+    ''' VB   = "Cannot infer a common type for the first and second operands of the binary 'If' operator. One must have a widening conversion to the other."
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC33110 = 33110
+
+    ''' <summary>
     ''' VBNC = "CHANGEME"
     ''' VB   = "'Global' must be followed by '.' and an identifier."
     ''' </summary>
@@ -6188,6 +6244,20 @@ Public Enum Messages
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Error)> VBNC36017 = 36017
+
+    ''' <summary>
+    ''' VBNC = "Data type(s) of the type parameter(s) in method '{0}' cannot be inferred from these arguments because more than one type is possible. Specifying the data type(s) explicitly might correct this error."
+    ''' VB   = "(No corresponding vbc error)"
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC36651 = 36651
+
+    ''' <summary>
+    ''' VBNC = "Data type(s) of the type parameter(s) in method '{0}' cannot be inferred from these arguments because they do not convert to the same type. Specifying the data type(s) explicitly might correct this error."
+    ''' VB   = "(No corresponding vbc error)"
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Error)> VBNC36657 = 36657
 
     ''' <summary>
     ''' VBNC = "CHANGEME"
@@ -6524,6 +6594,13 @@ Public Enum Messages
     ''' </summary>
     ''' <remarks></remarks>
     <Message(MessageLevel.Warning)> VBNC42015 = 42015
+
+    ''' <summary>
+    ''' VBNC = "Variable declaration without an 'As' clause; Object type assumed."
+    ''' VB   = "Variable declaration without an 'As' clause; type of Object assumed."
+    ''' </summary>
+    ''' <remarks></remarks>
+    <Message(MessageLevel.Warning)> VBNC42020 = 42020
 
     ''' <summary>
     ''' VBNC = "Function without an 'As' clause; Object return type assumed."

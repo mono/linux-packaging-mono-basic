@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -17,12 +17,12 @@
 ' Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ' 
 
-Public Class Token
+Public Structure Token
     Public m_TokenType As TokenType
     Public m_TokenObject As Object
 
     Shared Function IsSomething(ByVal Token As Token) As Boolean
-        Return Token IsNot Nothing AndAlso Token.IsSomething
+        'Return Token IsNot Nothing AndAlso Token.IsSomething
         Return Token.IsSomething
     End Function
 
@@ -32,6 +32,8 @@ Public Class Token
 
     Public Overrides Function ToString() As String
         If Me.IsIdentifier Then
+            Return Me.Identifier
+        ElseIf Me.IsKeyword Then
             Return Me.Identifier
         Else
             Return "<Token>"
@@ -88,7 +90,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.DecimalLiteral
         result.m_TokenObject = Value
-        '        result.m_TokenData1 = TypeCharacter
         Return result
     End Function
 
@@ -96,7 +97,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.SingleLiteral
         result.m_TokenObject = Value
-        'result.m_TokenData1 = TypeCharacter
         Return result
     End Function
 
@@ -104,7 +104,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.DoubleLiteral
         result.m_TokenObject = Value
-        ' result.m_TokenData1 = TypeCharacter
         Return result
     End Function
 
@@ -112,8 +111,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.Int16Literal
         result.m_TokenObject = Value
-        'result.m_TokenData1 = TypeCharacter
-        'result.m_TokenData2 = base
         Return result
     End Function
 
@@ -121,8 +118,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.Int32Literal
         result.m_TokenObject = Value
-        'result.m_TokenData1 = TypeCharacter
-        'result.m_TokenData2 = base
         Return result
     End Function
 
@@ -130,8 +125,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.Int64Literal
         result.m_TokenObject = Value
-        'result.m_TokenData1 = TypeCharacter
-        'result.m_TokenData2 = base
         Return result
     End Function
 
@@ -139,8 +132,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.UInt16Literal
         result.m_TokenObject = Value
-        'result.m_TokenData1 = TypeCharacter
-        'result.m_TokenData2 = base
         Return result
     End Function
 
@@ -148,8 +139,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.UInt32Literal
         result.m_TokenObject = Value
-        'result.m_TokenData1 = TypeCharacter
-        'result.m_TokenData2 = base
         Return result
     End Function
 
@@ -157,8 +146,6 @@ Public Class Token
         Dim result As New Token(Location)
         result.m_TokenType = TokenType.UInt64Literal
         result.m_TokenObject = Value
-        'result.m_TokenData1 = TypeCharacter
-        'result.m_TokenData2 = base
         Return result
     End Function
 
@@ -402,9 +389,9 @@ Public Class Token
         End If
     End Function
 
-    Shared Function IsKeyword(ByVal str As String, ByRef Keyword As KS) As Boolean
+    Shared Function IsKeyword(ByVal str As Char(), ByVal length As Integer, ByRef Keyword As KS) As Boolean
         Dim special As KS
-        special = Enums.GetKS(str)
+        special = Enums.GetKS(str, length)
         If special <> KS.None Then
             Keyword = special
             Return True
@@ -487,6 +474,6 @@ Public Class Token
             Return "not a symbol"
         End Get
     End Property
-End Class
+End Structure
 
 

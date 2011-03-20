@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,7 @@ Public Class ArrayInitializerExpression
 
         m_Initializers = Initializers
     End Sub
+
     ReadOnly Property Initializers() As Expressions
         Get
             Return m_Initializers
@@ -54,12 +55,4 @@ Public Class ArrayInitializerExpression
 
         Return result
     End Function
-
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write("{")
-        m_Initializers.Dump(Dumper)
-        Dumper.Write("}")
-    End Sub
-#End If
 End Class

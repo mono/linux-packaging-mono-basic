@@ -25,7 +25,6 @@
 ' OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 ' WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '
-#If NET_VER >= 2.0 Then
 Imports System.ComponentModel
 Imports System.Security.Permissions
 Imports system.Runtime.Serialization
@@ -44,7 +43,7 @@ Namespace Microsoft.VisualBasic.FileIO
 
         Public Sub New(ByVal message As String)
             MyBase.New(message)
-            m_AnyMessage = message <> String.Empty
+            m_AnyMessage = Not String.IsNullOrEmpty(message)
         End Sub
 
         <EditorBrowsable(EditorBrowsableState.Advanced)> _
@@ -55,19 +54,19 @@ Namespace Microsoft.VisualBasic.FileIO
 
         Public Sub New(ByVal message As String, ByVal innerException As Exception)
             MyBase.New(message, innerException)
-            m_AnyMessage = message <> String.Empty
+            m_AnyMessage = Not String.IsNullOrEmpty(message)
         End Sub
 
         Public Sub New(ByVal message As String, ByVal lineNumber As Long)
             MyBase.New(message)
             m_LineNumber = lineNumber
-            m_AnyMessage = message <> String.Empty
+            m_AnyMessage = Not String.IsNullOrEmpty(message)
         End Sub
 
         Public Sub New(ByVal message As String, ByVal lineNumber As Long, ByVal innerException As Exception)
             MyBase.New(message, innerException)
             m_LineNumber = lineNumber
-            m_AnyMessage = message <> String.Empty
+            m_AnyMessage = Not String.IsNullOrEmpty(message)
         End Sub
 
         <EditorBrowsable(EditorBrowsableState.Advanced), SecurityPermission(SecurityAction.Demand, SerializationFormatter:=True)> _
@@ -109,4 +108,3 @@ Namespace Microsoft.VisualBasic.FileIO
     End Class
 
 End Namespace
-#End If

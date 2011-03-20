@@ -1,11 +1,12 @@
 /r:System.dll
-/r:Microsoft.VisualBasic.dll
 /r:System.Xml.dll
 /r:System.Windows.Forms.dll
 /imports:system,system.collections,vb=microsoft.visualbasic,system.reflection,system.reflection.emit
+/imports:Mono.Cecil
 /rootnamespace:vbnc
 /t:exe
 /res:vbnc.Errors.resources
 /res:vbnc.vbnc.rsp
 /define:DEBUG=false
 /debug:full
+/define:_MYTYPE=\"Empty\"

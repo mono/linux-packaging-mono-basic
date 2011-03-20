@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
 Public Class BoxExpression
     Inherits Expression
 
-    Private m_DestinationType As Type
+    Private m_DestinationType As Mono.Cecil.TypeReference
     Private m_Expression As Expression
 
     ''' <summary>
@@ -30,7 +30,7 @@ Public Class BoxExpression
     ''' <param name="Expression"></param>
     ''' <param name="DestinationType"></param>
     ''' <remarks></remarks>
-    Sub New(ByVal Parent As ParsedObject, ByVal Expression As Expression, ByVal DestinationType As Type)
+    Sub New(ByVal Parent As ParsedObject, ByVal Expression As Expression, ByVal DestinationType As Mono.Cecil.TypeReference)
         MyBase.new(Parent)
         m_DestinationType = DestinationType
         m_Expression = Expression
@@ -38,11 +38,12 @@ Public Class BoxExpression
         Helper.Assert(m_DestinationType IsNot Nothing)
         Helper.Assert(m_Expression IsNot Nothing)
         Helper.Assert(m_Expression.IsResolved)
+        Helper.Assert(TypeOf Expression Is BoxExpression = False)
 
         Classification = New ValueClassification(Me, m_DestinationType)
 
         If MyBase.ResolveExpression(ResolveInfo.Default(Compiler)) = False Then
-            Helper.ErrorRecoveryNotImplemented()
+            Helper.ErrorRecoveryNotImplemented(Me.Location)
         End If
 
     End Sub
@@ -59,14 +60,20 @@ Public Class BoxExpression
 
     Protected Overrides Function GenerateCodeInternal(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
+        Dim tp As TypeReference
 
         result = m_Expression.GenerateCode(Info) AndAlso result
-        Emitter.EmitBox(Info, m_Expression.ExpressionType)
+
+        tp = m_Expression.ExpressionType
+        If CecilHelper.IsByRef(tp) Then
+            tp = CecilHelper.GetElementType(tp)
+        End If
+        Emitter.EmitBox(Info, tp)
 
         Return result
     End Function
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Return m_DestinationType
         End Get

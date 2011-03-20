@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -21,16 +21,14 @@
 ''' A list of code files.
 ''' </summary>
 Public Class CodeFiles
-    Inherits Generic.List(Of CodeFile)
-    ReadOnly Compiler As Compiler
+    Inherits BaseObjects(Of CodeFile)
 
     Sub New(ByVal Compiler As Compiler)
-        MyBase.new()
-        Me.Compiler = Compiler
+        MyBase.new(Compiler)
     End Sub
 
     Function Resolve(ByVal Info As ResolveInfo) As Boolean
-        Return Helper.ResolveCodeCollection(Me, info)
+        Return ResolveCode(Info)
     End Function
 
 End Class

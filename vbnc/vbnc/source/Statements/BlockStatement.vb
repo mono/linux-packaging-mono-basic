@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -49,12 +49,12 @@ Public MustInherit Class BlockStatement
     Public Overrides Function ResolveTypeReferences() As Boolean
         Dim result As Boolean = True
 
-#If DEBUG Then
-        Dim m1, m2 As MethodInfo
-        m1 = Me.GetType.GetMethod("ResolveTypeReferences")
-        m2 = GetType(BlockStatement).GetMethod("ResolveTypeReferences")
-        Helper.Assert(m1 IsNot m2)
-#End If
+        '#If DEBUG Then
+        '        Dim m1, m2 As MethodInfo
+        '        m1 = Me.GetType.GetMethod("ResolveTypeReferences")
+        '        m2 = GetType(BlockStatement).GetMethod("ResolveTypeReferences")
+        '        Helper.Assert(m1 IsNot m2)
+        '#End If
 
         result = m_Code.ResolveTypeReferences AndAlso result
 

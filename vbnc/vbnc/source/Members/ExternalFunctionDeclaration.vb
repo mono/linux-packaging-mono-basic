@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -33,12 +33,12 @@ Public Class ExternalFunctionDeclaration
         MyBase.New(Parent)
     End Sub
 
-    Shadows Sub Init(ByVal Attributes As Attributes, ByVal Modifiers As Modifiers, ByVal CharsetModifier As KS, ByVal Identifier As Identifier, ByVal LibraryClause As LibraryClause, ByVal AliasClause As AliasClause, ByVal ParameterList As ParameterList, ByVal ReturnTypeAttributes As Attributes, ByVal TypeName As TypeName)
+    Shadows Sub Init(ByVal Modifiers As Modifiers, ByVal CharsetModifier As KS, ByVal Identifier As Identifier, ByVal LibraryClause As LibraryClause, ByVal AliasClause As AliasClause, ByVal ParameterList As ParameterList, ByVal ReturnTypeAttributes As Attributes, ByVal TypeName As TypeName)
 
         Dim mySignature As New FunctionSignature(Me)
         mySignature.Init(Identifier, Nothing, ParameterList, ReturnTypeAttributes, TypeName, Me.Location)
 
-        MyBase.Init(Attributes, Modifiers, CharsetModifier, LibraryClause, AliasClause, mySignature)
+        MyBase.Init(Modifiers, CharsetModifier, LibraryClause, AliasClause, mySignature)
     End Sub
 
     Shared Shadows Function IsMe(ByVal tm As tm) As Boolean
@@ -56,4 +56,13 @@ Public Class ExternalFunctionDeclaration
             Return DirectCast(MyBase.Signature, FunctionSignature)
         End Get
     End Property
+
+    Public Overrides Function ResolveMember(ByVal Info As ResolveInfo) As Boolean
+        Dim result As Boolean = True
+
+        result = Signature.VerifyParameterNamesDoesntMatchFunctionName() AndAlso result
+        result = MyBase.ResolveMember(Info) AndAlso result
+
+        Return result
+    End Function
 End Class

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -80,14 +80,6 @@ Public MustInherit Class Expression
     ''' <remarks></remarks>
     Private m_Classification As ExpressionClassification
 
-#If DEBUG Then
-    ReadOnly Property Where() As String
-        Get
-            Return Location.ToString(Compiler)
-        End Get
-    End Property
-#End If
-
     ''' <summary>
     ''' First finds a code block, then finds the specified type in the code block.
     ''' </summary>
@@ -142,7 +134,7 @@ Public MustInherit Class Expression
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Overridable ReadOnly Property ExpressionType() As Type
+    Overridable ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Location)
             Return Nothing
@@ -180,11 +172,10 @@ Public MustInherit Class Expression
         Dim result As Boolean = True
 
         Try
-
             If Me.IsConstant Then
                 If Helper.CompareType(Me.ExpressionType, Compiler.TypeCache.Nothing) Then
                     Emitter.EmitLoadValue(Info, Me.ConstantValue)
-                ElseIf Info.DesiredType IsNot Nothing AndAlso Info.DesiredType.IsByRef Then
+                ElseIf Info.DesiredType IsNot Nothing AndAlso CecilHelper.IsByRef(Info.DesiredType) Then
                     Emitter.EmitLoadValueAddress(Info, Me.ConstantValue)
                 Else
                     Emitter.EmitLoadValue(Info.Clone(Me, Me.ExpressionType), Me.ConstantValue)
@@ -195,7 +186,7 @@ Public MustInherit Class Expression
                 result = GenerateCodeInternal(Info) AndAlso result
             End If
         Catch ex As Exception
-            Compiler.Report.ShowMessage(Messages.VBNC99999, Me.Location, "There was an exception during code generation.")
+            Compiler.Report.ShowMessage(Messages.VBNC99999, Me.Location, "Internal compiler error close to this location")
             Throw
         End Try
 
@@ -226,8 +217,12 @@ Public MustInherit Class Expression
 
         StartResolve()
 
-        result = ResolveExpressionInternal(ResolveInfo) AndAlso result
-
+        Try
+            result = ResolveExpressionInternal(ResolveInfo) AndAlso result
+        Catch ex As Exception
+            Compiler.Report.ShowMessage(Messages.VBNC99999, Me.Location, "Internal compiler error close to this location")
+            Throw
+        End Try
 #If EXTENDEDDEBUG Then
         Helper.Assert(result = False OrElse m_Classification IsNot Nothing, "Classification is nothing! (type of expression = " & Me.GetType.ToString & ")")
         Helper.Assert(ResolveInfo.CanFail OrElse result = (Compiler.Report.Errors = 0))
@@ -314,7 +309,7 @@ Public MustInherit Class Expression
         Return Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Location)
     End Function
 
-    Function ResolveAddressOfExpression(ByVal DelegateType As Type) As Boolean
+    Function ResolveAddressOfExpression(ByVal DelegateType As Mono.Cecil.TypeReference) As Boolean
         Dim result As Boolean = True
         Dim aoe As AddressOfExpression = TryCast(Me, AddressOfExpression)
 
@@ -333,12 +328,12 @@ Public MustInherit Class Expression
             Return Me
         ElseIf TypeOf Me Is InstanceExpression Then
             Return Me
-        ElseIf ExpressionType.IsValueType Then
+        ElseIf CecilHelper.IsValueType(ExpressionType) Then
             If TypeOf Me Is DeRefExpression Then
                 Dim derefExp As DeRefExpression = DirectCast(Me, DeRefExpression)
                 result = derefExp.Expression
-            ElseIf Helper.CompareType(Me.ExpressionType.BaseType, Compiler.TypeCache.System_Enum) Then
-                result = New BoxExpression(Me, Me, Me.ExpressionType)
+            ElseIf Helper.CompareType(CecilHelper.FindDefinition(Me.ExpressionType).BaseType, Compiler.TypeCache.System_Enum) Then
+                result = New BoxExpression(Me, Me, CecilHelper.MakeByRefType(Me.ExpressionType))
                 'ElseIf Me.ExpressionType.IsValueType AndAlso Helper.IsNullableType(Compiler, Me.ExpressionType) = False Then
                 '    result = New BoxExpression(Me, Me, Me.ExpressionType)
             Else
@@ -354,7 +349,7 @@ Public MustInherit Class Expression
     Function DereferenceByRef() As Expression
         Dim result As Expression
 
-        If ExpressionType.IsByRef Then
+        If CecilHelper.IsByRef(ExpressionType) Then
             result = New DeRefExpression(Me, Me)
         Else
             result = Me
@@ -391,7 +386,18 @@ Public MustInherit Class Expression
             Case ExpressionClassification.Classifications.Void
                 Throw New InternalException(Me)
             Case ExpressionClassification.Classifications.Type
-                Throw New InternalException(Me)
+                Dim exp As Expression = Nothing
+                If m_Classification.AsTypeClassification.CreateAliasExpression(Me, exp) = False Then
+                    Throw New InternalException(Me)
+                End If
+                If exp.Classification.IsPropertyGroupClassification Then
+                    exp = exp.ReclassifyToPropertyAccessExpression
+                    If exp.ResolveExpression(ResolveInfo.Default(Compiler)) = False Then
+                        Throw New InternalException(Me)
+                    End If
+                End If
+                Helper.Assert(exp.Classification.IsPropertyAccessClassification)
+                Return exp
             Case ExpressionClassification.Classifications.Namespace
                 Throw New InternalException(Me)
             Case Else
@@ -401,7 +407,7 @@ Public MustInherit Class Expression
         Return result
     End Function
 
-    Function ReclassifyMethodPointerToValueExpression(ByVal DelegateType As Type) As Expression
+    Function ReclassifyMethodPointerToValueExpression(ByVal DelegateType As Mono.Cecil.TypeReference) As Expression
         Dim result As Expression = Nothing
 
         Helper.Assert(Classification.IsMethodPointerClassification)
@@ -440,19 +446,11 @@ Public MustInherit Class Expression
             Case ExpressionClassification.Classifications.Void
                 Throw New InternalException(Me)
             Case ExpressionClassification.Classifications.Type
-                Dim exp As MemberAccessExpression
-                Dim mae As MemberAccessExpression = TryCast(Me, MemberAccessExpression)
-                If mae IsNot Nothing Then
-                    exp = New MemberAccessExpression(Me)
-                    exp.Init(m_Classification.AsTypeClassification.MyGroup.DefaultInstanceAlias, mae.SecondExpression)
-                    If Not exp.ResolveExpression(ResolveInfo.Default(Compiler)) Then
-                        Helper.AddError(Me)
-                        Return Nothing
-                    End If
-                    Return exp.ReclassifyToValueExpression
-                Else
-                    Return m_Classification.AsTypeClassification.MyGroup.DefaultInstanceAlias.ReclassifyToValueExpression
+                Dim exp As Expression = Nothing
+                If m_Classification.AsTypeClassification.CreateAliasExpression(Me, exp) = False Then
+                    Throw New InternalException(Me)
                 End If
+                Return exp
             Case ExpressionClassification.Classifications.Namespace
                 Throw New InternalException(Me)
             Case Else
@@ -463,34 +461,29 @@ Public MustInherit Class Expression
         Return result
     End Function
 
+    Function ReportReclassifyToValueErrorMessage() As Boolean
+
+        Select Case m_Classification.Classification
+            Case ExpressionClassification.Classifications.EventAccess
+                Compiler.Report.ShowMessage(Messages.VBNC32022, Me.Location)
+            Case ExpressionClassification.Classifications.Type
+                Compiler.Report.ShowMessage(Messages.VBNC30108, Me.Location)
+            Case ExpressionClassification.Classifications.Namespace
+                Compiler.Report.ShowMessage(Messages.VBNC30112, Me.Location)
+            Case ExpressionClassification.Classifications.Void
+                Compiler.Report.ShowMessage(Messages.VBNC30491, Me.Location)
+            Case Else
+                Compiler.Report.ShowMessage(Messages.VBNC99997, Me.Location)
+        End Select
+
+        Return False
+    End Function
 
 #End Region
-    '#If DEBUG Then
-    '    Protected Overrides Sub Finalize()
-    '        If m_Resolving Then
-    '            If Location IsNot Nothing Then
-    '                Compiler.Report.WriteLine(vbnc.Report.ReportLevels.Debug, "Expression still resolving: " & Me.Location.ToString)
-    '            Else
-    '                Compiler.Report.WriteLine(vbnc.Report.ReportLevels.Debug, "Expression still resolving. (Location is lost already).")
-    '            End If
-    '        End If
-    '    End Sub
-    '#End If
-#If DEBUG Then
-    Overridable Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write("<Dump of '" & Me.GetType.Name & "'>")
-    End Sub
-#End If
 
     Overridable ReadOnly Property AsString() As String
         Get
             Return "<String representation of " & Me.GetType.FullName & " not implemented>"
         End Get
     End Property
-
-    'ReadOnly Property IsUnresolved() As Boolean
-    '    Get
-    '        Return
-    '    End Get
-    'End Property
 End Class

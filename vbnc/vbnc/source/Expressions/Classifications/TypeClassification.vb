@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -26,25 +26,50 @@
 Public Class TypeClassification
     Inherits ExpressionClassification
 
-    Private m_Type As Type 'Descriptor
+    Private m_Type As Mono.Cecil.TypeDefinition 'Descriptor
     Private m_TypeParameter As TypeParameter
     Private m_Group As MyGroupData
 
     ReadOnly Property MyGroup() As MyGroupData
         Get
-            If Not CanBeExpression() Then Return Nothing
+            If m_Group Is Nothing Then
+                If Not CanBeExpression() Then Return Nothing
+            End If
             Return m_Group
         End Get
     End Property
 
     ReadOnly Property Expression() As Expression
         Get
-
-            If Not CanBeExpression() Then Return Nothing
-            If m_Group Is Nothing Then Return Nothing
+            If m_Group Is Nothing Then
+                If Not CanBeExpression() Then Return Nothing
+                If m_Group Is Nothing Then Return Nothing
+            End If
             Return m_Group.DefaultInstanceAlias
         End Get
     End Property
+
+    Function CreateAliasExpression(ByVal SharedExpression As Expression, ByRef result As Expression) As Boolean
+        Dim sne As SimpleNameExpression = TryCast(SharedExpression, SimpleNameExpression)
+        Dim mae As MemberAccessExpression
+        Dim maeIE As MemberAccessExpression
+
+        If TypeOf SharedExpression.Parent Is Is_IsNotExpression Then
+            Dim fieldLoad As New LoadFieldExpression(SharedExpression, DirectCast(m_Type.Annotations(Compiler), TypeDeclaration).MyGroupField.FieldBuilder, m_Group.DefaultInstanceAlias)
+            result = fieldLoad
+        Else
+            If sne IsNot Nothing Then
+                maeIE = New MemberAccessExpression(SharedExpression.Parent)
+                maeIE.Init(Expression, New IdentifierOrKeyword(SharedExpression.Parent, Token.CreateIdentifierToken(sne.Location, sne.Identifier.Identifier)))
+            Else
+                mae = TryCast(SharedExpression, MemberAccessExpression)
+                maeIE = New MemberAccessExpression(SharedExpression.Parent)
+                maeIE.Init(Expression, mae.SecondExpression)
+            End If
+            result = maeIE
+        End If
+        Return result.ResolveExpression(ResolveInfo.Default(SharedExpression.Compiler))
+    End Function
 
     ReadOnly Property CanBeExpression() As Boolean
         Get
@@ -59,7 +84,7 @@ Public Class TypeClassification
             For Each data As MyGroupData In Compiler.Assembly.GroupedClasses
                 If data.DefaultInstanceAlias Is Nothing Then Continue For
                 If data.TypeToCollect Is Nothing Then Continue For
-                If Helper.CompareType(data.TypeToCollect, m_Type.BaseType) = False Then Continue For
+                If Helper.IsSubclassOf(data.TypeToCollect, m_Type) = False Then Continue For
 
                 m_Group = data
 
@@ -76,18 +101,18 @@ Public Class TypeClassification
         End Get
     End Property
 
-    Property Type() As Type 'Descriptor
+    Property Type() As Mono.Cecil.TypeDefinition 'Descriptor
         Get
             Return m_Type
         End Get
-        Set(ByVal value As Type) 'Descriptor)
+        Set(ByVal value As Mono.Cecil.TypeDefinition) 'Descriptor)
             m_Type = value
         End Set
     End Property
 
     Sub New(ByVal Parent As ParsedObject, ByVal Type As TypeDeclaration)
         MyBase.new(Classifications.Type, Parent)
-        m_Type = Type.TypeDescriptor
+        m_Type = Type.CecilType
     End Sub
 
     Sub New(ByVal Parent As ParsedObject, ByVal TypeParameter As TypeParameter)
@@ -101,12 +126,12 @@ Public Class TypeClassification
 
     Sub New(ByVal Parent As ParsedObject, ByVal Type As Object)
         Me.new(Parent)
-        If TypeOf Type Is TypeDescriptor Then
-            m_Type = DirectCast(Type, TypeDescriptor)
-        ElseIf TypeOf Type Is Type Then
-            m_Type = DirectCast(Type, Type) ' New TypeDescriptor(DirectCast(Type, Type))
+        If TypeOf Type Is Mono.Cecil.TypeDefinition Then
+            m_Type = DirectCast(Type, Mono.Cecil.TypeDefinition)
+            'ElseIf TypeOf Type Is Type Then
+            '    m_Type = DirectCast(Type, Type) ' New TypeDescriptor(DirectCast(Type, Type))
         ElseIf TypeOf Type Is TypeDeclaration Then
-            m_Type = DirectCast(Type, TypeDeclaration).TypeDescriptor
+            m_Type = DirectCast(Type, TypeDeclaration).CecilType
         ElseIf TypeOf Type Is TypeParameter Then
             m_TypeParameter = DirectCast(Type, TypeParameter)
         Else
@@ -114,13 +139,8 @@ Public Class TypeClassification
         End If
     End Sub
 
-    Sub New(ByVal Parent As ParsedObject, ByVal Type As TypeDescriptor)
-        Me.New(Parent)
-        m_Type = Type
-    End Sub
-
-    Sub New(ByVal Parent As ParsedObject, ByVal Type As Type)
+    Sub New(ByVal Parent As ParsedObject, ByVal Type As Mono.Cecil.TypeDefinition)
         MyBase.New(Classifications.Type, Parent)
-        m_Type = Type ' New TypeDescriptor(Type)
+        m_Type = Type
     End Sub
 End Class

@@ -81,13 +81,9 @@ Namespace Microsoft.VisualBasic
 
 #If Moonlight = False Then
         Public Shared Function Asc(ByVal [String] As Char) As Integer
-#If NET_VER >= 2.0 Then
             ' Convert.ToUInt16 with ldarg.0 and ret is a good candidate for
             ' inlining and unsigned comparison will be performed later.
             Dim charCode As UShort = Convert.ToUInt16([String])
-#Else
-            Dim charCode As Integer = AscW([String])
-#End If
 
             ' Fast path for ASCII that also makes Asc incompatible with
             ' non-ASCII-compatible encodings.
@@ -139,11 +135,7 @@ Namespace Microsoft.VisualBasic
             ' non-ASCII-compatible encodings.
             If CharCode >= 0 AndAlso CharCode <= 127 Then
                 ' Convert.ToChar with ldarg.0 and ret is a good candidate for inlining.
-#If NET_VER >= 2.0 Then
                 Return Convert.ToChar(CUShort(CharCode))
-#Else
-                Return Convert.ToChar(CByte(CharCode))
-#End If
             End If
 
             If CharCode < -32768 OrElse CharCode > 65535 Then
@@ -159,12 +151,8 @@ Namespace Microsoft.VisualBasic
                 bytes = New Byte() {CByte(CharCode)}
                 byteCount = 1
             Else
-#If NET_VER >= 2.0 Then
                 ' GetMaxByteCount includes possible fallback characters from EncoderFallback
                 If enc.IsSingleByte Then
-#Else
-                If enc.GetMaxByteCount(1) = 1 Then
-#End If
                     Throw New ArgumentException("Procedure call or argument is not valid.")
                 End If
 
@@ -197,12 +185,8 @@ Namespace Microsoft.VisualBasic
                 Throw New ArgumentException("Argument 'CharCode' must be within the range of -32768 to 65535.")
             End If
 
-#If NET_VER >= 2.0 Then
             ' Convert.ToChar with ldarg.0 and ret is a good candidate for inlining.
             Return Convert.ToChar(CUShort(CharCode And &HFFFF))
-#Else
-            Return Convert.ToChar(CharCode And &HFFFF)
-#End If
         End Function
 
         Public Shared Function Filter(ByVal Source() As Object, ByVal Match As String, Optional ByVal Include As Boolean = True, _
@@ -215,7 +199,7 @@ Namespace Microsoft.VisualBasic
 
             Dim j As Integer = 0
             For i As Integer = 0 To Source.Length - 1
-                Dim s As String = CStr(Source(i))
+                Dim s As String = Conversions.ToString(Source(i))
 
                 If Compare = CompareMethod.Text Then
                     s = s.ToLower
@@ -224,12 +208,12 @@ Namespace Microsoft.VisualBasic
                 Dim comparisonResult As Boolean = (s.IndexOf(Match) >= 0)
 
                 If comparisonResult = Include Then
-                    Temp(j) = CStr(Source(i))
+                    Temp(j) = Conversions.ToString(Source(i))
                     j = j + 1
                 End If
             Next
 
-            ReDim Preserve Temp(j - 1)
+            Temp = DirectCast (Utils.CopyArray (Temp, New String (j - 1) {}), String ())
 
             Return Temp
         End Function
@@ -276,7 +260,7 @@ Namespace Microsoft.VisualBasic
             If Not PredefinedStyle Is Nothing Then
                 Return String.Format(PredefinedStyle.ToString(), Expression)
             End If
-            If Style = "" Then
+            If Style Is Nothing OrElse Style.Length = 0 Then
                 Return String.Format("{0}", Expression)
             Else
                 Return String.Format("{0:" + Style + "}", Expression)
@@ -335,17 +319,17 @@ Namespace Microsoft.VisualBasic
             Try
                 If TypeOf Expression Is String Then
                     Dim tmpstr1 As String
-                    Dim tmpstr2 As String = CStr(Expression)
+                    Dim tmpstr2 As String = Conversions.ToString(Expression)
                     If ((tmpstr2.StartsWith("(")) And (tmpstr2.EndsWith(")"))) Then
                         tmpstr1 = tmpstr2.Substring(1, tmpstr2.Length - 1)
                         tmpstr2 = tmpstr1.Substring(0, tmpstr1.Length - 2)
 
                         Dim obj As CultureInfo = System.Globalization.CultureInfo.CurrentCulture()
                         Dim currSym As String = obj.NumberFormat.CurrencySymbol()
-                        Dim ch1 As Char = CChar(tmpstr2.Substring(0, 1))
+                        Dim ch1 As Char = tmpstr2.Chars(0)
 
                         If Not Char.IsDigit(ch1) Then
-                            tmpstr2.TrimStart(CChar(currSym))
+                            tmpstr2.TrimStart(currSym.Chars(0))
                         End If
                     End If
                     Convert.ToDouble(tmpstr2)
@@ -442,7 +426,7 @@ Namespace Microsoft.VisualBasic
 
             Try
                 If TypeOf Expression Is String Then
-                    Dim tmpstr2 As String = CStr(Expression)
+                    Dim tmpstr2 As String = Conversions.ToString(Expression)
                     Convert.ToDouble(tmpstr2)
                 End If
 
@@ -528,7 +512,7 @@ Namespace Microsoft.VisualBasic
 
             Try
                 If TypeOf Expression Is String Then
-                    Dim tmpstr2 As String = CStr(Expression)
+                    Dim tmpstr2 As String = Conversions.ToString(Expression)
                     Convert.ToDouble(tmpstr2)
                 End If
 
@@ -704,7 +688,7 @@ Namespace Microsoft.VisualBasic
             End If
 
             For i = 0 To SourceArray.Length - 2
-                sb.Append(CStr(SourceArray(i)))
+                sb.Append(Conversions.ToString(SourceArray(i)))
                 If Not Delimiter Is Nothing Then
                     sb.Append(Delimiter)
                 End If
@@ -839,7 +823,7 @@ Namespace Microsoft.VisualBasic
                 Case TypeCode.Single
                     Return 4
                 Case TypeCode.String
-                    Return CStr(Expression).Length
+                    Return Conversions.ToString(Expression).Length
                 Case TypeCode.UInt16
                     Return 2
                 Case TypeCode.UInt32
@@ -881,7 +865,7 @@ Namespace Microsoft.VisualBasic
                 Throw New ArgumentException("Argument 'Length' is not a valid value.")
             End If
 
-            If str Is Nothing Or str = String.Empty Or Length = 0 Then
+            If str Is Nothing OrElse str.Length = 0 OrElse Length = 0 Then
                 Return String.Empty
             End If
 
@@ -917,7 +901,7 @@ Namespace Microsoft.VisualBasic
                 Throw New ArgumentException("Argument 'Start' must be greater than zero.")
             End If
 
-            If Expression Is Nothing Or Expression = String.Empty Then
+            If Expression Is Nothing OrElse Expression.Length = 0 Then
                 Return Nothing
             End If
 
@@ -925,7 +909,7 @@ Namespace Microsoft.VisualBasic
                 Return Nothing
             End If
 
-            If Find Is Nothing Or Find = String.Empty Then
+            If Find Is Nothing OrElse Find.Length = 0 Then
                 Return Expression
             End If
 
@@ -972,7 +956,7 @@ Namespace Microsoft.VisualBasic
                 Throw New ArgumentException("Argument 'Length' must be greater or equal to zero")
             End If
 
-            If str Is Nothing Or str = String.Empty Then
+            If str Is Nothing OrElse str.Length = 0 Then
                 Return String.Empty
             End If
 
@@ -1046,13 +1030,13 @@ Namespace Microsoft.VisualBasic
                 Optional ByVal Limit As Integer = -1, _
                 <OptionCompare()> Optional ByVal Compare As CompareMethod = CompareMethod.Binary) As String()
 
-            If Expression Is Nothing Or Expression = String.Empty Then
+            If Expression Is Nothing OrElse Expression.Length = 0 Then
                 Dim r(0) As String
                 r(0) = String.Empty
                 Return r
             End If
 
-            If Delimiter Is Nothing Or Delimiter = String.Empty Then
+            If Delimiter Is Nothing OrElse Expression.Length = 0 Then
                 Dim r(0) As String
                 r(0) = Expression
                 Return r
@@ -1097,25 +1081,17 @@ Namespace Microsoft.VisualBasic
 
             sarr(count) = Expression.Substring(previous)
 
-            ReDim Preserve sarr(count)
+            sarr = DirectCast (Utils.CopyArray (sarr, New String (count) {}), String ())
             Return sarr
 
         End Function
 
         Friend Shared Function String_Compare(ByVal strA As String, ByVal strB As String, ByVal ignoreCase As Boolean) As Integer
-#If NET_VER < 2.0 Then
-            Return String.Compare(strA, strB, ignoreCase)
-#Else
             Return String.Compare(strA, strB, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase)
-#End If
         End Function
 
         Friend Shared Function String_Compare(ByVal strA As String, ByVal indexA As Integer, ByVal strB As String, ByVal indexB As Integer, ByVal length As Integer, ByVal ignoreCase As Boolean) As Integer
-#If NET_VER < 2.0 Then
-            Return String.Compare(strA, indexA, strB, indexB, length, True)
-#Else
             Return String.Compare(strA, indexA, strB, indexB, length, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase)
-#End If
         End Function
 
         Public Shared Function StrComp(ByVal String1 As String, ByVal String2 As String, _
@@ -1166,11 +1142,7 @@ Namespace Microsoft.VisualBasic
                     Dim carr() As Char = str.ToCharArray()
                     Dim inWord As Boolean = False
                     For i As Integer = 0 To carr.Length - 1
-#If NET_VER >= 2.0 Then
                         If (Char.IsLetter(carr(i)) Or carr(i) = "'"c Or Char.IsDigit(carr(i))) Then
-#Else
-                        If (Char.IsLetter(carr(i)) Or carr(i) = "'"c) Then
-#End If
 
                             If Not inWord Then
                                 carr(i) = Char.ToUpper(carr(i))
@@ -1237,7 +1209,7 @@ Namespace Microsoft.VisualBasic
         End Function
 
         Public Shared Function StrReverse(ByVal Expression As String) As String
-            If Expression Is Nothing Or Expression = String.Empty Then
+            If Expression Is Nothing OrElse Expression.Length = 0 Then
                 Return String.Empty
             End If
 
@@ -1266,7 +1238,7 @@ Namespace Microsoft.VisualBasic
 
             Return Value.ToUpper()
         End Function
-#If NET_VER >= 2.0 Then
+
         <CLSCompliant(False)> _
         Public Shared Function Len(ByVal Expression As SByte) As Integer
             Return GetSize(Expression)
@@ -1286,7 +1258,5 @@ Namespace Microsoft.VisualBasic
         Public Shared Function Len(ByVal Expression As UShort) As Integer
             Return GetSize(Expression)
         End Function
-#End If
-
     End Class
 End Namespace

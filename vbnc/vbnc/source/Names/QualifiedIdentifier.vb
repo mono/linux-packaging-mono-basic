@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -27,24 +27,21 @@ Public Class QualifiedIdentifier
     Private m_First As ParsedObject
     Private m_Second As Token
 
-    Private m_ResolvedType As Type
+    Private m_ResolvedType As Mono.Cecil.TypeReference
 
     Private m_Name As String
 
     Sub New(ByVal Parent As ParsedObject)
         MyBase.New(Parent)
-        ' Helper.Assert(Me.HasLocation = False OrElse Me.Location.File IsNot Nothing)
     End Sub
 
     Sub New(ByVal Parent As ParsedObject, ByVal Location As Span)
         MyBase.New(Parent, location)
-        'Helper.Assert(Me.HasLocation = False OrElse Me.Location.File IsNot Nothing)
     End Sub
 
     Sub New(ByVal Parent As ParsedObject, ByVal First As ParsedObject, ByVal Second As Token)
         MyBase.new(Parent)
         Me.Init(First, Second)
-        'Helper.Assert(Me.HasLocation = False OrElse Me.Location.File IsNot Nothing)
     End Sub
 
     Sub Init(ByVal First As ParsedObject, ByVal Second As Token)
@@ -69,7 +66,7 @@ Public Class QualifiedIdentifier
         Return result
     End Function
 
-    ReadOnly Property ResolvedType() As Type
+    ReadOnly Property ResolvedType() As Mono.Cecil.TypeReference
         Get
             Return m_ResolvedType
         End Get
@@ -78,7 +75,7 @@ Public Class QualifiedIdentifier
     Function ResolveAsTypeName(ByVal AsAttributeTypeName As Boolean, Optional ByVal TypeArity As Integer = 0) As Boolean
         Dim result As Boolean = True
         Dim nri As New TypeNameResolutionInfo(Me, Me)
-        Dim resolvedType As Type
+        Dim resolvedType As Mono.Cecil.TypeReference
 
         nri.IsAttributeTypeName = AsAttributeTypeName
         nri.TypeArgumentCount = TypeArity
@@ -89,6 +86,18 @@ Public Class QualifiedIdentifier
                 resolvedType = nri.FoundAsType
             ElseIf nri.FoundIs(Of TypeParameter)() Then
                 resolvedType = nri.FoundAsType 'New TypeParameterDescriptor(nri.FoundAs(Of TypeParameter)())
+            ElseIf nri.FoundIs(Of ImportsClause)() Then
+                Dim ic As ImportsClause = nri.FoundAs(Of ImportsClause)()
+                If ic.IsNamespaceClause Then
+                    Return Compiler.Report.ShowMessage(Messages.VBNC30182, Me.Location)
+                ElseIf ic.AsAliasClause.Second.IsNamespaceImport Then
+                    Return Compiler.Report.ShowMessage(Messages.VBNC30182, Me.Location)
+                Else
+                    resolvedType = ic.AsAliasClause.Second.TypeImported
+                    If resolvedType Is Nothing Then
+                        Return Compiler.Report.ShowMessage(Messages.VBNC30002, Me.Location, ic.AsAliasClause.Name)
+                    End If
+                End If
             Else
                 resolvedType = Nothing
                 Return Helper.AddError(Me, "Could not resolve: '" & Name & "'")
@@ -104,6 +113,10 @@ Public Class QualifiedIdentifier
         m_ResolvedType = resolvedType
 
         Return result
+    End Function
+
+    Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
+        Return True 'Nothing to do here
     End Function
 
     ''' <summary>
@@ -126,7 +139,6 @@ Public Class QualifiedIdentifier
             Return m_Second
         End Get
         Set(ByVal value As Token)
-            'Helper.Assert(value Is Nothing)
             m_Second = value
         End Set
     End Property

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ Public Class MyGenerator
         Dim _MyTypeDefine As Define
         Dim _MyType As String
 
-        If Compiler.CommandLine.NoVBRuntimeRef Then Return result
+        If String.IsNullOrEmpty(Compiler.CommandLine.VBRuntime) Then Return result
 
         _MyTypeDefine = Compiler.CommandLine.Define("_MYTYPE")
         If _MyTypeDefine Is Nothing Then
@@ -91,9 +91,9 @@ Public Class MyGenerator
         result = GenerateMyUser() AndAlso result
         result = GenerateMyWebServices() AndAlso result
 
-        If Code.Length > 0 Then
+        If Code.Length > 0 OrElse m_MyType = MyTypes.Custom Then
             Dim projectPrepend As New System.Text.StringBuilder()
-            projectPrepend.AppendLine("    <Global.System.CodeDom.Compiler.GeneratedCode(""MyTemplate"", ""8.0.0.0"")> _")
+            projectPrepend.AppendLine("    <Global.System.CodeDom.Compiler.GeneratedCode(""MyTemplate"", ""10.0.0.0"")> _")
             projectPrepend.AppendLine("    <Global.Microsoft.VisualBasic.HideModuleName> _")
             projectPrepend.AppendLine("    Friend Module MyProject")
             projectPrepend.AppendLine("        <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)> _")
@@ -106,7 +106,7 @@ Public Class MyGenerator
             projectPrepend.AppendLine("            End Sub")
             projectPrepend.AppendLine("            ")
             If Compiler.CommandLine.Target = CommandLine.Targets.Library Then
-                projectPrepend.AppendLine("            Private m_Context As New Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue(Of T)")
+                projectPrepend.AppendLine("            Private ReadOnly m_Context As New Global.Microsoft.VisualBasic.MyServices.Internal.ContextValue(Of T)")
                 projectPrepend.AppendLine("            Friend ReadOnly Property GetInstance As T")
                 projectPrepend.AppendLine("                Get")
                 projectPrepend.AppendLine("                    Dim tmp as T = m_Context.Value")
@@ -187,7 +187,7 @@ Public Class MyGenerator
         End Select
 
         Code.AppendLine("    <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)> _")
-        Code.AppendLine("    <Global.System.CodeDom.Compiler.GeneratedCode(""MyTemplate"", ""8.0.0.0"")> _")
+        Code.AppendLine("    <Global.System.CodeDom.Compiler.GeneratedCode(""MyTemplate"", ""10.0.0.0"")> _")
         Code.AppendLine("    Friend Class MyApplication")
         Code.Append("        Inherits ") : Code.AppendLine(baseClass)
         'Code.AppendLine("        Public Sub New()")
@@ -195,6 +195,7 @@ Public Class MyGenerator
         If Compiler.CommandLine.Target = CommandLine.Targets.Winexe AndAlso baseClass = "Global.Microsoft.VisualBasic.ApplicationServices.WindowsFormsApplicationBase" Then
             Code.AppendLine("        <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Advanced)> _")
             Code.AppendLine("        <Global.System.Diagnostics.DebuggerHidden()> _")
+            Code.AppendLine("        <Global.System.STAThread()> _")
             Code.AppendLine("        Friend Shared Sub Main(ByVal Args As String())")
             Code.AppendLine("            Global.System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(Global.Microsoft.VisualBasic.ApplicationServices.WindowsFormsApplicationBase.UseCompatibleTextRendering)")
             Code.AppendLine("            $GLOBALMY$.MyProject.Application.Run(Args)")
@@ -328,7 +329,7 @@ Public Class MyGenerator
        "            End Function" & VB.vbNewLine & _
        "            " & VB.vbNewLine & _
        "            <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)> _" & VB.vbNewLine & _
-       "            Friend Function [GetType]() As Type" & VB.vbNewLine & _
+       "            Friend Overloads Function [GetType]() As Type" & VB.vbNewLine & _
        "                Return GetType(MyForms)" & VB.vbNewLine & _
        "            End Function" & VB.vbNewLine & _
        "            " & VB.vbNewLine & _
@@ -340,7 +341,7 @@ Public Class MyGenerator
        ""
         ProjectCode.Append(code)
 
-        ProjectCode.AppendLine("        Private Shared ReadOnly m_MyFormsObjectProvider As ThreadSafeObjectProvider(Of MyForms) = New ThreadSafeObjectProvider(Of MyForms)")
+        ProjectCode.AppendLine("        Private Shared m_MyFormsObjectProvider As ThreadSafeObjectProvider(Of MyForms) = New ThreadSafeObjectProvider(Of MyForms)")
         ProjectCode.AppendLine("        <Global.System.ComponentModel.Design.HelpKeyword(""My.Forms"")> _")
         ProjectCode.AppendLine("        Friend Shared ReadOnly Property Forms As MyForms")
         ProjectCode.AppendLine("            <Global.System.Diagnostics.DebuggerHidden()> _")
@@ -407,7 +408,7 @@ Public Class MyGenerator
        "            " & VB.vbNewLine & _
        "            <Global.System.Diagnostics.DebuggerHidden> _" & VB.vbNewLine & _
        "            <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)> _" & VB.vbNewLine & _
-       "            Friend Function [GetType]() As Type" & VB.vbNewLine & _
+       "            Friend Overloads Function [GetType]() As Type" & VB.vbNewLine & _
        "                Return GetType(MyWebServices)" & VB.vbNewLine & _
        "            End Function" & VB.vbNewLine & _
        "            " & VB.vbNewLine & _
@@ -469,7 +470,7 @@ Public Class MyGenerator
         "            " & VB.vbNewLine & _
         "            <Global.System.Diagnostics.DebuggerHidden> _" & VB.vbNewLine & _
         "            <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)> _" & VB.vbNewLine & _
-        "            Friend Function [GetType]() As Type" & VB.vbNewLine & _
+        "            Friend Overloads Function [GetType]() As Type" & VB.vbNewLine & _
         "                Return GetType(MyWebServices)" & VB.vbNewLine & _
         "            End Function" & VB.vbNewLine & _
         "            " & VB.vbNewLine & _
@@ -535,7 +536,7 @@ Public Class MyGenerator
         End Select
 
         Code.AppendLine("    <Global.System.ComponentModel.EditorBrowsable(Global.System.ComponentModel.EditorBrowsableState.Never)> _")
-        Code.AppendLine("    <Global.System.CodeDom.Compiler.GeneratedCode(""MyTemplate"", ""8.0.0.0"")> _")
+        Code.AppendLine("    <Global.System.CodeDom.Compiler.GeneratedCode(""MyTemplate"", ""10.0.0.0"")> _")
         Code.AppendLine("    Friend Class MyComputer")
         Code.Append("        Inherits ") : Code.AppendLine(baseClass)
         Code.AppendLine("        <Global.System.Diagnostics.DebuggerHidden()> _")

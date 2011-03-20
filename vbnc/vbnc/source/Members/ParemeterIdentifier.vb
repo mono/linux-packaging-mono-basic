@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -55,8 +55,6 @@ Public Class ParameterIdentifier
     Public Overrides Function ResolveTypeReferences() As Boolean
         Dim result As Boolean = True
 
-        Me.CheckTypeReferencesNotResolved()
-
         If m_ArrayNameModifier IsNot Nothing Then result = m_ArrayNameModifier.ResolveTypeReferences AndAlso result
 
         Return result
@@ -84,9 +82,12 @@ Public Class ParameterIdentifier
         End Get
     End Property
 
-    Public ReadOnly Property Name() As String Implements INameable.Name
+    Public Property Name() As String Implements INameable.Name
         Get
             Return m_Identifier.Name
         End Get
+        Set(ByVal value As String)
+            m_Identifier.Name = value
+        End Set
     End Property
 End Class

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -71,16 +71,6 @@ Public Class InternalException
     End Sub
 
     <Diagnostics.DebuggerHidden()> _
-    Sub New(ByVal Obj As MemberInfo)
-        MyBase.new()
-        If False Then 'Obj IsNot Nothing AndAlso Obj.Location IsNot Nothing Then
-            'm_Message = "There has been an internal error in the compiler caused by the line: " & Obj.Location.AsString
-        Else
-            m_Message = "There has been an internal error in the compiler."
-        End If
-        StopOnInternalException()
-    End Sub
-    <Diagnostics.DebuggerHidden()> _
     Sub New(ByVal InnerException As Exception)
         MyBase.New("", InnerException)
         m_Message = "There has been an internal error in the compiler: " & InnerException.Message
@@ -113,29 +103,4 @@ StopOnInternalException()
         recursive = False
 #End If
     End Sub
-
-#If DEBUG Then
-    Shared Sub Dump(ByVal xml As Xml.XmlWriter, ByVal ex As Exception, Optional ByVal ElementWritten As Boolean = False)
-        If ElementWritten = False Then xml.WriteStartElement("Exception")
-        xml.WriteAttributeString("Type", ex.GetType.ToString)
-        xml.WriteAttributeString("HelpLink", ex.HelpLink)
-        xml.WriteAttributeString("Source", ex.Source)
-        If ex.TargetSite IsNot Nothing Then xml.WriteAttributeString("TargetSite", ex.TargetSite.ToString)
-
-        xml.WriteStartElement("Message")
-        xml.WriteString(ex.Message)
-        xml.WriteEndElement()
-
-        xml.WriteStartElement("StackTrace")
-        xml.WriteString(ex.StackTrace)
-        xml.WriteEndElement()
-
-        If ex.InnerException IsNot Nothing Then
-            xml.WriteStartElement("InnerException")
-            Dump(xml, ex.InnerException, True)
-            xml.WriteEndElement()
-        End If
-        If ElementWritten = False Then xml.WriteEndElement()
-    End Sub
-#End If
 End Class

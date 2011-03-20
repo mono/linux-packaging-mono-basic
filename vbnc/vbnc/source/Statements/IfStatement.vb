@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -83,12 +83,10 @@ Public Class IfStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        Dim startFalse As Label = Info.ILGen.DefineLabel
-        EndLabel = Info.ILGen.DefineLabel
+        Dim startFalse As Label = Emitter.DefineLabel(Info)
+        EndLabel = Emitter.DefineLabel(Info)
 
-        'result = m_Condition.GenerateCode(Info.Clone(True, False, Compiler.TypeCache.Boolean)) AndAlso result
-        'Emitter.EmitConversion(Compiler.TypeCache.Boolean, Info)
-        result = CBoolExpression.GenerateCode(m_Condition, Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean)) AndAlso result
+        result = m_Condition.GenerateCode(Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean)) AndAlso result
 
         Emitter.EmitBranchIfFalse(Info, startFalse)
         'True code
@@ -96,7 +94,7 @@ Public Class IfStatement
         Emitter.EmitBranch(Info, EndLabel)
 
         'False code
-        Info.ILGen.MarkLabel(startFalse)
+        Emitter.MarkLabel(Info, startFalse)
         If m_ElseIfs IsNot Nothing Then
             For Each eif As ElseIfStatement In m_ElseIfs
                 result = eif.GenerateCode(Info) AndAlso result
@@ -106,7 +104,7 @@ Public Class IfStatement
         If m_FalseCode IsNot Nothing Then
             result = m_FalseCode.GenerateCode(Info) AndAlso result
         End If
-        Info.ILGen.MarkLabel(EndLabel)
+        Emitter.MarkLabel(Info, EndLabel)
 
 
         Return result
@@ -132,14 +130,15 @@ Public Class IfStatement
                 Helper.AddError(Me)
                 Return result
             End If
-            m_Condition = Helper.CreateTypeConversion(Me, m_Condition, Compiler.TypeCache.System_Boolean, result)
-
-            If result = False Then
-                Helper.AddError(Me)
-                Return result
-            End If
         Else
             Helper.AddError(Me, "Each expression in an If...Then...Else statement must be classified as a value and be implicitly convertible to Boolean")
+        End If
+
+        m_Condition = Helper.CreateTypeConversion(Me, m_Condition, Compiler.TypeCache.System_Boolean, result)
+
+        If result = False Then
+            Helper.AddError(Me)
+            Return result
         End If
 
         Return result

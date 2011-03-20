@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,6 @@
 ' Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ' 
 
-#Const SUPPORT_CSTYLE_COMMENTS = 1
 #If DEBUG Then
 #Const DOEOFCHECK = 0
 #Const EXTENDEDDEBUG = 0
@@ -75,7 +74,9 @@ Public Class Scanner
     Private m_EndOfFile As Boolean
     Private m_PeekedChars As New Generic.Queue(Of Char)
     Private m_Reader As System.IO.StreamReader
-    Private m_Builder As New System.Text.StringBuilder
+
+    Private m_StringBuilder(127) As Char
+    Private m_StringBuilderLength As Integer
 
     ''' <summary>
     ''' If any tokens has been found on this line.
@@ -109,27 +110,31 @@ Public Class Scanner
     ''' <remarks></remarks>
     Private m_ConditionStack As New Generic.List(Of Integer)
 
-    Private m_Methods As New Generic.Dictionary(Of MethodInfo, Object())
+    Private m_Methods As New Generic.Dictionary(Of Mono.Cecil.MethodReference, Mono.Collections.Generic.Collection(Of Mono.Cecil.CustomAttribute))
 
-    Function IsConditionallyExcluded(ByVal CalledMethod As MethodInfo, ByVal AtLocation As Span) As Boolean
-        Dim attribs() As Object
+    Function IsConditionallyExcluded(ByVal CalledMethod As Mono.Cecil.MethodReference, ByVal AtLocation As Span) As Boolean
+        Dim attribs As Mono.Collections.Generic.Collection(Of Mono.Cecil.CustomAttribute)
 
         If m_Methods.ContainsKey(CalledMethod) Then
             attribs = m_Methods(CalledMethod)
         Else
-            attribs = CalledMethod.GetCustomAttributes(Compiler.TypeCache.System_Diagnostics_ConditionalAttribute, False)
+            attribs = CecilHelper.FindDefinition(CalledMethod).CustomAttributes
             m_Methods.Add(CalledMethod, attribs)
         End If
 
-        If attribs Is Nothing Then Return False
+        If attribs Is Nothing OrElse attribs.Count = 0 Then Return False
 
-        For Each attrib As Object In attribs
-            Dim conditionalAttrib As System.Diagnostics.ConditionalAttribute
+        For i As Integer = 0 To attribs.Count - 1
+            Dim attrib As Mono.Cecil.CustomAttribute = attribs(i)
+            Dim identifier As String
 
-            conditionalAttrib = TryCast(attrib, System.Diagnostics.ConditionalAttribute)
-            If conditionalAttrib Is Nothing Then Continue For
+            If attrib.ConstructorArguments.Count <> 1 Then
+                Continue For
+            End If
+            identifier = TryCast(attrib.ConstructorArguments(0).Value, String)
+            If identifier = String.Empty Then Continue For
 
-            If Not IsDefinedAtLocation(conditionalAttrib.ConditionString, AtLocation) Then Return True
+            If Not IsDefinedAtLocation(identifier, AtLocation) Then Return True
         Next
 
         Return False
@@ -201,7 +206,7 @@ Public Class Scanner
         Me.NextUnconditionally()
 
         If m_Current.IsIdentifier = False Then
-            Compiler.Report.ShowMessage(Messages.VBNC30203)
+            Compiler.Report.ShowMessage(Messages.VBNC30203, GetCurrentLocation())
             Me.EatLine(False)
             Return
         End If
@@ -504,6 +509,37 @@ Public Class Scanner
     End Function
 #End Region
 
+#Region "StringBuilder"
+    Private Property StringBuilderLength As Integer
+        Get
+            Return m_StringBuilderLength
+        End Get
+        Set(ByVal value As Integer)
+            m_StringBuilderLength = value
+        End Set
+    End Property
+
+    Private Sub StringBuilderAppend(ByVal c As Char)
+        m_StringBuilderLength += 1
+        If m_StringBuilder Is Nothing Then
+            ReDim m_StringBuilder(31)
+        End If
+        If m_StringBuilder.Length < m_StringBuilderLength Then
+            Dim tmp(Math.Max(m_StringBuilder.Length * 2 - 1, m_StringBuilderLength)) As Char
+            m_StringBuilder.CopyTo(tmp, 0)
+            m_StringBuilder = tmp
+        End If
+        m_StringBuilder(m_StringBuilderLength - 1) = c
+    End Sub
+
+    Private Function StringBuilderToString() As String
+        Dim result As String
+        result = New String(m_StringBuilder, 0, m_StringBuilderLength)
+        m_StringBuilderLength = 0
+        Return result
+    End Function
+#End Region
+
     Private Structure Data
         Public Type As TokenType
         Public Symbol As KS
@@ -711,53 +747,6 @@ Public Class Scanner
             Case COMMENTCHAR1, COMMENTCHAR2, COMMENTCHAR3 'Traditional VB comment
                 EatLine(False) 'do not eat newline, it needs to be added as a token
                 Return
-#If SUPPORT_CSTYLE_COMMENTS Then
-            Case "/"c 'C-style comment
-                NextChar()
-                Select Case CurrentChar()
-                    Case "/"c 'Single line comment
-                        EatLine(False) 'do not eat newline, it needs to be added as a token
-                        Return
-                    Case "*"c 'Nestable, multiline comment.
-                        Dim iNesting As Integer = 1
-                        NextChar()
-                        Do
-                            Select Case CurrentChar()
-                                Case "*"c
-                                    If PeekChar() = "/"c Then
-                                        'End of comment found (if iNesting is 0)
-                                        NextChar()
-                                        NextChar()
-                                        iNesting -= 1
-                                    Else
-                                        NextChar()
-                                    End If
-                                Case "/"c
-                                    If PeekChar() = "*"c Then
-                                        'a nested comment was found
-                                        NextChar()
-                                        iNesting += 1
-                                    ElseIf PeekChar() = "/"c Then
-                                        EatLine(True)
-                                    Else
-                                        NextChar()
-                                    End If
-                                Case nl0
-                                    Compiler.Report.ShowMessage(Messages.VBNC90022)
-                                    Return
-                                Case Else
-                                    If IsNewLine() Then
-                                        EatNewLine() 'To update the line variable
-                                    Else
-                                        NextChar()
-                                    End If
-                            End Select
-                        Loop While (iNesting <> 0)
-                    Case Else
-                        'Function should never be called if not a comment
-                        Throw New InternalException("EatComment called with no comment.")
-                End Select
-#End If
             Case Else
                 REM is taken care of some other place.
                 'Function should never be called if not a comment
@@ -783,27 +772,27 @@ Public Class Scanner
         Dim Count As Integer
         'Date value
         Dim bCont As Boolean = True
-        m_Builder.Length = 0
+        StringBuilderLength = 0
         Do
             Count += 1
             Dim ch As Char = NextChar()
             If (IsNewLine()) Then
-                Compiler.Report.ShowMessage(Messages.VBNC90000)
+                Compiler.Report.ShowMessage(Messages.VBNC90000, GetCurrentLocation())
                 bCont = False
             Else
                 Select Case ch
                     Case nl0
-                        Compiler.Report.ShowMessage(Messages.VBNC90001)
+                        Compiler.Report.ShowMessage(Messages.VBNC90001, GetCurrentLocation())
                         bCont = False
                     Case "#"c
                         NextChar() 'The ending #
                         bCont = False
                 End Select
             End If
-            If bCont Then m_Builder.Append(ch)
+            If bCont Then StringBuilderAppend(ch)
         Loop While bCont
 
-        Return Token.CreateDateToken(GetCurrentLocation, CDate(m_Builder.ToString))
+        Return Token.CreateDateToken(GetCurrentLocation, CDate(StringBuilderToString))
     End Function
 
     Private Function CanStartIdentifier() As Boolean
@@ -852,15 +841,15 @@ Public Class Scanner
         '   NumericCharacter |
         '   CombiningCharacter |
         '   FormattingCharacter
-        m_Builder.Length = 0
+        StringBuilderLength = 0
 
         ch = CurrentChar()
-        m_Builder.Append(ch)
+        StringBuilderAppend(ch)
         If IsAlphaCharacter(ch) Then
             bValid = True
         ElseIf IsUnderscoreCharacter(ch) Then
             ch = NextChar()
-            m_Builder.Append(ch)
+            StringBuilderAppend(ch)
             bValid = IsIdentifierCharacter(ch)
         End If
 
@@ -869,11 +858,9 @@ Public Class Scanner
             Return Nothing
         Else
             Do While IsIdentifierCharacter(NextChar)
-                m_Builder.Append(CurrentChar)
+                StringBuilderAppend(CurrentChar)
             Loop
         End If
-
-        Dim strIdent As String = m_Builder.ToString()
 
         'The type character ! presents a special problem in that it can be used both as a type character and 
         'as a separator in the language. To remove ambiguity, a ! character is a type character as long as 
@@ -884,55 +871,56 @@ Public Class Scanner
         If TypeCharacters.IsTypeCharacter(CurrentChar, typecharacter) AndAlso (canstartidentifier = False OrElse typecharacter <> TypeCharacters.Characters.SingleTypeCharacter) Then
             NextChar()
             m_CurrentTypeCharacter = typecharacter
-            Return Token.CreateIdentifierToken(GetCurrentLocation, strIdent)
+            Return Token.CreateIdentifierToken(GetCurrentLocation, StringBuilderToString())
         Else
             Dim keyword As KS
-            If Escaped = False AndAlso Token.IsKeyword(strIdent, keyword) Then
+            If Escaped = False AndAlso Token.IsKeyword(m_StringBuilder, m_StringBuilderLength, keyword) Then
                 Return Token.CreateKeywordToken(GetCurrentLocation, keyword)
             Else
                 m_CurrentTypeCharacter = typecharacter
-                Return Token.CreateIdentifierToken(GetCurrentLocation, strIdent)
+                Return Token.CreateIdentifierToken(GetCurrentLocation, StringBuilderToString())
             End If
         End If
     End Function
 
     Private Function GetString() As Token
         Dim bEndOfString As Boolean = False
-        m_Builder.Length = 0
+        StringBuilderLength = 0
         Do
             Select Case NextChar()
                 Case """"c '
                     'If " followed by a ", output one "
                     If NextChar() = """" Then
-                        m_Builder.Append("""")
+                        StringBuilderAppend(""""c)
                     Else
                         bEndOfString = True
                     End If
                 Case nlA, nlD, nl2028, nl2029
                     'vbc accepts this...
-                    Compiler.Report.ShowMessage(Messages.VBNC90003)
+                    Compiler.Report.ShowMessage(Messages.VBNC90003, GetCurrentLocation())
                     bEndOfString = True
                 Case Else
                     If m_EndOfFile Then
-                        Compiler.Report.ShowMessage(Messages.VBNC90004)
+                        Compiler.Report.ShowMessage(Messages.VBNC90004, GetCurrentLocation())
                         'PreviousChar() 'Step back
                         bEndOfString = True
                     Else
-                        m_Builder.Append(CurrentChar())
+                        StringBuilderAppend(CurrentChar())
                     End If
+
             End Select
         Loop While bEndOfString = False
         If CurrentChar() = "C"c OrElse CurrentChar() = "c"c Then
             'Is a char type character
             NextChar()
-            If m_Builder.Length <> 1 Then
-                Compiler.Report.ShowMessage(Messages.VBNC30004)
-                Return Token.CreateStringLiteral(GetCurrentLocation, m_Builder.ToString)
+            If StringBuilderLength <> 1 Then
+                Compiler.Report.ShowMessage(Messages.VBNC30004, GetCurrentLocation())
+                Return Token.CreateStringLiteral(GetCurrentLocation, StringBuilderToString)
             Else
-                Return Token.CreateCharToken(GetCurrentLocation, m_Builder.Chars(0))
+                Return Token.CreateCharToken(GetCurrentLocation, m_StringBuilder(0))
             End If
         Else
-            Return Token.CreateStringLiteral(GetCurrentLocation, m_Builder.ToString)
+            Return Token.CreateStringLiteral(GetCurrentLocation, StringBuilderToString)
         End If
     End Function
 
@@ -953,6 +941,8 @@ Public Class Scanner
                     Case "b"c, "B"c 'Binary
                         Base = IntegerBase.Binary
 #End If
+                    Case "d"c, "D"c 'Decimal
+                        Base = IntegerBase.Decimal
                     Case "h"c, "H"c 'Hex
                         Base = IntegerBase.Hex
                     Case "o"c, "O"c 'Octal
@@ -1066,7 +1056,7 @@ Public Class Scanner
                             GetNumber = Token.CreateSingleToken(GetCurrentLocation, Single.Parse(strResult, Helper.USCulture))
                         Case BuiltInDataTypes.Integer, BuiltInDataTypes.Long, BuiltInDataTypes.Short, BuiltInDataTypes.UInteger, BuiltInDataTypes.ULong, BuiltInDataTypes.UShort
                             If bReal Then
-                                Compiler.Report.ShowMessage(Messages.VBNC90002, typeCharacter.ToString)
+                                Compiler.Report.ShowMessage(Messages.VBNC90002, GetCurrentLocation(), typeCharacter.ToString)
                                 IntegerValue = 0
                             Else
                                 'Try to parse the result
@@ -1092,18 +1082,18 @@ Public Class Scanner
                                     Throw New InternalException("")
                             End Select
                             If bOutOfRange AndAlso typeCharacter <> LiteralTypeCharacters_Characters.None Then
-                                Compiler.Report.ShowMessage(Messages.VBNC30439, typeCharacter.ToString)
+                                Compiler.Report.ShowMessage(Messages.VBNC30439, GetCurrentLocation(), typeCharacter.ToString)
                             End If
                             GetNumber = GetIntegralToken(ULong.Parse(strResult, Helper.USCulture), Base, typeCharacter)
                         Case Else
-                            Compiler.Report.ShowMessage(Messages.VBNC90002, typeCharacter.ToString)
+                            Compiler.Report.ShowMessage(Messages.VBNC90002, GetCurrentLocation(), typeCharacter.ToString)
                             GetNumber = Token.CreateDoubleToken(GetCurrentLocation, 0)
                     End Select
                 Catch ex As System.OverflowException
-                    Compiler.Report.ShowMessage(Messages.VBNC30036)
+                    Compiler.Report.ShowMessage(Messages.VBNC30036, GetCurrentLocation())
                     GetNumber = Token.CreateDoubleToken(GetCurrentLocation, 0)
                 Catch ex As Exception
-                    Compiler.Report.ShowMessage(Messages.VBNC90005)
+                    Compiler.Report.ShowMessage(Messages.VBNC90005, GetCurrentLocation())
                     GetNumber = Token.CreateDoubleToken(GetCurrentLocation, 0)
                 End Try
 #If EXTENDED Then
@@ -1128,7 +1118,7 @@ Public Class Scanner
                 Try
                     IntegerValue = Helper.OctToInt(strResult)
                 Catch ex As Exception
-                    Compiler.Report.ShowMessage(Messages.VBNC90006, "octal")
+                    Compiler.Report.ShowMessage(Messages.VBNC90006, GetCurrentLocation(), "octal")
                 End Try
                 GetNumber = GetIntegralToken(IntegerValue, Base, typeCharacter)
             Case Else
@@ -1426,12 +1416,15 @@ Public Class Scanner
                 Case "!"c
                     NextChar()
                     Result = NewToken(KS.Exclamation)
+                Case "?"c
+                    NextChar()
+                    Result = NewToken(KS.Interrogation)
                 Case "&"c
                     Select Case PeekChar()
 #If EXTENDED Then
                         Case "b"c, "B"c, "h"c, "H"c, "o"c, "O"c, "d"c, "D"c
 #Else
-                        Case "h"c, "H"c, "o"c, "O"c
+                        Case "h"c, "H"c, "o"c, "O"c, "d"c, "D"c
 #End If
                             Result = GetNumber()
                         Case Else 'Not a number, but operator
@@ -1499,22 +1492,14 @@ Public Class Scanner
                         Result = GetDate()
                     End If
                 Case "/"c
-#If SUPPORT_CSTYLE_COMMENTS Then
-                    If (PeekChar() = "/"c OrElse PeekChar() = "*"c) Then 'Comment
-                        EatComment()
-                    Else 'Division
-#End If
+                    NextChar()
+                    EatWhiteSpace()
+                    If (CurrentChar() = "="c) Then
                         NextChar()
-                        EatWhiteSpace()
-                        If (CurrentChar() = "="c) Then
-                            NextChar()
-                            Result = NewToken(KS.RealDivAssign)
-                        Else
-                            Result = NewToken(KS.RealDivision)
-                        End If
-#If SUPPORT_CSTYLE_COMMENTS Then
+                        Result = NewToken(KS.RealDivAssign)
+                    Else
+                        Result = NewToken(KS.RealDivision)
                     End If
-#End If
                 Case " "c 'Space
                     NextChar()
                     If (CurrentChar() = "_"c) Then '
@@ -1540,7 +1525,7 @@ Public Class Scanner
                             Result = Nothing
                         End If
                     Else
-                        Compiler.Report.ShowMessage(Messages.VBNC30037)
+                        Compiler.Report.ShowMessage(Messages.VBNC30037, GetCurrentLocation())
                         EatLine(False)
                     End If
             End Select

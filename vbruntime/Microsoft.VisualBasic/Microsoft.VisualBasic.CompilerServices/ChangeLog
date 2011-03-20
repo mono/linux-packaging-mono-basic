@@ -1,3 +1,62 @@
+2010-06-11  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Utils.vb:
+	* Versioned.vb:
+	* Operators.vb:
+	* LateBinder.vb:
+	* DoubleType.vb:
+	* DecimalType.vb:
+	* Conversions.vb:
+	* BooleanType.vb:
+	* IntegerType.vb:
+	* ProjectData.vb:
+	* LikeOperator.vb:
+	* NewLateBinding.vb:
+	* ObjectFlowControl.vb:
+	* StaticLocalInitFlag.vb:
+	* InternalErrorException.vb:
+	* IncompleteInitialization.vb: Remove .NET 1.0/1.1 logic
+
+2010-06-12  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* ProjectData.vb: Make it compile in VS2010.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* LateBinder.vb: Call Utils.CopyArray manually instead of using
+	Redim Preserve.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Versioned.vb:
+	* Operators.vb:
+	* LateBinder.vb:
+	* FlowControl.vb: Remove all uses of CType (and relatives): for primitive
+	types call the corresponding conversion method, for other types call
+	DirectCast.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Conversions.vb: Simplify type checking and conversion.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Versioned.vb: Use if instead of select on strings.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Conversions.vb: Make this class internally accessible in all profiles.
+	This way we can call the VB conversion methods manually more easily.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* StringType.vb:
+	* ObjectType.vb:
+	* CharType.vb:
+	* BooleanType.vb: Use String.Compare/Length instead of equality operator.
+	Second step in making the vbruntime compile in vb9 (by not being
+	self-referential).
+
 2009-05-01  Rolf Bjarne Kvinge  <RKvinge@novell.com>
 
 	* Operators.vb: Rename paramaters and shuffle some "#If
@@ -151,4 +210,3 @@
 
 	* StaticLocalInitFlag.vb: The "State" is actually a field, not a
 	property, hope this fixes the VB compiler.
-
