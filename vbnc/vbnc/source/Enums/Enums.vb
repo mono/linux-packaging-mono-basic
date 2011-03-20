@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -23,14 +23,6 @@ Module Enums
     ''' </summary>
     ''' <remarks></remarks>
     Friend strSpecial(KS.NumberOfItems) As String
-
-    Private keywordLookup As New Hashtable(Helper.StringComparer)
-
-    ''' <summary>
-    ''' The ks enums as friendly strings for dump support (i.e. NewLine as &lt;NewLine&gt;, etc.)
-    ''' </summary>
-    ''' <remarks></remarks>
-    Friend strSpecialFriendly(KS.NumberOfItems) As String
 
     ''' <summary>
     ''' BinaryExpression ::= 
@@ -112,184 +104,250 @@ Module Enums
     ''' </summary>
     ''' <remarks></remarks>
     Public ReadOnly PrimitiveTypeNames As KS() = New KS() {KS.Single, KS.Double, KS.Byte, KS.SByte, KS.UShort, KS.Short, KS.UInteger, KS.Integer, KS.ULong, KS.Long, KS.Decimal, KS.String, KS.Boolean, KS.Date, KS.Char}
-    
-    '''' <summary>
-    '''' ExternalMethodModifier  ::=  AccessModifier  |  "Shadows" | "Overloads"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ExternalMethodModifiers As KS() = New KS() {KS.Public, KS.Protected, KS.Friend, KS.Private, KS.Shadows, KS.Overloads}
 
-    '''' <summary>
-    '''' CharsetModifier  ::=  "Ansi" | "Unicode" |  "Auto"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly CharSetModifiers As KS() = New KS() {KS.Auto, KS.Unicode, KS.Ansi}
+    Class KW
+        Public KeywordL As String
+        Public KS As KS
+    End Class
 
-    '''' <summary>
-    '''' AccessModifier  ::=  "Public" |  "Protected" | "Friend" | "Private" | "Protected" "Friend"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly AccessModifiers As KS() = New KS() {KS.Public, KS.Protected, KS.Friend, KS.Private}
-    '''' <summary>
-    '''' VariableModifier  ::= AccessModifier  |	Shadows  |	Shared  |	ReadOnly  |	WithEvents  |	Dim
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly VariableModifiers As KS() = New KS() {KS.Public, KS.Protected, KS.Friend, KS.Private, KS.Shadows, KS.Shared, KS.ReadOnly, KS.WithEvents, KS.Dim}
-
-    '''' <summary>
-    '''' ConstantModifier  ::=  AccessModifier  |  Shadows
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ConstantModifiers As KS() = New KS() {KS.Public, KS.Protected, KS.Friend, KS.Private, KS.Shadows}
-
-    '''' <summary>
-    '''' LocalModifier  ::=  "Static" |"Dim" | "Const"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly LocalModifiers As KS() = New KS() {KS.Dim, KS.Static, KS.Const}
-
-    '''' <summary>
-    '''' ParameterModifier  ::=  ByVal  |  ByRef  |  Optional  |  ParamArray
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ParameterModifiers As KS() = New KS() {KS.ByVal, KS.ByRef, KS.Optional, KS.ParamArray}
-
-    '''' <summary>
-    '''' TypeModifier  ::=  AccessModifier  |  "Shadows"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly TypeModifiers As KS() = New KS() {KS.Public, KS.Protected, KS.Friend, KS.Private, KS.Shadows}
-
-    '''' <summary>
-    '''' ClassModifier  ::=  TypeModifier  |  "MustInherit"  |  "NotInheritable"  |  "Partial"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ClassModifiers As KS() = New KS() {KS.Public, KS.Protected, KS.Friend, KS.Private, KS.Shadows, KS.MustInherit, KS.NotInheritable, KS.Partial}
-
-    '''' <summary>
-    '''' StructureModifier  ::=  TypeModifier  |  "Partial"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly StructureModifiers As KS() = New KS() {KS.Public, KS.Protected, KS.Friend, KS.Private, KS.Shadows, KS.Partial}
-
-    '''' <summary>
-    '''' EventModifiers  ::=  AccessModifier  |  "Shadows" |  "Shared"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly EventModifiers As KS() = New KS() {KS.Public, KS.Private, KS.Friend, KS.Protected, KS.Shadows, KS.Shared}
-
-    '''' <summary>
-    '''' ProcedureModifier ::= AccessModifier | "Shadows" | "Shared" | "Overridable" | "NotOverridable" | "Overrides" | "Overloads"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ProcedureModifiers As KS() = New KS() {KS.Public, KS.Friend, KS.Protected, KS.Private, KS.Shadows, KS.Shared, KS.Overridable, KS.NotOverridable, KS.Overrides, KS.Overloads}
-
-    '''' <summary>
-    '''' MustOverrideProcedureModifier  ::=  ProcedureModifier  |  "MustOverride"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly MustOverrideProcedureModifiers As KS() = New KS() {KS.Public, KS.Friend, KS.Protected, KS.Private, KS.Shadows, KS.Shared, KS.Overridable, KS.NotOverridable, KS.Overrides, KS.Overloads, KS.MustOverride}
-
-    '''' <summary>
-    '''' MustOverridePropertyModifier  ::=  PropertyModifier  | "MustOverride"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly MustOverridePropertyModifiers As KS() = New KS() {KS.Public, KS.Friend, KS.Protected, KS.Private, KS.Shared, KS.Overridable, KS.NotOverridable, KS.Overrides, KS.Overloads, KS.Default, KS.ReadOnly, KS.WriteOnly, KS.MustOverride}
-
-    '''' <summary>
-    '''' PropertyModifier  ::=  ProcedureModifier  |  "Default"  |  "ReadOnly"  |  "WriteOnly"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly PropertyModifiers As KS() = New KS() {KS.Public, KS.Friend, KS.Protected, KS.Private, KS.Shared, KS.Overridable, KS.NotOverridable, KS.Overrides, KS.Overloads, KS.Default, KS.ReadOnly, KS.WriteOnly, KS.Shadows}
-
-    '''' <summary>
-    '''' InterfacePropertyModifier  ::=	"Shadows"  |	"Overloads"  |	"Default"  |	"ReadOnly"  |	"WriteOnly"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly InterfacePropertyModifier As KS() = New KS() {KS.Shadows, KS.Overloads, KS.Default, KS.ReadOnly, KS.WriteOnly}
-
-    '''' <summary>
-    '''' ConstructorModifier  ::=  AccessModifier  |  "Shared"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ConstructorModifiers As KS() = New KS() {KS.Public, KS.Friend, KS.Protected, KS.Private, KS.Shared}
-
-    '''' <summary>
-    '''' OperatorModifier  ::=  "Public"  | "Shared"  |  "Overloads"  |  "Shadows"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly OperatorModifiers As KS() = New KS() {KS.Public, KS.Shared, KS.Overloads, KS.Shadows}
-
-    '''' <summary>
-    '''' InterfaceEventModifiers  ::=  "Shadows"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly InterfaceEventModifiers As KS() = New KS() {KS.Shadows}
-
-    '''' <summary>
-    '''' InterfaceProcedureModifier  ::=  "Shadows" | "Overloads"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly InterfaceProcedureModifiers As KS() = New KS() {KS.Shadows, KS.Overloads}
-
-    '''' <summary>
-    '''' ConversionOperatorModifier  ::=  "Widening" | "Narrowing" |  ConversionModifier
-    '''' LAMESPEC: ConversionModifier should be OperatorModifier
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ConversionOperatorModifiers As KS() = New KS() {KS.Widening, KS.Narrowing, KS.Public, KS.Shared, KS.Overloads, KS.Shadows}
-
-    '''' <summary>
-    '''' ConstructorModifier  ::=  AccessModifier  |  "Shared"
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public ReadOnly ConstructorModifier As KS() = New KS() {KS.Public, KS.Friend, KS.Protected, KS.Private, KS.Shared}
-
-    Private m_KSAttributes(KS.NumberOfItems) As KSEnumStringAttribute
+    Public m_Keywords(12) As Generic.Dictionary(Of Char, Generic.List(Of KW))
 
     Sub New()
-        Dim stringAttribute As KSEnumStringAttribute
-        Dim fields() As Reflection.FieldInfo
-        Dim EnumDeclaration As Type = GetType(KS)
-        Dim attribType As Type = GetType(EnumStringAttribute)
+        strSpecial(KS.LT) = "<"
+        strSpecial(KS.GT) = ">"
+        strSpecial(KS.Equals) = "="
+        strSpecial(KS.NotEqual) = "<>"
+        strSpecial(KS.LE) = "<="
+        strSpecial(KS.GE) = ">="
+        strSpecial(KS.Exclamation) = "!"
+        strSpecial(KS.Concat) = "&"
+        strSpecial(KS.Mult) = "*"
+        strSpecial(KS.Add) = "+"
+        strSpecial(KS.Minus) = "-"
+        strSpecial(KS.Power) = "^"
+        strSpecial(KS.RealDivision) = "/"
+        strSpecial(KS.IntDivision) = "\"
+        strSpecial(KS.Numeral) = "#"
+        strSpecial(KS.LBrace) = "{"
+        strSpecial(KS.RBrace) = "}"
+        strSpecial(KS.LParenthesis) = "("
+        strSpecial(KS.RParenthesis) = ")"
+        strSpecial(KS.Dot) = "."
+        strSpecial(KS.Comma) = ","
+        strSpecial(KS.Colon) = ":"
+        strSpecial(KS.ShiftLeft) = "<<"
+        strSpecial(KS.ShiftRight) = ">>"
+        strSpecial(KS.ConcatAssign) = "&="
+        strSpecial(KS.AddAssign) = "+="
+        strSpecial(KS.MinusAssign) = "-="
+        strSpecial(KS.RealDivAssign) = "/="
+        strSpecial(KS.IntDivAssign) = "\="
+        strSpecial(KS.PowerAssign) = "^="
+        strSpecial(KS.MultAssign) = "*="
+        strSpecial(KS.ShiftLeftAssign) = "<<="
+        strSpecial(KS.ShiftRightAssign) = ">>="
 
-        fields = EnumDeclaration.GetFields()
-        For Each field As Reflection.FieldInfo In fields
-            If field.IsSpecialName Then Continue For
-            If System.Attribute.IsDefined(field, attribType) Then
-                stringAttribute = DirectCast(System.Attribute.GetCustomAttribute(field, attribType), KSEnumStringAttribute)
-                Dim value As KS
-                value = DirectCast(field.GetValue(Nothing), KS)
-                strSpecial(value) = stringAttribute.Value
-                strSpecialFriendly(value) = stringAttribute.FriendlyValue
-
-                If stringAttribute.IsKeyword Then
-                    keywordLookup.Add(stringAttribute.Value, field.GetValue(Nothing))
-                End If
-            End If
+        For i As Integer = 0 To 12
+            m_Keywords(i) = New Generic.Dictionary(Of Char, Generic.List(Of KW))
         Next
+
+        AddKeyword("Ansi", KS.Ansi)
+        AddKeyword("Auto", KS.Auto)
+        AddKeyword("ByRef", KS.ByRef)
+        AddKeyword("ByVal", KS.ByVal)
+        AddKeyword("Const", KS.Const)
+        AddKeyword("Default", KS.Default)
+        AddKeyword("Dim", KS.Dim)
+        AddKeyword("Friend", KS.Friend)
+        AddKeyword("Inherits", KS.Inherits)
+        AddKeyword("Narrowing", KS.Narrowing)
+        AddKeyword("MustInherit", KS.MustInherit)
+        AddKeyword("MustOverride", KS.MustOverride)
+        AddKeyword("NotInheritable", KS.NotInheritable)
+        AddKeyword("NotOverridable", KS.NotOverridable)
+        AddKeyword("Optional", KS.Optional)
+        AddKeyword("Overloads", KS.Overloads)
+        AddKeyword("Overridable", KS.Overridable)
+        AddKeyword("Overrides", KS.Overrides)
+        AddKeyword("Partial", KS.Partial)
+        AddKeyword("ParamArray", KS.ParamArray)
+        AddKeyword("Private", KS.Private)
+        AddKeyword("Protected", KS.Protected)
+        AddKeyword("Public", KS.Public)
+        AddKeyword("ReadOnly", KS.ReadOnly)
+        AddKeyword("Shadows", KS.Shadows)
+        AddKeyword("Shared", KS.Shared)
+        AddKeyword("Static", KS.Static)
+        AddKeyword("Unicode", KS.Unicode)
+        AddKeyword("Widening", KS.Widening)
+        AddKeyword("WithEvents", KS.WithEvents)
+        AddKeyword("WriteOnly", KS.WriteOnly)
+        AddKeyword("AddHandler", KS.AddHandler)
+        AddKeyword("AddressOf", KS.AddressOf)
+        AddKeyword("AndAlso", KS.AndAlso)
+        AddKeyword("Alias", KS.Alias)
+        AddKeyword("And", KS.And)
+        AddKeyword("As", KS.As)
+        AddKeyword("Boolean", KS.Boolean)
+        AddKeyword("Byte", KS.Byte)
+        AddKeyword("Call", KS.Call)
+        AddKeyword("Case", KS.Case)
+        AddKeyword("Catch", KS.Catch)
+        AddKeyword("CBool", KS.CBool)
+        AddKeyword("CByte", KS.CByte)
+        AddKeyword("CChar", KS.CChar)
+        AddKeyword("CDate", KS.CDate)
+        AddKeyword("CDec", KS.CDec)
+        AddKeyword("CDbl", KS.CDbl)
+        AddKeyword("Char", KS.Char)
+        AddKeyword("CInt", KS.CInt)
+        AddKeyword("Class", KS.Class)
+        AddKeyword("CLng", KS.CLng)
+        AddKeyword("CObj", KS.CObj)
+        AddKeyword("Continue", KS.Continue)
+        AddKeyword("CSByte", KS.CSByte)
+        AddKeyword("CShort", KS.CShort)
+        AddKeyword("CSng", KS.CSng)
+        AddKeyword("CStr", KS.CStr)
+        AddKeyword("CUInt", KS.CUInt)
+        AddKeyword("CULng", KS.CULng)
+        AddKeyword("CUShort", KS.CUShort)
+        AddKeyword("CType", KS.CType)
+        AddKeyword("Date", KS.Date)
+        AddKeyword("Decimal", KS.Decimal)
+        AddKeyword("Declare", KS.Declare)
+        AddKeyword("Delegate", KS.Delegate)
+        AddKeyword("DirectCast", KS.DirectCast)
+        AddKeyword("Do", KS.Do)
+        AddKeyword("Double", KS.Double)
+        AddKeyword("Each", KS.Each)
+        AddKeyword("Else", KS.Else)
+        AddKeyword("ElseIf", KS.ElseIf)
+        AddKeyword("End", KS.End)
+        AddKeyword("Enum", KS.Enum)
+        AddKeyword("Erase", KS.Erase)
+        AddKeyword("Error", KS.Error)
+        AddKeyword("Event", KS.Event)
+        AddKeyword("Exit", KS.Exit)
+        AddKeyword("False", KS.False)
+        AddKeyword("Finally", KS.Finally)
+        AddKeyword("For", KS.For)
+        AddKeyword("Function", KS.Function)
+        AddKeyword("Get", KS.Get)
+        AddKeyword("GetType", KS.GetType)
+        AddKeyword("Global", KS.Global)
+        AddKeyword("GoTo", KS.GoTo)
+        AddKeyword("Handles", KS.Handles)
+        AddKeyword("If", KS.If)
+        AddKeyword("Implements", KS.Implements)
+        AddKeyword("Imports", KS.Imports)
+        AddKeyword("In", KS.In)
+        AddKeyword("Integer", KS.Integer)
+        AddKeyword("Interface", KS.Interface)
+        AddKeyword("Is", KS.Is)
+        AddKeyword("IsNot", KS.IsNot)
+        AddKeyword("Let", KS.Let)
+        AddKeyword("Lib", KS.Lib)
+        AddKeyword("Like", KS.Like)
+        AddKeyword("Long", KS.Long)
+        AddKeyword("Loop", KS.Loop)
+        AddKeyword("Me", KS.Me)
+        AddKeyword("Mod", KS.Mod)
+        AddKeyword("Module", KS.Module)
+        AddKeyword("MyBase", KS.MyBase)
+        AddKeyword("MyClass", KS.MyClass)
+        AddKeyword("Namespace", KS.Namespace)
+        AddKeyword("New", KS.New)
+        AddKeyword("Next", KS.Next)
+        AddKeyword("Not", KS.Not)
+        AddKeyword("Nothing", KS.Nothing)
+        AddKeyword("Object", KS.Object)
+        AddKeyword("Of", KS.Of)
+        AddKeyword("On", KS.On)
+        AddKeyword("Operator", KS.Operator)
+        AddKeyword("Option", KS.Option)
+        AddKeyword("Or", KS.Or)
+        AddKeyword("OrElse", KS.OrElse)
+        AddKeyword("Property", KS.Property)
+        AddKeyword("RaiseEvent", KS.RaiseEvent)
+        AddKeyword("ReDim", KS.ReDim)
+        AddKeyword("REM", KS.[REM])
+        AddKeyword("RemoveHandler", KS.RemoveHandler)
+        AddKeyword("Resume", KS.Resume)
+        AddKeyword("Return", KS.Return)
+        AddKeyword("SByte", KS.SByte)
+        AddKeyword("Select", KS.Select)
+        AddKeyword("Set", KS.Set)
+        AddKeyword("Short", KS.Short)
+        AddKeyword("Single", KS.Single)
+        AddKeyword("Step", KS.Step)
+        AddKeyword("Stop", KS.Stop)
+        AddKeyword("String", KS.String)
+        AddKeyword("Structure", KS.Structure)
+        AddKeyword("Sub", KS.Sub)
+        AddKeyword("SyncLock", KS.SyncLock)
+        AddKeyword("Then", KS.Then)
+        AddKeyword("Throw", KS.Throw)
+        AddKeyword("To", KS.To)
+        AddKeyword("True", KS.True)
+        AddKeyword("Try", KS.Try)
+        AddKeyword("TryCast", KS.TryCast)
+        AddKeyword("TypeOf", KS.TypeOf)
+        AddKeyword("UInteger", KS.UInteger)
+        AddKeyword("ULong", KS.ULong)
+        AddKeyword("UShort", KS.UShort)
+        AddKeyword("Using", KS.Using)
+        AddKeyword("Until", KS.Until)
+        AddKeyword("Variant", KS.Variant)
+        AddKeyword("When", KS.When)
+        AddKeyword("While", KS.While)
+        AddKeyword("With", KS.With)
+        AddKeyword("Xor", KS.Xor)
     End Sub
 
-    Function GetKSStringAttribute(ByVal Value As KS) As KSEnumStringAttribute
-        If m_KSAttributes(Value) Is Nothing Then
-            m_KSAttributes(Value) = DirectCast(System.Attribute.GetCustomAttribute(GetType(KS).GetField(Value.ToString), GetType(KSEnumStringAttribute)), KSEnumStringAttribute)
-            'Return DirectCast(System.Attribute.GetCustomAttribute(GetType(KS).GetField(Value.ToString), GetType(KSEnumStringAttribute)), KSEnumStringAttribute)
-        End If
-        Return m_KSAttributes(Value)
-    End Function
+    Private Sub AddKeyword(ByVal keyword As String, ByVal ks As KS)
+        Dim list As Generic.List(Of KW) = Nothing
+        Dim kw As New KW()
+        kw.KeywordL = keyword.ToLowerInvariant()
+        kw.KS = ks
 
-    Function GetStringAttribute(ByVal Value As [Enum]) As EnumStringAttribute
-        Helper.Assert(Value IsNot Nothing)
-        Helper.Assert(Value.GetType.GetField(Value.ToString) IsNot Nothing)
-        Helper.Assert(System.Attribute.GetCustomAttribute(Value.GetType.GetField(Value.ToString), GetType(EnumStringAttribute)) IsNot Nothing)
-        Return DirectCast(System.Attribute.GetCustomAttribute(Value.GetType.GetField(Value.ToString), GetType(EnumStringAttribute)), EnumStringAttribute)
-    End Function
-
-    Function GetKS(ByVal Name As String) As KS
-        If keywordLookup.Contains(Name) Then
-            Return CType(keywordLookup.Item(Name), KS)
-        Else
-            Return KS.None
+        If Not m_Keywords(keyword.Length - 2).TryGetValue(keyword(0), list) Then
+            list = New Generic.List(Of KW)
+            m_Keywords(keyword.Length - 2)(keyword(0)) = list
         End If
+
+        list.Add(kw)
+
+        strSpecial(ks) = keyword
+    End Sub
+
+    Public Function GetKS(ByVal value As Char(), ByVal length As Integer) As KS
+        Dim list As Generic.List(Of KW) = Nothing
+        Dim ch0 As Char
+
+        If length < 2 OrElse length > 14 Then Return KS.None
+        ch0 = value(0)
+        If ch0 >= "a"c AndAlso ch0 <= "z"c Then ch0 = VB.Chr(VB.Asc(ch0) - 32)
+
+        If Not m_Keywords(length - 2).TryGetValue(ch0, list) Then Return KS.None
+
+        If list Is Nothing Then Return KS.None
+
+        For i As Integer = 0 To list.Count - 1
+            Dim kwL As String = list(i).KeywordL
+            For c As Integer = 1 To length - 1
+                Dim kc As Char = value(c)
+
+                If kc >= "A"c AndAlso kc <= "Z"c Then kc = VB.Chr(VB.Asc(kc) + 32)
+
+                If kwL(c) = kc Then
+                    If c = length - 1 Then Return list(i).KS
+                    Continue For
+                End If
+                Exit For
+            Next
+        Next
+
+        Return KS.None
     End Function
 End Module

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -81,13 +81,13 @@ Public Class DoStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        Dim startLabel As Label = Info.ILGen.DefineLabel
-        EndLabel = Info.ILGen.DefineLabel
-        m_NextIteration = Info.ILGen.DefineLabel
+        Dim startLabel As Label = Emitter.DefineLabel(Info)
+        EndLabel = Emitter.DefineLabel(Info)
+        m_NextIteration = Emitter.DefineLabel(Info)
 
-        Info.ILGen.MarkLabel(startLabel)
+        Emitter.MarkLabel(Info, startLabel)
         If m_PreCondition IsNot Nothing Then
-            Info.ILGen.MarkLabel(m_NextIteration)
+            Emitter.MarkLabel(Info, m_NextIteration)
             result = m_PreCondition.GenerateCode(Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean)) AndAlso result
             Emitter.EmitConversion(m_PreCondition.ExpressionType, Compiler.TypeCache.System_Boolean, Info)
             If m_IsWhile Then
@@ -100,7 +100,7 @@ Public Class DoStatement
         result = CodeBlock.GenerateCode(Info) AndAlso result
 
         If m_PostCondition IsNot Nothing Then
-            Info.ILGen.MarkLabel(m_NextIteration)
+            Emitter.MarkLabel(Info, m_NextIteration)
             result = m_PostCondition.GenerateCode(Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean)) AndAlso result
             Emitter.EmitConversion(m_PostCondition.ExpressionType, Compiler.TypeCache.System_Boolean, Info)
             If m_IsWhile Then
@@ -111,7 +111,7 @@ Public Class DoStatement
         End If
         Emitter.EmitBranch(Info, startLabel)
 
-        Info.ILGen.MarkLabel(EndLabel)
+        Emitter.MarkLabel(Info, EndLabel)
 
         Return result
     End Function
@@ -122,14 +122,21 @@ Public Class DoStatement
         If m_PreCondition IsNot Nothing Then
             result = m_PreCondition.ResolveExpression(Info) AndAlso result
             result = Helper.VerifyValueClassification(m_PreCondition, Info) AndAlso result
+
+            If Me.Location.File(Compiler).IsOptionStrictOn AndAlso Compiler.TypeResolution.IsImplicitlyConvertible(Me, m_PreCondition.ExpressionType, Compiler.TypeCache.System_Boolean) = False Then
+                result = Compiler.Report.ShowMessage(Messages.VBNC30512, m_PreCondition.Location, m_PreCondition.ExpressionType.FullName, "Boolean")
+            End If
         End If
+
         If m_PostCondition IsNot Nothing Then
             result = m_PostCondition.ResolveExpression(info) AndAlso result
             result = Helper.VerifyValueClassification(m_PostCondition, Info) AndAlso result
+
+            If Me.Location.File(Compiler).IsOptionStrictOn AndAlso Compiler.TypeResolution.IsImplicitlyConvertible(Me, m_PostCondition.ExpressionType, Compiler.TypeCache.System_Boolean) = False Then
+                result = Compiler.Report.ShowMessage(Messages.VBNC30512, m_PostCondition.Location, m_PostCondition.ExpressionType.FullName, "Boolean")
+            End If
         End If
         result = CodeBlock.ResolveCode(info) AndAlso result
-
-        Compiler.Helper.AddCheck("Check that conditions are boolean expressions.")
 
         Return result
     End Function

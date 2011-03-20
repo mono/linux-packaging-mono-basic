@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ Public Class VariableInitializer
         End Get
     End Property
 
-    ReadOnly Property ExpressionType() As Type
+    ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Dim exp As Expression = InitializerExpression
             If exp IsNot Nothing Then

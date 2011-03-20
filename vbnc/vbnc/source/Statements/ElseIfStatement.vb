@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ Public Class ElseIfStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        Dim falseLabel As Label = Info.ILGen.DefineLabel
+        Dim falseLabel As Label = Emitter.DefineLabel(Info)
 
         result = m_Condition.GenerateCode(Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean)) AndAlso result
         Emitter.EmitBranchIfFalse(Info, falseLabel)
@@ -54,7 +54,7 @@ Public Class ElseIfStatement
         result = CodeBlock.GenerateCode(Info) AndAlso result
         Emitter.EmitBranch(Info, ParentAsIfStatement.EndLabel)
 
-        Info.ILGen.MarkLabel(falseLabel)
+        Emitter.MarkLabel(Info, falseLabel)
 
         Return result
     End Function

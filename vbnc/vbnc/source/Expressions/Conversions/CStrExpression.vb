@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -24,40 +24,56 @@ Public Class CStrExpression
         MyBase.New(Parent, Expression)
     End Sub
 
-    Sub New(ByVal Parent As ParsedObject)
-        MyBase.New(Parent)
+    Sub New(ByVal Parent As ParsedObject, ByVal IsExplicit As Boolean)
+        MyBase.New(Parent, IsExplicit)
     End Sub
 
     Protected Overrides Function GenerateCodeInternal(ByVal Info As EmitInfo) As Boolean
-        Return GenerateCode(Me.Expression, Info)
+        Return GenerateCode(Me, Info)
     End Function
 
     Protected Overrides Function ResolveExpressionInternal(ByVal Info As ResolveInfo) As Boolean
         Dim result As Boolean = True
 
         result = MyBase.ResolveExpressionInternal(Info) AndAlso result
-        result = Validate(Info, Expression.ExpressionType) AndAlso result
+        result = Validate(Info, Me) AndAlso result
 
         Return result
     End Function
 
-    Shared Function Validate(ByVal Info As ResolveInfo, ByVal SourceType As Type) As Boolean
+    Shared Function Validate(ByVal Info As ResolveInfo, ByVal Conversion As ConversionExpression) As Boolean
         Dim result As Boolean = True
 
-        'Dim expType As Type = SourceType
-        'Dim expTypeCode As TypeCode = Helper.GetTypeCode(Compiler, expType)
-        'Dim ExpressionType As Type = Info.Compiler.TypeCache.String
-
-        Return result
-    End Function
-
-    Overloads Shared Function GenerateCode(ByVal Expression As Expression, ByVal Info As EmitInfo) As Boolean
-        Dim result As Boolean = True
-
-        Dim expType As Type = Expression.ExpressionType
+        Dim Expression As Expression = Conversion.Expression
+        Dim ExpressionType As TypeReference = Conversion.ExpressionType
+        Dim expType As Mono.Cecil.TypeReference = Expression.ExpressionType
         Dim expTypeCode As TypeCode = Helper.GetTypeCode(Info.Compiler, expType)
 
-        result = Expression.Classification.GenerateCode(Info.Clone(Expression, expType)) AndAlso result
+        Select Case expTypeCode
+            Case TypeCode.Object
+                If Helper.CompareType(expType, Info.Compiler.TypeCache.System_Char_Array) Then
+                    'OK
+                ElseIf Helper.CompareType(expType, Info.Compiler.TypeCache.System_Object) Then
+                    'OK
+                ElseIf Helper.CompareType(expType, Info.Compiler.TypeCache.Nothing) Then
+                    'OK
+                ElseIf Helper.CompareType(expType, Info.Compiler.TypeCache.System_Char_Array) Then
+                    'OK
+                Else
+                    result = Conversion.FindUserDefinedConversionOperator() AndAlso result
+                End If
+        End Select
+
+        Return result
+    End Function
+
+    Overloads Shared Function GenerateCode(ByVal Conversion As ConversionExpression, ByVal Info As EmitInfo) As Boolean
+        Dim result As Boolean = True
+        Dim expType As Mono.Cecil.TypeReference = Nothing
+        Dim expTypeCode As TypeCode
+        Dim Expression As Expression = Conversion.Expression
+
+        result = GenerateCodeForExpression(Conversion, Info, expTypeCode, expType) AndAlso result
 
         Select Case expTypeCode
             Case TypeCode.Boolean
@@ -69,7 +85,6 @@ Public Class CStrExpression
             Case TypeCode.DateTime
                 Emitter.EmitCall(Info, Info.Compiler.TypeCache.MS_VB_CS_Conversions__ToString_DateTime)
             Case TypeCode.SByte, TypeCode.Int16
-                Info.Stack.SwitchHead(expType, Info.Compiler.TypeCache.System_Int32)
                 Emitter.EmitCall(Info, Info.Compiler.TypeCache.MS_VB_CS_Conversions__ToString_Int32)
             Case TypeCode.Int32
                 Emitter.EmitCall(Info, Info.Compiler.TypeCache.MS_VB_CS_Conversions__ToString_Int32)
@@ -92,11 +107,10 @@ Public Class CStrExpression
                     Emitter.EmitCall(Info, Info.Compiler.TypeCache.MS_VB_CS_Conversions__ToString_Object)
                 ElseIf Helper.CompareType(expType, Info.Compiler.TypeCache.Nothing) Then
                     'No conversion necessary
-                    Info.Stack.SwitchHead(Info.Compiler.TypeCache.Nothing, Info.Compiler.TypeCache.System_String)
                 ElseIf Helper.CompareType(expType, Info.Compiler.TypeCache.System_Char_Array) Then
                     Emitter.EmitNew(Info, Info.Compiler.TypeCache.System_String__ctor_Array)
                 Else
-                    result = CTypeExpression.GenerateUserDefinedConversionCode(Info, Expression, Info.Compiler.TypeCache.System_String) AndAlso result
+                    Return Info.Compiler.Report.ShowMessage(Messages.VBNC99999, Expression.Location, "Can't convert")
                 End If
             Case TypeCode.Decimal
                 Emitter.EmitCall(Info, Info.Compiler.TypeCache.MS_VB_CS_Conversions__ToString_Decimal)
@@ -109,7 +123,7 @@ Public Class CStrExpression
 
     Public Overrides ReadOnly Property IsConstant() As Boolean
         Get
-            Return Expression.IsConstant AndAlso (Helper.CompareType(Expression.ExpressionType, Compiler.TypeCache.System_String) OrElse Helper.CompareType(Expression.ExpressionType, Compiler.TypeCache.System_Char))
+            Return Expression.IsConstant AndAlso (Helper.CompareType(Expression.ExpressionType, Compiler.TypeCache.System_String) OrElse Helper.CompareType(Expression.ExpressionType, Compiler.TypeCache.System_Char) OrElse Helper.CompareType(Expression.ExpressionType, Compiler.TypeCache.Nothing))
         End Get
     End Property
 
@@ -117,21 +131,24 @@ Public Class CStrExpression
         Get
             Dim tpCode As TypeCode
             Dim originalValue As Object
+
             originalValue = Expression.ConstantValue
-            tpCode = Helper.GetTypeCode(Compiler, originalValue.GetType)
+            tpCode = Helper.GetTypeCode(Compiler, CecilHelper.GetType(Compiler, originalValue))
             Select Case tpCode
                 Case TypeCode.Char, TypeCode.String
                     Return CStr(originalValue)
+                Case TypeCode.DBNull
+                    Return DBNull.Value
                 Case Else
-                    Compiler.Report.ShowMessage(Messages.VBNC30060, originalValue.ToString, ExpressionType.ToString)
+                    Compiler.Report.ShowMessage(Messages.VBNC30060, Location, originalValue.ToString, Helper.ToString(Expression, ExpressionType))
                     Return False
             End Select
         End Get
     End Property
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
-            Return Compiler.TypeCache.System_String '_Descriptor
+            Return Compiler.TypeCache.System_String
         End Get
     End Property
 End Class

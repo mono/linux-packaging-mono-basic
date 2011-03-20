@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -98,7 +98,10 @@ Public Class AssignmentStatement
         ElseIf RSide.Classification.CanBeValueClassification Then
             RSide = RSide.ReclassifyToValueExpression()
             result = RSide.ResolveExpression(ResolveInfo.Default(Info.Compiler)) AndAlso result
-            'RSide.Classification = RSide.Classification.ReclassifyToValue
+            If result AndAlso RSide.Classification.IsPropertyGroupClassification Then
+                RSide = RSide.ReclassifyToPropertyAccessExpression
+                result = RSide.ResolveExpression(ResolveInfo.Default(Info.Compiler)) AndAlso result
+            End If
         Else
             Helper.ShowClassificationError(Compiler, RSide.Location, RSide.Classification, "expression")
             result = False
@@ -122,10 +125,10 @@ Public Class AssignmentStatement
 
         If result = False Then Return result
 
-        If m_LSide.ExpressionType.IsGenericType AndAlso Helper.CompareType(Compiler.TypeCache.System_Nullable1, m_LSide.ExpressionType.GetGenericTypeDefinition) Then
-            Dim lTypeArg As Type()
-            lTypeArg = m_LSide.ExpressionType.GetGenericArguments
-            If lTypeArg.Length = 1 AndAlso Helper.CompareType(lTypeArg(0), m_RSide.ExpressionType) Then
+        If CecilHelper.IsGenericType(m_LSide.ExpressionType) AndAlso Helper.CompareType(Compiler.TypeCache.System_Nullable1, CecilHelper.GetGenericTypeDefinition(m_LSide.ExpressionType)) Then
+            Dim lTypeArg As Mono.Collections.Generic.Collection(Of Mono.Cecil.TypeReference)
+            lTypeArg = CecilHelper.GetGenericArguments(m_LSide.ExpressionType)
+            If lTypeArg.Count = 1 AndAlso Helper.CompareType(lTypeArg(0), m_RSide.ExpressionType) Then
                 Dim objCreation As DelegateOrObjectCreationExpression
                 objCreation = New DelegateOrObjectCreationExpression(Me)
                 objCreation.Init(m_LSide.ExpressionType, New ArgumentList(objCreation, m_RSide))
@@ -155,12 +158,6 @@ Public Class AssignmentStatement
             Return KS.Equals
         End Get
     End Property
-    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-        m_LSide.Dump(Dumper)
-        Dumper.Write(" " & Enums.GetKSStringAttribute(AssignmentType).FriendlyValue & " ")
-        m_RSide.Dump(Dumper)
-        Dumper.WriteLine("")
-    End Sub
 #End If
 
 End Class

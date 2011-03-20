@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -69,12 +69,29 @@ Public Class CodeFile
     ''' </summary>
     Private m_OptionCompare As OptionCompareStatement
 
-    Private m_SymbolDocument As System.Diagnostics.SymbolStore.ISymbolDocumentWriter
+    ''' <summary>
+    ''' The state of the Option Infer flag in this file.
+    ''' </summary>
+    Private m_OptionInfer As OptionInferStatement
+
+    Private m_SymbolDocument As Mono.Cecil.Cil.Document
 
     Private m_ConditionalConstants As New Generic.List(Of ConditionalConstants)
     Private m_ConditionalConstantsLines As New Generic.List(Of UInteger)
 
     Private m_Code As String
+
+    Public ReadOnly Property SymbolDocument() As Mono.Cecil.Cil.Document
+        Get
+            If m_SymbolDocument Is Nothing Then
+                m_SymbolDocument = New Mono.Cecil.Cil.Document(System.IO.Path.Combine(m_RelativePath.Replace("<"c, "["c).Replace(">"c, "]"c), m_FileName.Replace("<"c, "["c).Replace(">"c, "]"c)))
+                m_SymbolDocument.Language = Cil.DocumentLanguage.Basic
+                m_SymbolDocument.LanguageVendor = Cil.DocumentLanguageVendor.Microsoft
+                m_SymbolDocument.Type = Cil.DocumentType.Text
+            End If
+            Return m_SymbolDocument
+        End Get
+    End Property
 
     Sub AddConditionalConstants(ByVal Line As UInteger, ByVal Constants As ConditionalConstants)
         m_ConditionalConstants.Add(Constants.Clone)
@@ -116,17 +133,8 @@ Public Class CodeFile
         End Set
     End Property
 
-    ReadOnly Property SymbolDocument() As System.Diagnostics.SymbolStore.ISymbolDocumentWriter
-        Get
-            If m_SymbolDocument Is Nothing AndAlso Compiler.SymbolWriter IsNot Nothing Then
-                m_SymbolDocument = Compiler.SymbolWriter.DefineDocument(Me.FileName, Nothing, Nothing, Nothing)
-            End If
-            Return m_SymbolDocument
-        End Get
-    End Property
-
     Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
-        Return Helper.ResolveCodeCollection(m_Imports, Info)
+        Return m_Imports.ResolveCode(Info)
     End Function
 
     ReadOnly Property OptionExplicit() As OptionExplicitStatement
@@ -147,10 +155,17 @@ Public Class CodeFile
         End Get
     End Property
 
-    Sub Init(ByVal OptionCompare As OptionCompareStatement, ByVal OptionStrict As OptionStrictStatement, ByVal OptionExplicit As OptionExplicitStatement, ByVal [Imports] As ImportsClauses)
+    ReadOnly Property OptionInfer As OptionInferStatement
+        Get
+            Return m_OptionInfer
+        End Get
+    End Property
+
+    Sub Init(ByVal OptionCompare As OptionCompareStatement, ByVal OptionStrict As OptionStrictStatement, ByVal OptionExplicit As OptionExplicitStatement, ByVal OptionInfer As OptionInferStatement, ByVal [Imports] As ImportsClauses)
         m_OptionCompare = OptionCompare
         m_OptionStrict = OptionStrict
         m_OptionExplicit = OptionExplicit
+        m_OptionInfer = OptionInfer
         m_Imports = [Imports]
         Helper.AssertNotNothing(m_Imports)
     End Sub
@@ -193,6 +208,16 @@ Public Class CodeFile
                 Return Compiler.CommandLine.OptionCompare = CommandLine.OptionCompareTypes.Binary
             Else
                 Return m_OptionCompare.IsBinary
+            End If
+        End Get
+    End Property
+
+    Public Shadows ReadOnly Property IsOptionInferOn As Boolean
+        Get
+            If m_OptionInfer Is Nothing Then
+                Return Compiler.CommandLine.OptionInfer = CommandLine.OptionInferTypes.On
+            Else
+                Return m_OptionInfer.IsOn
             End If
         End Get
     End Property
@@ -272,7 +297,7 @@ Public Class CodeFile
 
                 Return StreamReader
             Catch e As Exception
-                Compiler.Report.ShowMessage(Messages.VBNC31007, FileName)
+                Compiler.Report.ShowMessage(Messages.VBNC31007, Span.CommandLineSpan, FileName)
                 Return Nothing
             End Try
         End Get

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -52,13 +52,6 @@ Public Class UnaryNotExpression
         Return result
     End Function
 
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write("Not ")
-        Expression.Dump(Dumper)
-    End Sub
-#End If
-
     Public Overrides ReadOnly Property IsConstant() As Boolean
         Get
             Return Expression.IsConstant AndAlso Compiler.TypeResolution.IsIntegralType(Expression.ExpressionType)
@@ -70,7 +63,7 @@ Public Class UnaryNotExpression
             Helper.Assert(IsConstant)
             Dim value As Object = Expression.ConstantValue
             Helper.Assert(value IsNot Nothing)
-            Select Case Helper.GetTypeCode(Compiler, value.GetType)
+            Select Case Helper.GetTypeCode(Compiler, CecilHelper.GetType(Compiler, value))
                 Case TypeCode.SByte
                     Return Not CSByte(value)
                 Case TypeCode.Byte

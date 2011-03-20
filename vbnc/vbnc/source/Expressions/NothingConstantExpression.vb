@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,6 @@
 Public Class NothingConstantExpression
     Inherits ConstantExpression
 
-    Public Overrides Function ResolveTypeReferences() As Boolean
-        Dim result As Boolean = True
-
-        Me.CheckTypeReferencesNotResolved()
-
-        Return result
-    End Function
-
     Protected Overrides Function GenerateCodeInternal(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
@@ -46,7 +38,7 @@ Public Class NothingConstantExpression
         Return True
     End Function
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Return Compiler.TypeCache.Nothing
         End Get

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -28,8 +28,8 @@ Public Class CodeBlock
     ''' This is just a cache, all the variables are also in m_Statements.
     ''' </summary>
     ''' <remarks></remarks>
-    Private m_Variables As New Nameables(Of VariableDeclaration)(Me)
-    Private m_StaticVariables As Generic.List(Of VariableDeclaration)
+    Private m_Variables As New Nameables(Of LocalVariableDeclaration)(Me)
+    Private m_StaticVariables As Generic.List(Of LocalVariableDeclaration)
 
     ''' <summary>
     ''' A list of all the statements (expressions) in this code block.
@@ -57,7 +57,7 @@ Public Class CodeBlock
     ''' This is the variable informing which handler should handle an exception.
     ''' </summary>
     ''' <remarks></remarks>
-    Public VB_ActiveHandler As LocalBuilder
+    Public VB_ActiveHandler As Mono.Cecil.Cil.VariableDefinition
     Public VB_ActiveHandlerLabel As Label
     ''' <summary>
     ''' A value is stored here to check if the running code is in the unstructured handler
@@ -65,7 +65,7 @@ Public Class CodeBlock
     ''' -1: in the handler.
     ''' </summary>
     ''' <remarks></remarks>
-    Public VB_ResumeTarget As LocalBuilder
+    Public VB_ResumeTarget As Mono.Cecil.Cil.VariableDefinition
     Public UnstructuredResumeNextHandler As Label
     Public UnstructuredResumeHandler As Label
     ''' <summary>
@@ -83,7 +83,7 @@ Public Class CodeBlock
     ''' The index into the jump table of the current instruction.
     ''' </summary>
     ''' <remarks></remarks>
-    Public VB_CurrentInstruction As LocalBuilder
+    Public VB_CurrentInstruction As Mono.Cecil.Cil.VariableDefinition
     Public UnstructuredExceptionHandlers As Generic.List(Of Label)
     Public UnstructuredExceptionLabels As Generic.List(Of Label)
     Public EndMethodLabel As Label
@@ -110,13 +110,13 @@ Public Class CodeBlock
         End Get
     End Property
 
-    Sub FindStaticVariables(ByVal list As Generic.List(Of VariableDeclaration))
+    Sub FindStaticVariables(ByVal list As Generic.List(Of LocalVariableDeclaration))
         If m_StaticVariables IsNot Nothing Then
             list.AddRange(m_StaticVariables)
             Return
         End If
 
-        For Each var As VariableDeclaration In m_Variables
+        For Each var As LocalVariableDeclaration In m_Variables
             If var.Modifiers.Is(ModifierMasks.Static) Then
                 list.Add(var)
             End If
@@ -153,13 +153,13 @@ Public Class CodeBlock
         If cb IsNot Nothing Then cb.AddLabel(lbl)
     End Sub
 
-    Sub AddVariable(ByVal var As VariableDeclaration)
+    Sub AddVariable(ByVal var As LocalVariableDeclaration)
         m_Variables.Add(var)
         m_Sequence.Add(var)
     End Sub
 
-    Sub AddVariables(ByVal list As Generic.ICollection(Of VariableDeclaration))
-        For Each var As VariableDeclaration In list
+    Sub AddVariables(ByVal list As Generic.ICollection(Of LocalVariableDeclaration))
+        For Each var As LocalVariableDeclaration In list
             AddVariable(var)
         Next
     End Sub
@@ -258,17 +258,17 @@ Public Class CodeBlock
     Private Function GenerateUnstructuredStart(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        EndMethodLabel = Info.ILGen.DefineLabel
-        m_InternalExceptionLocation = Info.ILGen.DefineLabel
-        UnstructuredResumeNextHandler = Info.ILGen.DefineLabel
-        UnstructuredResumeHandler = Info.ILGen.DefineLabel
-        UnstructuredSwitchHandlerEnd = Info.ILGen.DefineLabel
+        EndMethodLabel = Emitter.DefineLabel(Info)
+        m_InternalExceptionLocation = Emitter.DefineLabel(Info)
+        UnstructuredResumeNextHandler = Emitter.DefineLabel(Info)
+        UnstructuredResumeHandler = Emitter.DefineLabel(Info)
+        UnstructuredSwitchHandlerEnd = Emitter.DefineLabel(Info)
 
         VB_ActiveHandler = Emitter.DeclareLocal(Info, Compiler.TypeCache.System_Int32, "VB$ActiveHandler")
         VB_ActiveHandlerLabel = Emitter.DefineLabel(Info)
         VB_ResumeTarget = Emitter.DeclareLocal(Info, Compiler.TypeCache.System_Int32, "VB$ResumeTarget")
 
-        EndUnstructuredExceptionHandler = Info.ILGen.BeginExceptionBlock()
+        EndUnstructuredExceptionHandler = Emitter.EmitBeginExceptionBlock(Info)
         UnstructuredExceptionLabels = New Generic.List(Of Label)
         UnstructuredExceptionHandlers = New Generic.List(Of Label)
 
@@ -283,7 +283,7 @@ Public Class CodeBlock
         UnstructuredExceptionLabels.Add(UnstructuredSwitchHandlerEnd) 'index 0
         If Me.HasResume Then
             VB_CurrentInstruction = Emitter.DeclareLocal(Info, Compiler.TypeCache.System_Int32, "VB$CurrentStatement")
-            ResumeNextExceptionHandler = Info.ILGen.DefineLabel
+            ResumeNextExceptionHandler = Emitter.DefineLabel(Info)
 
             UnstructuredExceptionLabels.Add(ResumeNextExceptionHandler) 'index 1
         Else
@@ -293,21 +293,9 @@ Public Class CodeBlock
         Return result
     End Function
 
-    'Private Sub DumpUnstructuredVars(ByVal Info As EmitInfo, Optional ByVal text As String = "")
-
-    '    Emitter.EmitLoadValue(Info, text & "VB_ActiveHandler: {0}, VB_ResumeTarget: {1}, VB_CurrentInstruction: {2}")
-    '    Emitter.EmitLoadVariable(Info, VB_ActiveHandler)
-    '    Emitter.EmitBox(Info, GetType(Integer))
-    '    Emitter.EmitLoadVariable(Info, VB_ResumeTarget)
-    '    Emitter.EmitBox(Info, GetType(Integer))
-    '    Emitter.EmitLoadVariable(Info, VB_CurrentInstruction)
-    '    Emitter.EmitBox(Info, GetType(Integer))
-    '    Emitter.EmitCall(Info, GetType(System.Console).GetMethod("WriteLine", New Type() {GetType(String), GetType(Object), GetType(Object), GetType(Object)}))
-    'End Sub
-
     Private Function GenerateUnstructuredEnd(ByVal Method As IMethod, ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
-        Dim retvar As LocalBuilder = Method.DefaultReturnVariable
+        Dim retvar As Mono.Cecil.Cil.VariableDefinition = Method.DefaultReturnVariable
 
         'Add a label to the end of the code as the last item in the switch.
 
@@ -319,10 +307,10 @@ Public Class CodeBlock
 
         Me.UnstructuredExceptionLabels.Add(UnstructuredSwitchHandlerEnd)
 
-        Dim tmpVar As LocalBuilder = Info.ILGen.DeclareLocal(Compiler.TypeCache.System_Int32)
+        Dim tmpVar As Mono.Cecil.Cil.VariableDefinition = Emitter.DeclareLocal(Info, Compiler.TypeCache.System_Int32)
         If Me.HasResume Then
             'Increment the instruction pointer index with one, then jump to the switch
-            Info.ILGen.MarkLabel(ResumeNextExceptionHandler)
+            Emitter.MarkLabel(Info, ResumeNextExceptionHandler)
             Emitter.EmitLoadI4Value(Info, -1)
             Emitter.EmitStoreVariable(Info, VB_ResumeTarget)
             Emitter.EmitLoadVariable(Info, VB_CurrentInstruction)
@@ -333,18 +321,18 @@ Public Class CodeBlock
         End If
 
         'Emit the actual handler 
-        Info.ILGen.MarkLabel(UnstructuredResumeNextHandler)
+        Emitter.MarkLabel(Info, UnstructuredResumeNextHandler)
         Emitter.EmitLoadI4Value(Info, -1)
         Emitter.EmitStoreVariable(Info, VB_ActiveHandler)
         Emitter.EmitLoadVariable(Info, VB_ResumeTarget)
         Emitter.EmitStoreVariable(Info, tmpVar)
-        Info.ILGen.MarkLabel(UnstructuredResumeHandler)
+        Emitter.MarkLabel(Info, UnstructuredResumeHandler)
         Emitter.EmitLoadI4Value(Info, 0)
         Emitter.EmitStoreVariable(Info, VB_ResumeTarget)
         Emitter.EmitLoadVariable(Info, tmpVar)
         Emitter.EmitSwitch(Info, UnstructuredExceptionLabels.ToArray)
 
-        Info.ILGen.MarkLabel(UnstructuredSwitchHandlerEnd)
+        Emitter.MarkLabel(Info, UnstructuredSwitchHandlerEnd)
         Emitter.EmitLeave(Info, EndMethodLabel)
 
         'Emit the handler selector
@@ -353,8 +341,6 @@ Public Class CodeBlock
         Dim removedLabel As Label = handlers(0)
         handlers(0) = endHandlers
         Emitter.MarkLabel(Info, VB_ActiveHandlerLabel)
-
-        'DumpUnstructuredVars(Info, "HandlerSelector - ")
 
         If VB_CurrentInstruction IsNot Nothing Then
             Emitter.EmitLoadVariable(Info, VB_CurrentInstruction)
@@ -372,7 +358,6 @@ Public Class CodeBlock
         'if it was not raised when in the unstructured handler and if there actually
         'is a registered exception handler.
         Info.ILGen.BeginExceptFilterBlock()
-        Info.Stack.Push(Compiler.TypeCache.System_Object)
         Emitter.EmitIsInst(Info, Compiler.TypeCache.System_Object, Compiler.TypeCache.System_Exception)
         Emitter.EmitLoadNull(Info.Clone(Me, True, False, Compiler.TypeCache.System_Exception))
         Emitter.EmitGT_Un(Info, Compiler.TypeCache.System_Exception) 'TypeOf ... Is System.Exception
@@ -387,11 +372,8 @@ Public Class CodeBlock
         Emitter.EmitEquals(Info, Compiler.TypeCache.System_Int32) 'if code is in a unstructured handler or not
         Emitter.EmitAnd(Info, Compiler.TypeCache.System_Boolean)
 
-        Info.Stack.Pop(Compiler.TypeCache.System_Boolean)
-
         'create the catch block
-        Info.ILGen.BeginCatchBlock(Nothing)
-        Info.Stack.Push(Compiler.TypeCache.System_Object)
+        Info.ILGen.BeginCatchBlock(CType(Nothing, Mono.Cecil.TypeReference))
         Emitter.EmitCastClass(Info, Compiler.TypeCache.System_Object, Compiler.TypeCache.System_Exception)
         Emitter.EmitCall(Info, Compiler.TypeCache.MS_VB_CS_ProjectData__SetProjectError_Exception)
         Emitter.EmitLeave(Info, VB_ActiveHandlerLabel)
@@ -399,27 +381,26 @@ Public Class CodeBlock
         Info.ILGen.EndExceptionBlock()
 
         'Create an internal exception if the code gets here.
-        Info.ILGen.MarkLabel(m_InternalExceptionLocation)
+        Emitter.MarkLabel(Info, m_InternalExceptionLocation)
         Emitter.EmitLoadI4Value(Info, -2146828237)
         Emitter.EmitCall(Info, Compiler.TypeCache.MS_VB_CS_ProjectData__CreateProjectError_Int32)
         Emitter.EmitThrow(Info)
 
-        Info.ILGen.MarkLabel(EndMethodLabel)
+        Emitter.MarkLabel(Info, EndMethodLabel)
 
-        Dim veryMethodEnd As Label = Info.ILGen.DefineLabel
+        Dim veryMethodEnd As Label = Emitter.DefineLabel(Info)
         Emitter.EmitLoadVariable(Info.Clone(Me, True, False, Compiler.TypeCache.System_Boolean), VB_ResumeTarget)
-        Info.Stack.SwitchHead(Compiler.TypeCache.System_Int32, Compiler.TypeCache.System_Boolean)
         Emitter.EmitBranchIfFalse(Info, veryMethodEnd)
         Emitter.EmitCall(Info, Compiler.TypeCache.MS_VB_CS_ProjectData__ClearProjectError)
-        Info.ILGen.MarkLabel(veryMethodEnd)
+        Emitter.MarkLabel(Info, veryMethodEnd)
 
         If retvar IsNot Nothing Then
             Emitter.MarkLabel(Info, m_EndOfMethodLabel.Value)
             Emitter.EmitLoadVariable(Info, retvar)
-            Info.ILGen.Emit(OpCodes.Ret)
+            Info.ILGen.Emit(Mono.Cecil.Cil.OpCodes.Ret)
         Else
             Emitter.MarkLabel(Info, m_EndOfMethodLabel.Value)
-            Info.ILGen.Emit(OpCodes.Ret)
+            Info.ILGen.Emit(Mono.Cecil.Cil.OpCodes.Ret)
         End If
 
         Return result
@@ -461,8 +442,8 @@ Public Class CodeBlock
         End If
 
 #If DEBUG Then
-        If Method.MemberDescriptor.MemberType = MemberTypes.Constructor = False Then
-            info.ILGen.Emit(OpCodes.Nop)
+        If CecilHelper.GetMemberType(Method.MemberDescriptor) = MemberTypes.Constructor = False Then
+            info.ILGen.Emit(Mono.Cecil.Cil.OpCodes.Nop)
         End If
 #End If
 
@@ -472,7 +453,7 @@ Public Class CodeBlock
             Emitter.MarkLabel(info, m_EndOfMethodLabel.Value)
         End If
 
-        Dim retvar As LocalBuilder = Method.DefaultReturnVariable
+        Dim retvar As Mono.Cecil.Cil.VariableDefinition = Method.DefaultReturnVariable
         If retvar IsNot Nothing Then
             Emitter.EmitLoadVariable(info, retvar)
         Else
@@ -510,10 +491,10 @@ Public Class CodeBlock
         Dim result As Boolean = True
         If UpmostBlock.HasResume Then
             Dim index As Integer
-            Dim lbl As Label = Info.ILGen.DefineLabel
+            Dim lbl As Label = Emitter.DefineLabel(Info)
             UpmostBlock.UnstructuredExceptionLabels.Add(lbl)
             index = UpmostBlock.UnstructuredExceptionLabels.IndexOf(lbl)
-            Info.ILGen.MarkLabel(lbl)
+            Emitter.MarkLabel(Info, lbl)
             Emitter.EmitLoadI4Value(Info, index)
             Emitter.EmitStoreVariable(Info, UpmostBlock.VB_CurrentInstruction)
         End If
@@ -523,12 +504,8 @@ Public Class CodeBlock
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-#If DEBUG Then
-        Info.Stack.CheckStackEmpty("Start of block " & Me.GetType.Name & " - " & Location.ToString(Compiler) & ") in " & Info.Method.FullName & " reached, but stack is not empty.")
-#End If
-
         For i As Integer = 0 To m_Variables.Count - 1
-            Dim var As VariableDeclaration = m_Variables(i)
+            Dim var As LocalVariableDeclaration = m_Variables(i)
             result = CreateLabelForCurrentInstruction(Info) AndAlso result
             result = var.DefineLocalVariable(Info) AndAlso result
         Next
@@ -536,23 +513,16 @@ Public Class CodeBlock
         For i As Integer = 0 To m_Sequence.Count - 1
             Dim stmt As BaseObject = m_Sequence.Item(i)
 
-#If DEBUG Then
-            Info.Stack.CheckStackEmpty("Start of statement #" & (i + 1).ToString & " (" & stmt.GetType.Name & " - " & stmt.Location.ToString(Compiler) & ") in " & Info.Method.FullName & " reached, but stack is not empty.")
-#End If
-
             Emitter.MarkSequencePoint(Info, stmt.Location)
 
             result = CreateLabelForCurrentInstruction(Info) AndAlso result
             result = stmt.GenerateCode(Info) AndAlso result
-#If DEBUG Then
-            Info.Stack.CheckStackEmpty("End of statement #" & (i + 1).ToString & " (" & stmt.GetType.Name & " - " & stmt.Location.ToString(Compiler) & ") in " & Info.Method.FullName & " reached, but stack is not empty.")
-#End If
         Next
 
         Return result
     End Function
 
-    ReadOnly Property Variables() As Nameables(Of VariableDeclaration)
+    ReadOnly Property Variables() As Nameables(Of LocalVariableDeclaration)
         Get
             Return m_Variables
         End Get
@@ -570,17 +540,22 @@ Public Class CodeBlock
         End Get
     End Property
 
+    Public Overrides Sub Initialize(ByVal Parent As BaseObject)
+        MyBase.Initialize(Parent)
+
+        If m_Variables IsNot Nothing Then m_Variables.Initialize(Me)
+        If m_Statements IsNot Nothing Then m_Statements.Initialize(Me)
+    End Sub
+
     Public Overrides Function ResolveTypeReferences() As Boolean
         Dim result As Boolean = True
 
         For i As Integer = 0 To m_Variables.Count - 1
             result = m_Variables(i).ResolveTypeReferences AndAlso result
-            'vbnc.Helper.Assert(result = (Report.Errors = 0))
         Next
 
-        For Each obj As Statement In m_Statements
-            result = obj.ResolveTypeReferences AndAlso result
-            'vbnc.Helper.Assert(result = (Report.Errors = 0))
+        For i As Integer = 0 To m_Statements.Count - 1
+            result = m_Statements(i).ResolveTypeReferences AndAlso result
         Next
 
         Return result
@@ -590,9 +565,7 @@ Public Class CodeBlock
         Dim result As Boolean = True
 
         For i As Integer = 0 To m_Variables.Count - 1
-            result = m_Variables(i).ResolveMember(Info) AndAlso result
             result = m_Variables(i).ResolveCode(Info) AndAlso result
-            'Helper.Assert(result = (Compiler.Report.Errors = 0))
         Next
 
         'We may add statements as we go.

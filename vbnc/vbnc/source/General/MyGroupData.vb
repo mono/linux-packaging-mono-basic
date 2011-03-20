@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,9 @@
 ' 
 
 Public Class MyGroupData
-    Public TypeToCollect As Type
-    Public CreateInstanceMethod As MethodBase
-    Public DisposeInstanceMethod As MethodBase
+    Public TypeToCollect As Mono.Cecil.TypeReference
+    Public CreateInstanceMethod As Mono.Cecil.MethodReference
+    Public DisposeInstanceMethod As Mono.Cecil.MethodReference
     Public DefaultInstanceAlias As Expression
     Public ClassDeclaration As ClassDeclaration
 End Class

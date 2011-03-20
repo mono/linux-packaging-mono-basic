@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -64,15 +64,15 @@ Public Class WhileStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        EndLabel = Info.ILGen.DefineLabel
-        m_NextIteration = Info.ILGen.DefineLabel
+        EndLabel = Emitter.DefineLabel(Info)
+        m_NextIteration = Emitter.DefineLabel(Info)
 
-        Info.ILGen.MarkLabel(m_NextIteration)
+        Emitter.MarkLabel(Info, m_NextIteration)
         result = m_Condition.GenerateCode(Info.Clone(Me, True, , Compiler.TypeCache.System_Boolean)) AndAlso result
         Emitter.EmitBranchIfFalse(Info, EndLabel)
         result = CodeBlock.GenerateCode(Info) AndAlso result
         Emitter.EmitBranch(Info, m_NextIteration)
-        Info.ILGen.MarkLabel(EndLabel)
+        Emitter.MarkLabel(Info, EndLabel)
 
         Return result
     End Function

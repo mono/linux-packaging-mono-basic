@@ -25,7 +25,6 @@
 ' OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 ' WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '
-#If NET_VER >= 2.0 Then
 Imports System.ComponentModel
 
 Namespace Microsoft.VisualBasic.Logging
@@ -90,7 +89,7 @@ Namespace Microsoft.VisualBasic.Logging
 
             If ex Is Nothing Then Throw New ArgumentNullException("ex")
             msg = ex.Message
-            If additionalInfo <> String.Empty Then
+            If Not String.IsNullOrEmpty(additionalInfo) Then
                 msg &= " " & additionalInfo
             End If
             WriteEntry(msg, severity, id)
@@ -110,4 +109,3 @@ Namespace Microsoft.VisualBasic.Logging
         End Property
     End Class
 End Namespace
-#End If

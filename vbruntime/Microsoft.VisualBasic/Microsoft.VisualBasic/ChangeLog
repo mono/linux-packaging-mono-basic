@@ -1,10 +1,87 @@
+2010-06-11  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Strings.vb:
+	* Globals.vb:
+	* FileData.vb:
+	* ErrObject.vb:
+	* Conversion.vb:
+	* Collection.vb:
+	* FileSystem.vb:
+	* VbStrConv.vb:
+	* Information.vb:
+	* MsgBoxStyle.vb:
+	* MsgBoxResult.vb:
+	* AudioPlayMode.vb:
+	* HideModuleNameAttribute.vb:
+	* MyGroupCollectionAttribute.vb: Remove .NET 1.0/1.1 logic.
+
+2010-06-12  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* ErrObject.vb: Make it compile in VS2010.
+
+2009-07-10  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* FileSystem.vb: A character can never be equal to an empty string, remove
+	condition. Also to get the first character in a string just use the indexed
+	Chars property instead of substring and converting that string back to a character.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* ChangeLog:
+	* Conversion.vb: Use character constants whenever possible when comparing characters
+	instead of converting characters to strings and comparing that. Also do an explicit
+	ToString on characters when joining them.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* ControlChars.vb: Reduce the number of (ignorable) errors in VS.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Collection.vb: Fix type checking, no way this can be right.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Strings.vb: Call Utils.CopyArray manually instead of using
+	Redim Preserve.
+
+	* Interaction.vb: Don't use Redim Preserve to create an array for the
+	first time.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Strings.vb:
+	* Interaction.vb:
+	* Information.vb:
+	* FileSystem.vb:
+	* FileData.vb:
+	* DateAndTime.vb:
+	* Collection.vb:  Remove all uses of CType (and relatives): for primitive
+	types call the corresponding conversion method, for other types call
+	DirectCast.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Information.vb:
+	* DateAndTime.vb: Use if instead of select on strings.
+
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Strings.vb:
+	* Interaction.vb:
+	* FileSystem.vb:
+	* FileData.vb:
+	* Collection.vb: Use String.Compare/Length instead of equality operator.
+	Second step in making the vbruntime compile in vb9 (by not being
+	self-referential).
+
 2009-12-18  Rolf Bjarne Kvinge  <RKvinge@novell.com>
 
 	* Strings.vb: Fix ctor to be shared so that shared fields are
 	initialized, and fix FormatNumeric to check if a key exists before
 	trying to fetch it, Hashtable might throw exceptions otherwise.
 
-2009-07-10  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+2010-04-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
 
 	* Financial.vb:
 	* FileSystem.vb:

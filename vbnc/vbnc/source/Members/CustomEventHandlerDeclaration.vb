@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -47,12 +47,9 @@ Public Class CustomEventHandlerDeclaration
         MyBase.New(Parent)
     End Sub
 
-    Shadows Sub Init(ByVal Attributes As Attributes, ByVal Modifiers As Modifiers, ByVal ParameterList As ParameterList, ByVal Block As CodeBlock, ByVal HandlerType As KS, ByVal EventName As Identifier)
-        MyBase.Init(Attributes, Modifiers, HandlerType, EventName, ParameterList, Block)
-
-        Dim m_MethodImplAttributes As MethodImplAttributes
-        m_MethodImplAttributes = Reflection.MethodImplAttributes.IL Or Reflection.MethodImplAttributes.Managed
-        MyBase.SetImplementationFlags(m_MethodImplAttributes)
+    Shadows Sub Init(ByVal Modifiers As Modifiers, ByVal ParameterList As ParameterList, ByVal Block As CodeBlock, ByVal HandlerType As KS, ByVal EventName As Identifier)
+        MyBase.Init(Modifiers, HandlerType, EventName, ParameterList, Block)
+        MyBase.MethodImplAttributes = Mono.Cecil.MethodImplAttributes.IL Or Mono.Cecil.MethodImplAttributes.Managed
     End Sub
 
     Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean

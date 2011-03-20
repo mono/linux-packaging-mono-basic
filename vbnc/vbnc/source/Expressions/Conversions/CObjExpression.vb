@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -24,25 +24,21 @@ Public Class CObjExpression
         MyBase.New(Parent, Expression)
     End Sub
 
-    Sub New(ByVal Parent As ParsedObject)
-        MyBase.New(Parent)
+    Sub New(ByVal Parent As ParsedObject, ByVal IsExplicit As Boolean)
+        MyBase.New(Parent, IsExplicit)
     End Sub
 
     Protected Overrides Function ResolveExpressionInternal(ByVal Info As ResolveInfo) As Boolean
         Dim result As Boolean = True
 
         result = MyBase.ResolveExpressionInternal(Info) AndAlso result
-        result = Validate(Info, Expression.ExpressionType) AndAlso result
+        result = Validate(Info, Expression) AndAlso result
 
         Return result
     End Function
 
-    Shared Function Validate(ByVal Info As ResolveInfo, ByVal SourceType As Type) As Boolean
+    Shared Function Validate(ByVal Info As ResolveInfo, ByVal Expression As Expression) As Boolean
         Dim result As Boolean = True
-
-        'Dim expType As Type = SourceType
-        'Dim expTypeCode As TypeCode = Helper.GetTypeCode(Compiler, expType)
-        'Dim ExpressionType As Type = Info.Compiler.TypeCache.ULong
 
         Return result
     End Function
@@ -52,7 +48,7 @@ Public Class CObjExpression
 
         If Info.IsRHS Then
             result = Expression.GenerateCode(Info.Clone(Expression, True, False, Expression.ExpressionType)) AndAlso result
-            If Expression.ExpressionType.IsValueType OrElse Expression.ExpressionType.IsGenericParameter Then
+            If CecilHelper.IsValueType(Expression.ExpressionType) OrElse CecilHelper.IsGenericParameter(Expression.ExpressionType) Then
                 Emitter.EmitBox(Info, Expression.ExpressionType)
             End If
         Else
@@ -72,7 +68,7 @@ Public Class CObjExpression
         End Get
     End Property
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Return Compiler.TypeCache.System_Object
         End Get

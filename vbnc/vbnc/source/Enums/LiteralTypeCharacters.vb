@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -18,21 +18,21 @@
 ' 
 Public Enum LiteralTypeCharacters_Characters As Byte
     None '= -1
-    <KSEnumString("S")> ShortCharacter
-    <KSEnumString("US")> UnsignedShortCharacter
-    <KSEnumString("I")> IntegerCharacter
-    <KSEnumString("UI")> UnsignedIntegerCharacter
-    <KSEnumString("L")> LongCharacter
-    <KSEnumString("UL")> UnsignedLongCharacter
-    <KSEnumString("%")> IntegerTypeCharacter
-    <KSEnumString("&")> LongTypeCharacter
+    ShortCharacter
+    UnsignedShortCharacter
+    IntegerCharacter
+    UnsignedIntegerCharacter
+    LongCharacter
+    UnsignedLongCharacter
+    IntegerTypeCharacter
+    LongTypeCharacter
 
-    <KSEnumString("F")> SingleCharacter
-    <KSEnumString("R")> DoubleCharacter
-    <KSEnumString("D")> DecimalCharacter
-    <KSEnumString("!")> SingleTypeCharacter
-    <KSEnumString("#")> DoubleTypeCharacter
-    <KSEnumString("@")> DecimalTypeCharacter
+    SingleCharacter
+    DoubleCharacter
+    DecimalCharacter
+    SingleTypeCharacter
+    DoubleTypeCharacter
+    DecimalTypeCharacter
 
 End Enum
 

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -21,12 +21,10 @@ Public Interface IMethod
     Inherits INonTypeMember, IDefinableMember
     ReadOnly Property Signature() As SubSignature
     ReadOnly Property HasReturnValue() As Boolean
-    ReadOnly Property ILGenerator() As ILGenerator
-    ReadOnly Property MethodBuilder() As MethodBuilder
-    ReadOnly Property MethodDescriptor() As MethodBase
-    ReadOnly Property GetParameters() As ParameterInfo()
-    ReadOnly Property DefaultReturnVariable() As LocalBuilder
+    ReadOnly Property GetParameters() As Mono.Cecil.ParameterDefinition()
+    ReadOnly Property DefaultReturnVariable() As Mono.Cecil.Cil.VariableDefinition
 
     ReadOnly Property HandlesOrImplements() As HandlesOrImplements
-    Sub SetImplementationFlags(ByVal flags As MethodImplAttributes)
+    Property MethodImplementationFlags() As Mono.Cecil.MethodImplAttributes
+    ReadOnly Property CecilBuilder() As Mono.Cecil.MethodDefinition
 End Interface

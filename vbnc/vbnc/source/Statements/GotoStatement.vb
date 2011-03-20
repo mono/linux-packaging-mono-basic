@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,7 @@ Public Class GotoStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        Emitter.EmitBranchOrLeave(Info, m_Destination.LabelBuilder, Me, m_Destination)
+        Emitter.EmitBranchOrLeave(Info, m_Destination.GetLabel(Info), Me, m_Destination)
 
         Return result
     End Function
@@ -60,12 +60,4 @@ Public Class GotoStatement
             Return m_GotoWhere
         End Get
     End Property
-
-    '#If DEBUG Then
-    '    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-    '        Dumper.Write("Goto ")
-    '        m_GotoWhere.Dump(Dumper)
-    '        Dumper.WriteLine("")
-    '    End Sub
-    '#End If
 End Class

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ Public Class SimpleTypeName
 
     Private m_TypeName As ParsedObject
 
-    Private m_ResolvedType As Type
+    Private m_ResolvedType As Mono.Cecil.TypeReference
     Private m_TypeParameter As TypeParameter
 
     Sub New(ByVal Parent As ParsedObject)
@@ -69,11 +69,20 @@ Public Class SimpleTypeName
         End Get
     End Property
 
-    ReadOnly Property ResolvedType() As Type 'Descriptor
+    ReadOnly Property ResolvedType() As Mono.Cecil.TypeReference 'Descriptor
         Get
             Return m_ResolvedType
         End Get
     End Property
+
+    Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
+        Dim result As Boolean = True
+
+        If m_TypeName IsNot Nothing Then result = m_TypeName.ResolveCode(Info) AndAlso result
+        If m_TypeParameter IsNot Nothing Then result = m_TypeParameter.ResolveCode(Info) AndAlso result
+
+        Return result
+    End Function
 
     Public Overrides Function ResolveTypeReferences() As Boolean
         Return ResolveTypeReferences(False)
@@ -85,12 +94,21 @@ Public Class SimpleTypeName
             'Not necessary.'result = AsBuiltInTypeName.ResolveTypeReferences AndAlso result
             m_ResolvedType = AsBuiltInTypeName.ResolvedType
         ElseIf IsQualifiedIdentifier Then
-            Dim tpParam As TypeParameterDescriptor
+            Dim tpParam As Mono.Cecil.GenericParameter
             result = AsQualifiedIdentifier.ResolveAsTypeName(AsAttributeTypeName) AndAlso result
+            If result = False Then Return result
             m_ResolvedType = AsQualifiedIdentifier.ResolvedType
-            tpParam = TryCast(m_ResolvedType, TypeParameterDescriptor)
+            tpParam = TryCast(m_ResolvedType, Mono.Cecil.GenericParameter)
             If tpParam IsNot Nothing Then
-                m_TypeParameter = tpParam.TypeParameter
+                m_TypeParameter = DirectCast(tpParam.Annotations(Compiler), TypeParameter)
+            End If
+            If result = False Then Return result
+            If Not TypeOf m_ResolvedType Is Mono.Cecil.GenericInstanceType AndAlso m_ResolvedType.GenericParameters.Count > 0 Then
+                Dim tmp As New Mono.Cecil.GenericInstanceType(m_ResolvedType)
+                For i As Integer = 0 To m_ResolvedType.GenericParameters.Count - 1
+                    tmp.GenericArguments.Add(m_ResolvedType.GenericParameters(i))
+                Next
+                m_ResolvedType = tmp
             End If
         Else
             Throw New InternalException(Me)

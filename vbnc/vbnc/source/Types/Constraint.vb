@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -58,17 +58,17 @@ Public Class Constraint
         End Get
     End Property
 
-    ReadOnly Property SpecialConstraintAttribute() As GenericParameterAttributes
+    ReadOnly Property SpecialConstraintAttribute() As Mono.Cecil.GenericParameterAttributes
         Get
             Select Case m_Special
                 Case KS.[New]
-                    Return GenericParameterAttributes.DefaultConstructorConstraint
+                    Return Mono.Cecil.GenericParameterAttributes.DefaultConstructorConstraint
                 Case KS.Class
-                    Return GenericParameterAttributes.ReferenceTypeConstraint
+                    Return Mono.Cecil.GenericParameterAttributes.ReferenceTypeConstraint
                 Case KS.Structure
-                    Return GenericParameterAttributes.NotNullableValueTypeConstraint
+                    Return Mono.Cecil.GenericParameterAttributes.NotNullableValueTypeConstraint
                 Case KS.None
-                    Return GenericParameterAttributes.None
+                    Return Mono.Cecil.GenericParameterAttributes.NonVariant
                 Case Else
                     Throw New InternalException(Me)
             End Select

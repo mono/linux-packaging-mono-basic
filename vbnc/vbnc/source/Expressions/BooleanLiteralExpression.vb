@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -37,10 +37,10 @@ Public Class BooleanLiteralExpression
         Return result
     End Function
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
 
-            Return Compiler.TypeCache.System_Boolean '_Descriptor
+            Return Compiler.TypeCache.System_Boolean
         End Get
     End Property
 
@@ -49,11 +49,4 @@ Public Class BooleanLiteralExpression
             Return m_Value
         End Get
     End Property
-
-
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write(m_Value.ToString)
-    End Sub
-#End If
 End Class

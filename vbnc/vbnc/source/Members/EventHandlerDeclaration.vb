@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ Public MustInherit Class EventHandlerDeclaration
         MyBase.new(Parent)
     End Sub
 
-    Shadows Sub Init(ByVal Attributes As Attributes, ByVal Modifiers As Modifiers, ByVal HandlerType As KS, ByVal EventName As Identifier, ByVal Parameters As ParameterList, ByVal Code As CodeBlock)
+    Shadows Sub Init(ByVal Modifiers As Modifiers, ByVal HandlerType As KS, ByVal EventName As Identifier, ByVal Parameters As ParameterList, ByVal Code As CodeBlock)
 
         m_HandlerType = HandlerType
 
@@ -53,7 +53,8 @@ Public MustInherit Class EventHandlerDeclaration
         mySignature = New SubSignature(Me)
         mySignature.Init(New Identifier(mySignature, name, EventName.Location, EventName.TypeCharacter), Nothing, Parameters)
 
-        MyBase.Init(Attributes, Modifiers, mySignature, Code)
+        MyBase.Init(Modifiers, mySignature, Code)
+        UpdateDefinition()
     End Sub
 
     ''' <summary>

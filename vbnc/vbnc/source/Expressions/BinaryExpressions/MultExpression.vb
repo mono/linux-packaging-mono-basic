@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -71,11 +71,11 @@ Public Class MultExpression
             If lvalue Is Nothing OrElse rvalue Is Nothing Then
                 Return Nothing
             Else
-                Dim tlvalue, trvalue As Type
+                Dim tlvalue, trvalue As Mono.Cecil.TypeReference
                 Dim clvalue, crvalue As TypeCode
-                tlvalue = lvalue.GetType
+                tlvalue = CecilHelper.GetType(Compiler, lvalue)
                 clvalue = Helper.GetTypeCode(Compiler, tlvalue)
-                trvalue = rvalue.GetType
+                trvalue = CecilHelper.GetType(Compiler, rvalue)
                 crvalue = Helper.GetTypeCode(Compiler, trvalue)
 
                 Dim csmallest As TypeCode

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -26,9 +26,10 @@ Public Class MissingExpression
 
     Protected Overrides Function GenerateCodeInternal(ByVal Info As EmitInfo) As Boolean
         Helper.Stop() 'A missing expression doesn't know how to emit itself.
+        Return False
     End Function
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Return New MissingType(Me.Compiler)
         End Get
@@ -41,10 +42,4 @@ Public Class MissingExpression
     Sub New(ByVal Parent As Expression)
         MyBase.New(Parent)
     End Sub
-
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write("<Missing>")
-    End Sub
-#End If
 End Class

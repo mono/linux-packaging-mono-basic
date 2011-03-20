@@ -50,7 +50,7 @@ Namespace Microsoft.VisualBasic
         Private Shared m_OpenFiles As Hashtable
 
         Public Shared Sub ChDir(ByVal Path As String)
-            If ((Path = "") Or (Path Is Nothing)) Then Throw New System.ArgumentException("Argument 'Path' is Nothing or empty.")
+            If Path Is Nothing OrElse Path.Length = 0 Then Throw New System.ArgumentException("Argument 'Path' is Nothing or empty.")
 
             Dim fileinfo As New FileInfo(Path)
             If (fileinfo.Exists) Then Throw New System.IO.IOException("The Directory name is invalid.")
@@ -64,20 +64,19 @@ Namespace Microsoft.VisualBasic
 
         End Sub
         Public Shared Sub ChDrive(ByVal Drive As Char)
-            If (Drive = "") Then Return
             If Not Char.IsLetter(Drive) Then Throw New System.ArgumentException("Argument 'Drive' is not a valid value.")
 
             Try
-                Directory.SetCurrentDirectory(Drive + Path.VolumeSeparatorChar)
+                Directory.SetCurrentDirectory(Drive.ToString() & Path.VolumeSeparatorChar.ToString())
             Catch ex As DirectoryNotFoundException
-                Throw New System.IO.IOException("Drive " + "'" + Drive + "'" + " not found.")
+                Throw New System.IO.IOException("Drive " + "'" + Drive.ToString() + "'" + " not found.")
 
             End Try
 
         End Sub
         Public Shared Sub ChDrive(ByVal Drive As String)
-            If (Drive Is Nothing) Or (Drive = "") Then Return
-            Dim ch As Char = CChar(Drive.Substring(0, 1))
+            If Drive Is Nothing OrElse Drive.Length = 0 Then Return
+            Dim ch As Char = Drive(0)
             FileSystem.ChDrive(ch)
 
         End Sub
@@ -87,9 +86,9 @@ Namespace Microsoft.VisualBasic
         Public Shared Function CurDir(ByVal Drive As Char) As String
             If Not Char.IsLetter(Drive) Then Throw New System.ArgumentException("Argument 'Drive' is not a valid value.")
             Try
-                Directory.SetCurrentDirectory(Drive + Path.VolumeSeparatorChar)
+                Directory.SetCurrentDirectory(Drive.ToString() & Path.VolumeSeparatorChar.ToString())
             Catch ex As DirectoryNotFoundException
-                Throw New System.IO.IOException("Drive " + "'" + Drive + "'" + " not found.")
+                Throw New System.IO.IOException("Drive " + "'" + Drive.ToString() + "'" + " not found.")
             End Try
 
             Return Path.GetFullPath(Convert.ToString(Drive))
@@ -120,11 +119,11 @@ Namespace Microsoft.VisualBasic
             m_FileSystemInfos = Nothing
             m_Index = 0
 
-            If Pathname <> String.Empty Then
+            If Not Pathname Is Nothing AndAlso Pathname.Length <> 0 Then
                 str_parent_dir = IO.Path.GetDirectoryName(Pathname)
             End If
 
-            If str_parent_dir = String.Empty Then
+            If str_parent_dir Is Nothing OrElse str_parent_dir.Length = 0 Then
                 str_parent_dir = Directory.GetCurrentDirectory
             End If
             str_pattern = IO.Path.GetFileName(Pathname)
@@ -134,14 +133,14 @@ Namespace Microsoft.VisualBasic
             If di.Exists = False Then Return String.Empty
 
             If (Attributes And FileAttributes.Directory) <> 0 Then
-                If (str_pattern = String.Empty) Then
+                If str_pattern Is Nothing OrElse str_pattern.Length = 0 Then
                     dirs = di.GetDirectories()
                 Else
                     dirs = di.GetDirectories(str_pattern)
                 End If
             End If
 
-            If str_pattern = String.Empty Then
+            If str_pattern Is Nothing OrElse str_pattern.Length = 0 Then
                 files = di.GetFiles()
             Else
                 files = di.GetFiles(str_pattern)
@@ -214,14 +213,10 @@ Namespace Microsoft.VisualBasic
             File.Copy(Source, Destination, True)
         End Sub
         Public Shared Function FileDateTime(ByVal PathName As String) As Date
-            If (PathName = "") Then Throw New System.IO.FileNotFoundException("File " + "'" + "'" + " not found.")
+            If PathName Is Nothing OrElse PathName.Length = 0 Then Throw New System.IO.FileNotFoundException("File " + "'" + "'" + " not found.")
 
             Dim InvalidChars() As Char
-#If NET_VER >= 2.0 Then
             InvalidChars = Path.GetInvalidPathChars()
-#Else
-            InvalidChars = Path.InvalidPathChars
-#End If
             If Not (PathName.IndexOfAny(InvalidChars) = -1) Then
                 Throw New System.ArgumentException("Argument 'PathName' is not a valid value.")
             End If
@@ -277,7 +272,7 @@ Namespace Microsoft.VisualBasic
             FindFileData(FileNumber).FileGetObject(Value, RecordNumber)
         End Sub
         Public Shared Function FileLen(ByVal PathName As String) As Long
-            If ((PathName = "") Or (PathName Is Nothing)) Then Throw New System.IO.FileNotFoundException("File " + "'" + PathName + "'" + " not found.")
+            If PathName Is Nothing OrElse PathName.Length = 0 Then Throw New System.IO.FileNotFoundException("File " + "'" + PathName + "'" + " not found.")
             Dim fi As New FileInfo(PathName)
             If (fi.Exists) Then
                 Return fi.Length
@@ -371,12 +366,8 @@ Namespace Microsoft.VisualBasic
         Public Shared Sub FilePut(ByVal FileNumber As Integer, ByVal Value As System.ValueType, Optional ByVal RecordNumber As Long = -1)
             FindFileData(FileNumber).FilePut(Value, RecordNumber)
         End Sub
-#If NET_VER >= 2.0 Then
         <Obsolete("This member has been deprectated. Try FilePutObject.")> _
         Public Shared Sub FilePut(ByVal FileNumber As Object, ByVal Value As Object, Optional ByVal RecordNumber As Object = -1)
-#Else
-        Public Shared Sub FilePut(ByVal FileNumber As Object, ByVal Value As Object, Optional ByVal RecordNumber As Object = -1)
-#End If
             Throw New ArgumentException("Use 'FilePutObject' instead of 'FilePut' when using argument of type 'Object'.")
         End Sub
         Public Shared Sub FilePutObject(ByVal FileNumber As Integer, ByVal Value As Object, Optional ByVal RecordNumber As Long = -1)
@@ -400,14 +391,10 @@ Namespace Microsoft.VisualBasic
 
         Public Shared Function GetAttr(ByVal PathName As String) As Microsoft.VisualBasic.FileAttribute
 
-            If ((PathName = "") Or (PathName Is Nothing)) Then Throw New System.ArgumentException("The path is not of a legal form.")
+            If PathName Is Nothing OrElse PathName.Length = 0 Then Throw New System.ArgumentException("The path is not of a legal form.")
 
             Dim InvalidChars() As Char
-#If NET_VER >= 2.0 Then
             InvalidChars = Path.GetInvalidPathChars()
-#Else
-            InvalidChars = Path.InvalidPathChars
-#End If
             If Not (PathName.IndexOfAny(InvalidChars) = -1) Then
                 Throw New System.ArgumentException("Argument 'PathName' is not a valid value.")
             End If
@@ -464,7 +451,7 @@ Namespace Microsoft.VisualBasic
             Return FindFileData(FileNumber).InputString(CharCount)
         End Function
         Public Shared Sub Kill(ByVal PathName As String)
-            If ((PathName = "") Or (PathName Is Nothing)) Then Throw New System.ArgumentException("The path is not of a legal form.")
+            If PathName Is Nothing OrElse PathName.Length = 0 Then Throw New System.ArgumentException("The path is not of a legal form.")
             Dim str_parent_dir, str_file_to_delete As String
             Dim last_ch, i As Integer
             Dim di As DirectoryInfo
@@ -483,7 +470,7 @@ Namespace Microsoft.VisualBasic
             tmpFile = di.GetFiles(str_file_to_delete)
             If Not (tmpFile.Length = 0) Then
                 For i = 0 To tmpFile.Length - 1
-                    File.Delete(str_parent_dir + Path.DirectorySeparatorChar + tmpFile(i).Name)
+                    File.Delete(str_parent_dir & Path.DirectorySeparatorChar.ToString() & tmpFile(i).Name)
                 Next
             Else
                 Throw New System.IO.FileNotFoundException(" No files found matching: " + PathName)
@@ -509,7 +496,7 @@ Namespace Microsoft.VisualBasic
             FindFileData(FileNumber).LOF()
         End Function
         Public Shared Sub MkDir(ByVal Path As String)
-            If ((Path = "") Or (Path Is Nothing)) Then Throw New System.ArgumentException("Argument 'Path' is Nothing or empty.")
+            If Path Is Nothing OrElse Path.Length = 0 Then Throw New System.ArgumentException("Argument 'Path' is Nothing or empty.")
             Dim di As New DirectoryInfo(Path)
             If (di.Exists) Then
                 Throw New System.IO.IOException("Path/File access error.")
@@ -525,7 +512,7 @@ Namespace Microsoft.VisualBasic
             FindFileData(FileNumber).PrintLine(Output)
         End Sub
         Public Shared Sub Rename(ByVal OldPath As String, ByVal NewPath As String)
-            If ((OldPath = "") Or (OldPath Is Nothing) Or (NewPath = "") Or (NewPath Is Nothing)) Then Throw New System.ArgumentException("The path is not of a legal form.")
+            If OldPath Is Nothing OrElse OldPath.Length = 0 OrElse NewPath Is Nothing OrElse NewPath.Length = 0 Then Throw New System.ArgumentException("The path is not of a legal form.")
 
             Dim fiNew As New FileInfo(NewPath)
             Dim fiOld As New FileInfo(OldPath)
@@ -552,11 +539,7 @@ Namespace Microsoft.VisualBasic
                 '' MSDN says IOException on this scenario(as Directory.Move throw), 
                 '' but FileSystem.Rename actually returns ArgumentException
                 If diNew.Exists Then
-#If NET_VER >= 2.0 Then
                     Throw New System.IO.IOException("File already exists.")
-#Else
-                    Throw New System.IO.FileNotFoundException("File not found.")
-#End If
                 End If
                 Try
                     Directory.Move(OldPath, NewPath)
@@ -571,7 +554,7 @@ Namespace Microsoft.VisualBasic
         Public Shared Sub RmDir(ByVal Path As String)
             Dim fi As FileInfo()
 
-            If ((Path = "") Or (Path Is Nothing)) Then Throw New System.ArgumentException("Argument 'Path' is Nothing or empty.")
+            If Path Is Nothing OrElse Path.Length = 0 Then Throw New System.ArgumentException("Argument 'Path' is Nothing or empty.")
             Dim di As New DirectoryInfo(Path)
             fi = di.GetFiles
             If Not (fi.Length = 0) Then
@@ -589,14 +572,10 @@ Namespace Microsoft.VisualBasic
         End Sub
         Public Shared Sub SetAttr(ByVal PathName As String, ByVal Attributes As Microsoft.VisualBasic.FileAttribute)
 
-            If ((PathName = "") Or (PathName Is Nothing)) Then Throw New System.ArgumentException("The path is not of a legal form.")
+            If PathName Is Nothing OrElse PathName.Length = 0 Then Throw New System.ArgumentException("The path is not of a legal form.")
 
             Dim InvalidChars() As Char
-#If NET_VER >= 2.0 Then
             InvalidChars = Path.GetInvalidPathChars()
-#Else
-            InvalidChars = Path.InvalidPathChars
-#End If
             If Not (PathName.IndexOfAny(InvalidChars) = -1) Then
                 Throw New System.ArgumentException("Argument 'PathName' is not a valid value.")
             End If

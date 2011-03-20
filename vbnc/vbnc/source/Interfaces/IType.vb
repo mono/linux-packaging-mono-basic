@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -25,14 +25,12 @@
 ''' </summary>
 ''' <remarks></remarks>
 Public Interface IType
-    Inherits INameable, IModifiable, IDefinableType, IMember, ICreatableType
+    Inherits INameable, IModifiable, IDefinableType, IMember ', ICreatableType
 
-    ReadOnly Property TypeAttributes() As TypeAttributes
-    ReadOnly Property TypeBuilder() As TypeBuilder
+    Property TypeAttributes() As Mono.Cecil.TypeAttributes
+    ReadOnly Property CecilType() As Mono.Cecil.TypeDefinition
     ReadOnly Property Members() As MemberDeclarations
-    ReadOnly Property BaseType() As Type
-    ReadOnly Property TypeDescriptor() As TypeDescriptor
+    Property BaseType() As Mono.Cecil.TypeReference
     ReadOnly Property IsNestedType() As Boolean
     ReadOnly Property [Namespace]() As String
-    Function ResolveType() As Boolean 'No info is needed to resolve a type.
 End Interface

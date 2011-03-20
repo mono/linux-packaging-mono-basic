@@ -25,7 +25,6 @@
 ' OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 ' WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '
-#If NET_VER >= 2.0 Then
 #If TARGET_JVM = False Then 'Windows.Forms Not Supported by Grasshopper
 Imports System.Windows.Forms
 
@@ -39,7 +38,7 @@ Namespace Microsoft.VisualBasic.FileIO
             If Path.Contains("\\") AndAlso Path.StartsWith("\\") = False Then
                 Path = Path.Replace("\\", "\")
             End If
-            If Path.EndsWith(System.IO.Path.DirectorySeparatorChar) Then
+            If Path.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()) Then
                 Return Path.Substring(0, Path.Length - 1)
             Else
                 Return Path
@@ -101,5 +100,4 @@ Namespace Microsoft.VisualBasic.FileIO
         End Property
     End Class
 End Namespace
-#End If
 #End If

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -30,8 +30,8 @@ Public Class InterfaceFunctionDeclaration
         MyBase.New(Parent)
     End Sub
 
-    Shadows Sub Init(ByVal Attributes As Attributes, ByVal Modifiers As Modifiers, ByVal Signature As FunctionSignature)
-        MyBase.Init(Attributes, Modifiers, Signature, Nothing)
+    Shadows Sub Init(ByVal Modifiers As Modifiers, ByVal Signature As FunctionSignature)
+        MyBase.Init(Modifiers, Signature, Nothing)
     End Sub
 
     Shared Shadows Function IsMe(ByVal tm As tm) As Boolean

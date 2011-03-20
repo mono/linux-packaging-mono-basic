@@ -28,7 +28,6 @@
 ' OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 ' WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#If NET_VER >= 2.0 Then
 Imports System
 Imports System.Globalization
 
@@ -87,12 +86,12 @@ Namespace Microsoft.VisualBasic.CompilerServices
                 Return ToCharArrayRankOne("")
             End If
 
-            If (GetType(Char()).Equals(Value.GetType())) Then
-                Return CType(Value, Char())
+            If TypeOf Value Is Char() Then
+                Return DirectCast(Value, Char())
             End If
 
-            If (GetType(String).Equals(Value.GetType())) Then
-                Return ToCharArrayRankOne(CType(Value, String))
+            If TypeOf Value Is String Then
+                Return ToCharArrayRankOne(DirectCast(Value, String))
             End If
 
             Throw New InvalidCastException("Conversion from type '" + Value.GetType().Name + "' to type 'Char()' is not valid.")
@@ -236,4 +235,3 @@ Namespace Microsoft.VisualBasic.CompilerServices
         End Function
     End Class
 End Namespace
-#End If

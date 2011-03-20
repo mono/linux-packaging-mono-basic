@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -63,10 +63,13 @@ Public Class VariableIdentifier
         End Get
     End Property
 
-    Public ReadOnly Property Name() As String Implements INameable.Name
+    Public Property Name() As String Implements INameable.Name
         Get
             Return m_Identifier.Identifier
         End Get
+        Set(ByVal value As String)
+            m_Identifier.Identifier = value
+        End Set
     End Property
 End Class
 

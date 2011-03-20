@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -72,16 +72,9 @@ Public Class NewExpression
         End Get
     End Property
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Return m_Expression.ExpressionType
         End Get
     End Property
-
-
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        m_Expression.Dump(Dumper)
-    End Sub
-#End If
 End Class

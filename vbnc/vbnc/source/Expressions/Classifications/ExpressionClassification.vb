@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -31,8 +31,6 @@ Public Class ExpressionClassification
 
     Private m_Classification As Classifications
 
-    Private m_ConstantValue As Object
-
     ReadOnly Property Parent() As ParsedObject
         Get
             Return m_Parent
@@ -54,34 +52,21 @@ Public Class ExpressionClassification
     Overridable ReadOnly Property IsConstant() As Boolean
         Get
             Compiler.Report.ShowMessage(Messages.VBNC99997, m_Parent.Location)
-            Return m_ConstantValue IsNot Nothing
+            Return False
         End Get
     End Property
 
-    ''' <summary>
-    ''' Returns the constant value for this object if it has a constant value, 
-    ''' otherwise it throws an exception.
-    ''' Calls IsConstant before returning the value.
-    ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
-    Property ConstantValue() As Object
+    Overridable ReadOnly Property ConstantValue() As Object
         Get
-            If Me.IsConstant Then
-                Helper.Assert(m_ConstantValue IsNot Nothing)
-                Return m_ConstantValue
-            Else
-                Throw New InternalException(Me)
-            End If
+            'IsConstant should have been called before ConstantValue
+            'and if a classification overrides IsConstant to return true,
+            'it should also override ConstantValue
+            Helper.StopIfDebugging()
+            Return Nothing
         End Get
-        Protected Set(ByVal value As Object)
-            Helper.Assert(value IsNot Nothing)
-            m_ConstantValue = value
-        End Set
     End Property
 
-    Overloads Function [GetType](ByVal ThrowIfNoType As Boolean) As Type
+    Overloads Function [GetType](ByVal ThrowIfNoType As Boolean) As Mono.Cecil.TypeReference
         Select Case m_Classification
             Case Classifications.Value
                 Return AsValueClassification.Type
@@ -225,14 +210,14 @@ Public Class ExpressionClassification
     ReadOnly Property CanBeValueClassification() As Boolean
         Get
             Select Case m_Classification
-                Case Classifications.Value, Classifications.Variable, Classifications.EventAccess, _
+                Case Classifications.Value, Classifications.Variable, _
                 Classifications.LateBoundAccess, Classifications.MethodGroup, _
                 Classifications.MethodPointer, Classifications.PropertyAccess, Classifications.PropertyGroup
                     Return True
                 Case Classifications.Type
                     Dim tc As TypeClassification = AsTypeClassification
                     Return tc.CanBeExpression AndAlso tc.Expression.Classification.CanBeValueClassification
-                Case Classifications.Void, Classifications.Namespace
+                Case Classifications.Void, Classifications.Namespace, Classifications.EventAccess
                     Return False
                 Case Else
                     Compiler.Report.ShowMessage(Messages.VBNC99997, m_Parent.Location)
@@ -248,9 +233,12 @@ Public Class ExpressionClassification
                     Return True
                 Case Classifications.LateBoundAccess
                     Return True
+                Case Classifications.Type
+                    Dim tc As TypeClassification = AsTypeClassification
+                    Return tc.CanBeExpression AndAlso tc.Expression.Classification.CanBePropertyAccessClassification
                 Case Classifications.Value, Classifications.Variable, Classifications.EventAccess, _
 Classifications.LateBoundAccess, Classifications.MethodGroup, _
-Classifications.MethodPointer, Classifications.PropertyAccess, Classifications.Void, Classifications.Type, Classifications.Namespace
+Classifications.MethodPointer, Classifications.PropertyAccess, Classifications.Void, Classifications.Namespace
                     Return False
                 Case Else
                     Compiler.Report.ShowMessage(Messages.VBNC99997, m_Parent.Location)
@@ -291,12 +279,6 @@ Classifications.MethodPointer, Classifications.PropertyAccess, Classifications.V
     Friend Overridable Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Return Compiler.Report.ShowMessage(Messages.VBNC99997, m_Parent.Location)
     End Function
-
-    'Shadows ReadOnly Property Parent() As ParsedObject
-    '    Get
-    '        Return DirectCast(MyBase.Parent, ParsedObject)
-    '    End Get
-    'End Property
 End Class
 
 

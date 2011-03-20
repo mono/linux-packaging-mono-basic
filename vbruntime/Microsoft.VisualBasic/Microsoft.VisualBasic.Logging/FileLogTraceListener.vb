@@ -25,7 +25,6 @@
 ' OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 ' WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '
-#If NET_VER >= 2.0 Then
 Imports System.Runtime.InteropServices
 Imports System.Text
 
@@ -210,7 +209,7 @@ Namespace Microsoft.VisualBasic.Logging
                 End If
             End If
 #if Not TARGET_JVM
-            If New System.IO.DriveInfo(Me.FullLogFileName(0)).TotalFreeSpace - msgSize < m_ReserveDiskSpace Then
+            If New System.IO.DriveInfo(Me.FullLogFileName(0).ToString()).TotalFreeSpace - msgSize < m_ReserveDiskSpace Then
                 If m_DiskSpaceExhaustedBehaviour = DiskSpaceExhaustedOption.ThrowException Then
                     Throw New InvalidOperationException("No more disk space for log file")
                 Else
@@ -398,4 +397,3 @@ Namespace Microsoft.VisualBasic.Logging
     End Class
 
 End Namespace
-#End If

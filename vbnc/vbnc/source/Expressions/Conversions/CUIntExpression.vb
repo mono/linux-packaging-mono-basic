@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,12 @@ Public Class CUIntExpression
         MyBase.New(Parent, Expression)
     End Sub
 
-    Sub New(ByVal Parent As ParsedObject)
-        MyBase.New(Parent)
+    Sub New(ByVal Parent As ParsedObject, ByVal IsExplicit As Boolean)
+        MyBase.New(Parent, IsExplicit)
     End Sub
 
     Protected Overrides Function GenerateCodeInternal(ByVal Info As EmitInfo) As Boolean
-        Return GenerateCode(Me.Expression, Info)
+        Return GenerateCode(Me, Info)
     End Function
 
     Protected Overrides Function ResolveExpressionInternal(ByVal Info As ResolveInfo) As Boolean
@@ -37,37 +37,49 @@ Public Class CUIntExpression
 
         result = MyBase.ResolveExpressionInternal(Info) AndAlso result
 
-        result = Validate(Info, Expression.ExpressionType) AndAlso result
+        result = Validate(Info, Me) AndAlso result
 
         Return result
     End Function
-
-    Shared Function Validate(ByVal Info As ResolveInfo, ByVal SourceType As Type) As Boolean
+    
+    Shared Function Validate(ByVal Info As ResolveInfo, ByVal Conversion As ConversionExpression) As Boolean
         Dim result As Boolean = True
 
-        Dim expType As Type = SourceType
-        Dim expTypeCode As TypeCode = Helper.GetTypeCode(Info.Compiler, expType)
-        Dim ExpressionType As Type = Info.Compiler.TypeCache.System_UInt32
+        Dim expType As Mono.Cecil.TypeReference = Nothing
+        Dim expTypeCode As TypeCode
+        Dim Expression As Expression = Conversion.Expression
+        Dim ExpressionType As TypeReference = Conversion.ExpressionType
+
+        result = ValidateForNullable(Info, Conversion, expTypeCode, expType) AndAlso result
+
         Select Case expTypeCode
             Case TypeCode.Char
-                Info.Compiler.Report.ShowMessage(Messages.VBNC32006, expType.Name)
+                Info.Compiler.Report.ShowMessage(Messages.VBNC32006, Expression.Location, Helper.ToString(Expression, expType))
                 result = False
             Case TypeCode.DateTime
-                Info.Compiler.Report.ShowMessage(Messages.VBNC30311, expType.Name, expType.Name)
+                Info.Compiler.Report.ShowMessage(Messages.VBNC30311, Expression.Location, Helper.ToString(Expression, expType), Helper.ToString(Expression, ExpressionType))
                 result = False
+            Case TypeCode.Object
+                If Helper.CompareType(expType, Info.Compiler.TypeCache.System_Object) Then
+                    'OK
+                ElseIf Helper.CompareType(expType, Info.Compiler.TypeCache.Nothing) Then
+                    'OK
+                Else
+                    result = Conversion.FindUserDefinedConversionOperator() AndAlso result
+                End If
         End Select
 
 
         Return result
     End Function
 
-    Overloads Shared Function GenerateCode(ByVal Expression As Expression, ByVal Info As EmitInfo) As Boolean
+    Overloads Shared Function GenerateCode(ByVal Conversion As ConversionExpression, ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
+        Dim expType As Mono.Cecil.TypeReference = Nothing
+        Dim expTypeCode As TypeCode
+        Dim Expression As Expression = Conversion.Expression
 
-        Dim expType As Type = Expression.ExpressionType
-        Dim expTypeCode As TypeCode = Helper.GetTypeCode(Info.Compiler, expType)
-
-        result = Expression.Classification.GenerateCode(Info.Clone(Expression, expType)) AndAlso result
+        result = GenerateCodeForExpression(Conversion, Info, expTypeCode, expType) AndAlso result
 
         Select Case expTypeCode
             Case TypeCode.Boolean
@@ -78,10 +90,10 @@ Public Class CUIntExpression
             Case TypeCode.UInt32
                 'Nothing to do
             Case TypeCode.Char
-                Info.Compiler.Report.ShowMessage(Messages.VBNC32006, expType.Name)
+                Info.Compiler.Report.ShowMessage(Messages.VBNC32006, Expression.Location, Helper.ToString(Expression, expType))
                 result = False
             Case TypeCode.DateTime
-                Info.Compiler.Report.ShowMessage(Messages.VBNC30311, expType.Name, expType.Name)
+                Info.Compiler.Report.ShowMessage(Messages.VBNC30311, Expression.Location, Helper.ToString(Expression, expType), Helper.ToString(Expression, expType))
                 result = False
             Case TypeCode.SByte, TypeCode.Int16, TypeCode.Int32, TypeCode.Int64
                 Emitter.EmitConv_U4_Overflow(Info, expType)
@@ -103,6 +115,8 @@ Public Class CUIntExpression
             Case TypeCode.Object
                 If Helper.CompareType(expType, Info.Compiler.TypeCache.System_Object) Then
                     Emitter.EmitCall(Info, Info.Compiler.TypeCache.MS_VB_CS_Conversions__ToUInteger_Object)
+                ElseIf Helper.CompareType(expType, Info.Compiler.TypeCache.Nothing) Then
+                    Emitter.EmitCall(Info, Info.Compiler.TypeCache.MS_VB_CS_Conversions__ToUInteger_Object)
                 Else
                     Return Info.Compiler.Report.ShowMessage(Messages.VBNC99997, Expression.Location)
                 End If
@@ -122,7 +136,7 @@ Public Class CUIntExpression
             Dim tpCode As TypeCode
             Dim originalValue As Object
             originalValue = Expression.ConstantValue
-            tpCode = Helper.GetTypeCode(Compiler, originalValue.GetType)
+            tpCode = Helper.GetTypeCode(Compiler, CecilHelper.GetType(Compiler, originalValue))
             Select Case tpCode
                 Case TypeCode.Boolean, TypeCode.Byte, TypeCode.UInt16, TypeCode.UInt32
                     Return CUInt(originalValue) 'No range checking needed.
@@ -131,19 +145,19 @@ Public Class CUIntExpression
                     If Compiler.TypeResolution.CheckNumericRange(originalValue, resultvalue, ExpressionType) Then
                         Return resultvalue
                     Else
-                        Compiler.Report.ShowMessage(Messages.VBNC30439, ExpressionType.ToString)
+                        Compiler.Report.ShowMessage(Messages.VBNC30439, Location, Helper.ToString(Expression, ExpressionType))
                         Return New UInteger
                     End If
                 Case Else
-                    Compiler.Report.ShowMessage(Messages.VBNC30060, originalValue.ToString, ExpressionType.ToString)
+                    Compiler.Report.ShowMessage(Messages.VBNC30060, Location, originalValue.ToString, Helper.ToString(Expression, ExpressionType))
                     Return New UInteger
             End Select
         End Get
     End Property
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
-            Return Compiler.TypeCache.System_UInt32 '_Descriptor
+            Return Compiler.TypeCache.System_UInt32
         End Get
     End Property
 End Class

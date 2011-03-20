@@ -1,3 +1,134 @@
+2010-06-11  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml:
+	* Errors/30198.vb:
+	* Errors/30199.vb:
+	* Errors/33106.vb:
+	* Errors/33104.vb:
+	* Errors/30201.vb:
+	* Errors/33104-1.vb:
+	* Errors/33104-2.vb:
+	* Errors/33107.vb:
+	* Errors/33107-1.vb:
+	* Errors/33110.vb:
+	* Errors/33110-1.vb:
+	* Errors/error.vb:
+
+	* Errors/30512-1.vb:
+	* Errors/30512-2.vb:
+	* Errors/30512-3.vb:
+	* CompileTime2/ConditionalExpression1.vb: Added tests for binary/ternary ifs.
+
+	* SelfTest/SelfCompile.files.linux:
+	* SelfTest/SelfCompile.files.windows: Updated with new file.
+
+2010-06-11  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml:
+	* Errors/30512-4.vb:
+	* Errors/30311-37.vb:
+	* Errors/30311-36.vb:
+	* CompileTime2/ImplicitNullableConversions1.vb:
+	* CompileTime2/UserDefinedNullableConversions1.vb: Added new tests.
+
+2010-06-11  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml:
+	* CompileTime/ByRefStructureReturn1.vb: Added new test.
+
+2010-06-10  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml:
+	* CompileTime2/DefaultProperty7.vb: New test case.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: The decimal constant tests are passing now.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: Narrowing1 is fixed (again) now.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: rt is fixed now.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: ValueType1 is fixed now.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: DefaultInstance1.vb is fixed now.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: Make cecil a dependency for the rt test.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: Explicitly list all nunit test files.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: Remove linux-specific tests, and make the windows-specific tests
+	work on linux too.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: Add test cases for test files created on trunk.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* */all.rsp:
+	* VBRunTime/Microsoft.VisualBasic.vb:
+	* VBRunTime/Microsoft.VisualBasic.linux.vb:
+	* VBRunTime/Microsoft.VisualBasic.windows.vb: Deleted, no longer needed with
+	the new test harness.
+
+	* CompileTime2/ValueType1.vb: Remove duplicated test (in RunTime).
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* tests.xml: Updated according to rt changes.
+
+2010-06-08  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* ...: Merge from vbnc/cecil branch.
+
+2010-04-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* CompileTime/DefaultMember1.vb: Added test.
+
+2010-04-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* CompileTime2/MultDimArray1.vb: Added test.
+
+2010-03-24  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Errors/30512.vb:
+	* CompileTime/DoLoopWhile3.vb: Added test cases.
+
+2010-02-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Bugs/bug-333403.vb: Fix copyright.
+
+2010-01-14  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* CompileTime2/UsingStatement6.vb: Added.
+
+2009-10-24  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* CompileTime2/FunctionReturnVariable1.vb: Added.
+
+2009-10-24  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* SelfTest/SelfCompile.files.windows: Fixed to work again.
+
+2009-10-23  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Bugs/bug-547165.vb: Added test case.
+
 2009-07-22  Rolf Bjarne Kvinge  <RKvinge@novell.com>
 
 	* CompileTime/Narrowing1.vb: Added test case.

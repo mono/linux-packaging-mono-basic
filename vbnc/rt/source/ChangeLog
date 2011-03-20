@@ -1,3 +1,64 @@
+2010-06-11  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* frmMain.vb: Fix the automatic creation of error tests.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* CecilComparer.vb: Don't use features not implemented in vbnc yet.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* frmMain.vb: Make the form's icon the correct color.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Test.vb: Add support for dependencies for a test - files that will be copied
+	into the current directory before the test starts.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* Test.vb: Delete dead code.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* frmMain.vb: When creating a new test, ensure it's visible and select it.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* VerificationBase.vb: Override ToString to return the name of the
+	verification so that it shows up nicely in the property grid.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* frmMain.vb: Add support for using the VB 10 compiler.
+
+2010-06-09  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* rt.vbproj: Updated.
+
+	* Test.vb:
+	* OldResult.vb:
+	* FileComparer.vb:
+	* CompilerHelper.vb:
+	* frmMain.vb:
+	* frmMain.Designer.vb:
+	* frmTestEditor.vb:
+	* frmTestEditor.resx:
+	* frmTestEditor.Designer.vb:
+	* frmAssemblyDiff.vb:
+	* frmAssemblyDiff.resx:
+	* frmAssemblyDiff.Designer.vb: Delete dead code.
+
+2010-06-08  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* (all files): Merge the rt from the vbnc/cecil branch.
+
+2009-12-16  Rolf Bjarne Kvinge  <RKvinge@novell.com>
+
+	* rt9.vbproj: Updated.
+
+	* Test.vb: Add support for PEVerify in other locations.
+
 2008-05-06  Rolf Bjarne Kvinge <RKvinge@novell.com> 
 
 	* Added support for having a list of known failures,
@@ -112,4 +173,3 @@
 	- Tests can now optionally be loaded recursively or not.
 	* ExternalProcessExecutor.vb:
 	- Use "mono" as executable when running on Mono.
-

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -31,15 +31,9 @@ Public Class ConditionalExpression
     End Property
 
     Public Sub New(ByVal Scanner As Scanner)
-        MyBase.New(Scanner)
+        MyBase.New(Scanner, Scanner.GetCurrentLocation())
         m_Scanner = Scanner
     End Sub
-
-    'ReadOnly Property Reader() As Scanner
-    '    Get
-    '        Return m_Compiler
-    '    End Get
-    'End Property
 
     Sub NextToken()
         m_Scanner.NextUnconditionally()
@@ -68,12 +62,13 @@ Public Class ConditionalExpression
                 Case TypeCode.DateTime
                     Result = CurrentToken.DateLiteral
                 Case Else
-                    Helper.Assert(Compiler.TypeResolution.IsNumericType(CurrentToken.LiteralValue.GetType))
+                    Helper.Assert(Compiler.TypeResolution.IsNumericType(CecilHelper.GetType(Compiler, CurrentToken.LiteralValue)))
                     Result = CDbl(CurrentToken.LiteralValue) 'AsFloatingPointLiteral.Literal
             End Select
+            'Result = CurrentToken.Value.Literal
             NextToken()
         ElseIf CurrentToken.IsKeyword Then
-            Dim tpType As Type = Compiler.TypeResolution.KeywordToType(CurrentToken.Keyword)
+            Dim tpType As Mono.Cecil.TypeReference = Compiler.TypeResolution.KeywordToType(CurrentToken.Keyword)
             If tpType Is Nothing Then
                 If CurrentToken.Equals(KS.True) Then
                     Result = True
@@ -84,7 +79,7 @@ Public Class ConditionalExpression
                     NextToken()
                     Return True
                 Else 'TODO: Conversion functions (CInt...)
-                    Compiler.Report.ShowMessage(Messages.VBNC30201)
+                    Compiler.Report.ShowMessage(Messages.VBNC30201, Location)
                 End If
                 NextToken()
                 Return False
@@ -120,11 +115,11 @@ Public Class ConditionalExpression
             Dim op1, op2 As Double
             Dim bErr As Boolean
             If ToDouble(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Double.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Double.ToString)
                 bErr = True
             End If
             If ToDouble(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Double.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Double.ToString)
                 bErr = True
             End If
 
@@ -148,7 +143,7 @@ Public Class ConditionalExpression
 
             Dim op1 As Double
             If ToDouble(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Double.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Double.ToString)
                 LSide = 0
             Else
                 LSide = -op1
@@ -177,11 +172,11 @@ Public Class ConditionalExpression
             Dim op1, op2 As Double
             Dim bErr As Boolean
             If ToDouble(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Double.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Double.ToString)
                 bErr = True
             End If
             If ToDouble(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Double.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Double.ToString)
                 bErr = True
             End If
 
@@ -191,7 +186,7 @@ Public Class ConditionalExpression
                 LSide = op1 * op2
             Else
                 If op2 = 0 Then
-                    Compiler.Report.ShowMessage(Messages.VBNC30542)
+                    Compiler.Report.ShowMessage(Messages.VBNC30542, Location)
                     LSide = CDbl(0)
                 Else
                     LSide = op1 / op2
@@ -215,18 +210,18 @@ Public Class ConditionalExpression
             Dim op1, op2 As Double
             Dim bErr As Boolean
             If ToDouble(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Long.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Long.ToString)
                 bErr = True
             End If
             If ToDouble(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Long.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Long.ToString)
                 bErr = True
             End If
 
             If bErr Then
                 LSide = CDbl(0)
             ElseIf CLng(op2) = 0 Then
-                Compiler.Report.ShowMessage(Messages.VBNC30542)
+                Compiler.Report.ShowMessage(Messages.VBNC30542, Location)
                 LSide = CDbl(0)
             Else
                 LSide = CDbl(CLng(op1) \ CLng(op2))
@@ -249,11 +244,11 @@ Public Class ConditionalExpression
             Dim op1, op2 As Double
             Dim bErr As Boolean
             If ToDouble(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Double.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Double.ToString)
                 bErr = True
             End If
             If ToDouble(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Double.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Double.ToString)
                 bErr = True
             End If
 
@@ -288,22 +283,22 @@ Public Class ConditionalExpression
                 If TypeOf LSide Is String Then
                     op1 = Double.Parse(DirectCast(LSide, String))
                     If ToDouble(RSide, op2) = False Then
-                        Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Double.ToString)
+                        Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Double.ToString)
                         bErr = True
                     End If
                 ElseIf TypeOf RSide Is String Then
                     op2 = Double.Parse(DirectCast(RSide, String))
                     If ToDouble(LSide, op1) = False Then
-                        Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Double.ToString)
+                        Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Double.ToString)
                         bErr = True
                     End If
                 Else
                     If ToDouble(RSide, op2) = False Then
-                        Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Double.ToString)
+                        Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Double.ToString)
                         bErr = True
                     End If
                     If ToDouble(LSide, op1) = False Then
-                        Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Double.ToString)
+                        Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Double.ToString)
                         bErr = True
                     End If
                 End If
@@ -363,17 +358,17 @@ Public Class ConditionalExpression
             Dim op1 As Double, op2 As Double
             Dim bErr As Boolean
             If ToDouble(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Long.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Long.ToString)
                 bErr = True
             End If
             If ToDouble(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Integer.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Integer.ToString)
                 bErr = True
             End If
             If op1 < Long.MinValue OrElse op1 > Long.MaxValue Then
-                Compiler.Report.ShowMessage(Messages.VBNC30439, KS.Long.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30439, Location, KS.Long.ToString)
             ElseIf op2 < Integer.MinValue OrElse op2 > Integer.MaxValue Then
-                Compiler.Report.ShowMessage(Messages.VBNC30439, KS.Integer.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30439, Location, KS.Integer.ToString)
             End If
 
             If bErr Then
@@ -436,7 +431,7 @@ Public Class ConditionalExpression
 
             Dim op1 As Boolean
             If ToBoolean(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Boolean.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Boolean.ToString)
                 LSide = 0
             Else
                 LSide = Not op1
@@ -464,11 +459,11 @@ Public Class ConditionalExpression
             Dim op1 As Boolean, op2 As Boolean
             Dim bErr As Boolean
             If ToBoolean(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Boolean.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Boolean.ToString)
                 bErr = True
             End If
             If ToBoolean(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Boolean.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Boolean.ToString)
                 bErr = True
             End If
 
@@ -499,11 +494,11 @@ Public Class ConditionalExpression
             Dim op1 As Boolean, op2 As Boolean
             Dim bErr As Boolean
             If ToBoolean(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Boolean.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Boolean.ToString)
                 bErr = True
             End If
             If ToBoolean(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Boolean.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Boolean.ToString)
                 bErr = True
             End If
 
@@ -532,11 +527,11 @@ Public Class ConditionalExpression
             Dim op1 As Boolean, op2 As Boolean
             Dim bErr As Boolean
             If ToBoolean(LSide, op1) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, LSide.GetType.ToString, KS.Boolean.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, LSide.GetType.ToString, KS.Boolean.ToString)
                 bErr = True
             End If
             If ToBoolean(RSide, op2) = False Then
-                Compiler.Report.ShowMessage(Messages.VBNC30748, RSide.GetType.ToString, KS.Boolean.ToString)
+                Compiler.Report.ShowMessage(Messages.VBNC30748, Location, RSide.GetType.ToString, KS.Boolean.ToString)
                 bErr = True
             End If
 
@@ -561,7 +556,7 @@ Public Class ConditionalExpression
 
     'Helper conversion functions
     Private Function ToDouble(ByVal value As Object, ByRef Result As Double) As Boolean
-        Dim vTp As Type = value.GetType
+        Dim vTp As Mono.Cecil.TypeReference = CecilHelper.GetType(Compiler, value)
         If Helper.CompareType(vTp, Compiler.TypeCache.System_Byte) OrElse _
             Helper.CompareType(vTp, Compiler.TypeCache.System_Decimal) OrElse _
             Helper.CompareType(vTp, Compiler.TypeCache.System_Double) OrElse _

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -87,6 +87,10 @@ Public Class EventAccessorDeclarations
     End Function
 
     Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
-        Return Helper.ResolveCodeCollection(m_Handlers, info)
+        Dim result As Boolean = True
+        For i As Integer = 0 To m_Handlers.Length - 1
+            result = m_Handlers(i).ResolveCode(Info) AndAlso result
+        Next
+        Return result
     End Function
 End Class

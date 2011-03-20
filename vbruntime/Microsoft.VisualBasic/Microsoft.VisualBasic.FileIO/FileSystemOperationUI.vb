@@ -26,7 +26,6 @@
 ' WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '
 
-#If NET_VER >= 2.0 Then
 #If TARGET_JVM = False Then 'Windows.Forms Not Supported by Grasshopper
 Imports System.IO
 Imports System.Text
@@ -82,7 +81,7 @@ Namespace Microsoft.VisualBasic.FileIO
 
             If (Date.Now - m_LastUpdate).TotalSeconds < 1 Then Return
 
-            If DestinationDirectory <> String.Empty Then
+            If Not DestinationDirectory Is Nothing AndAlso DestinationDirectory.Length <> 0 Then
                 lblDirs.Text = String.Format("From '{0}' to '{1}'", Path.GetFileName(SourceDirectory), Path.GetFileName(DestinationDirectory))
                 lblFile.Text = File
             Else
@@ -207,5 +206,4 @@ Namespace Microsoft.VisualBasic.FileIO
 
     End Class
 End Namespace
-#End If
 #End If

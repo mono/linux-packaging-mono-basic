@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ Public Class ResumeStatement
     Friend Overrides Function GenerateCode(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
 
-        Dim ResumeOK As Label = Info.ILGen.DefineLabel
+        Dim ResumeOK As Label = Emitter.DefineLabel(Info)
 
         Dim block As CodeBlock = Me.FindFirstParent(Of CodeBlock)()
         Dim lastblock As CodeBlock = block
@@ -47,7 +47,6 @@ Public Class ResumeStatement
 
         'Test if the code is in an exception handler
         Emitter.EmitLoadVariable(Info, block.VB_ResumeTarget)
-        Info.Stack.SwitchHead(Compiler.TypeCache.System_Int32, Compiler.TypeCache.System_Boolean)
         Emitter.EmitBranchIfTrue(Info, ResumeOK)
 
         'If code is not in an exception handler raise an error
@@ -55,7 +54,7 @@ Public Class ResumeStatement
         Emitter.EmitCall(Info, Compiler.TypeCache.MS_VB_CS_ProjectData__CreateProjectError_Int32)
         Emitter.EmitThrow(Info)
 
-        Info.ILGen.MarkLabel(ResumeOK)
+        Emitter.MarkLabel(Info, ResumeOK)
         'Load the instruction switch index
         Emitter.EmitLoadVariable(Info, block.VB_CurrentInstruction)
         'Increment the instruction pointer if it is a Resume Next statement
@@ -68,17 +67,6 @@ Public Class ResumeStatement
 
         Return result
     End Function
-
-
-#If DEBUG Then
-    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-        If m_IsResumeNext Then
-            Dumper.WriteLine("Resume Next")
-        Else
-            Dumper.WriteLine("Resume")
-        End If
-    End Sub
-#End If
 
     Public Overrides Function ResolveStatement(ByVal Info As ResolveInfo) As Boolean
         Dim result As Boolean = True

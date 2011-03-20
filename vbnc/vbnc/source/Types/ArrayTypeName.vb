@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ Public Class ArrayTypeName
     Private m_TypeName As NonArrayTypeName
     Private m_ArrayTypeModifiers As ArrayTypeModifiers
 
-    Private m_ResolvedType As Type
+    Private m_ResolvedType As Mono.Cecil.TypeReference
 
     ReadOnly Property TypeName() As NonArrayTypeName
         Get
@@ -61,7 +61,7 @@ Public Class ArrayTypeName
         Return result
     End Function
 
-    ReadOnly Property ResolvedType() As Type
+    ReadOnly Property ResolvedType() As Mono.Cecil.TypeReference
         Get
             Return m_ResolvedType
         End Get
@@ -73,7 +73,7 @@ Public Class ArrayTypeName
         result = m_TypeName.ResolveTypeReferences AndAlso result
         'Not necessary.'result = m_ArrayTypeModifiers.ResolveCode AndAlso result
 
-        Dim tp As Type = m_TypeName.ResolvedType
+        Dim tp As Mono.Cecil.TypeReference = m_TypeName.ResolvedType
         tp = m_ArrayTypeModifiers.CreateArrayType(tp)
         m_ResolvedType = tp
 
@@ -94,4 +94,11 @@ Public Class ArrayTypeName
         Return m_TypeName.ToString & m_ArrayTypeModifiers.ToString
     End Function
 
+    Public Overrides Function ResolveCode(ByVal Info As ResolveInfo) As Boolean
+        Dim result As Boolean = True
+
+        result = m_TypeName.ResolveCode(Info) AndAlso result
+
+        Return result
+    End Function
 End Class

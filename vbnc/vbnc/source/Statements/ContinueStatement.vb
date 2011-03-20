@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -88,19 +88,19 @@ Public Class ContinueStatement
                 m_ContainingStatement = Me.FindFirstParent(Of WhileStatement)()
                 If m_ContainingStatement Is Nothing Then
                     'Helper.AddCheck("error BC30784: 'Continue While' can only appear inside a 'While' statement.")
-                    Compiler.Report.ShowMessage(Messages.VBNC30784)
+                    Compiler.Report.ShowMessage(Messages.VBNC30784, Location)
                 End If
             Case KS.For
                 m_ContainingStatement = CType(Me.FindFirstParent(Of ForEachStatement, ForStatement)(), Statement)
                 If m_ContainingStatement Is Nothing Then
                     'Helper.AddError("error BC30783: 'Continue For' can only appear inside a 'For' statement.")
-                    Compiler.Report.ShowMessage(Messages.VBNC30783)
+                    Compiler.Report.ShowMessage(Messages.VBNC30783, Location)
                 End If
             Case KS.Do
                 m_ContainingStatement = Me.FindFirstParent(Of DoStatement)()
                 If m_ContainingStatement Is Nothing Then
                     'Helper.AddCheck("error BC30782: 'Continue Do' can only appear inside a 'Do' statement.")
-                    Compiler.Report.ShowMessage(Messages.VBNC30782)
+                    Compiler.Report.ShowMessage(Messages.VBNC30782, Location)
                 End If
             Case KS.Else
                 Throw New InternalException(Me)
@@ -116,10 +116,4 @@ Public Class ContinueStatement
             Return m_ContinueWhat
         End Get
     End Property
-
-#If DEBUG Then
-    Public Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.WriteLine("Continue " & Enums.GetKSStringAttribute(m_ContinueWhat).FriendlyValue)
-    End Sub
-#End If
 End Class

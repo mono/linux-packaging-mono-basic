@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,7 @@ Public Class TypeCharacters
     Private Const m_Characters As String = "%&@!#$"
     Private Shared m_DataTypes() As KS = {KS.None, KS.Integer, KS.Long, KS.Decimal, KS.Single, KS.Double, KS.String}
 
-    Shared Function TypeCharacterToType(ByVal Compiler As Compiler, ByVal TypeCharacter As TypeCharacters.Characters) As Type
+    Shared Function TypeCharacterToType(ByVal Compiler As Compiler, ByVal TypeCharacter As TypeCharacters.Characters) As Mono.Cecil.TypeReference
         Select Case GetDataType(TypeCharacter)
             Case KS.Integer
                 Return Compiler.TypeCache.System_Int32

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ Public MustInherit Class BinaryExpression
     Protected m_LeftExpression As Expression
     Protected m_RightExpression As Expression
 
-    Private m_ExpressionType As Type
+    Private m_ExpressionType As Mono.Cecil.TypeReference
 
     ''' <summary>
     ''' If this is an overloadable operator.
@@ -57,22 +57,22 @@ Public MustInherit Class BinaryExpression
         Return result
     End Function
 
-    Private Function GetValueType(ByVal tp As Type) As Type
+    Private Function GetValueType(ByVal tp As Mono.Cecil.TypeReference) As Mono.Cecil.TypeReference
         Helper.Assert(tp IsNot Nothing)
-        If tp.IsByRef Then
+        If TypeOf tp Is ByReferenceType Then
             Return tp.GetElementType
         Else
             Return tp
         End If
     End Function
 
-    ReadOnly Property LeftType() As Type
+    ReadOnly Property LeftType() As Mono.Cecil.TypeReference
         Get
             Return GetValueType(m_LeftExpression.ExpressionType)
         End Get
     End Property
 
-    ReadOnly Property RightType() As Type
+    ReadOnly Property RightType() As Mono.Cecil.TypeReference
         Get
             Return GetValueType(m_RightExpression.ExpressionType)
         End Get
@@ -100,7 +100,7 @@ Public MustInherit Class BinaryExpression
         Helper.Assert(Info.IsRHS, "Expression is not a right hand side expression.")
     End Sub
 
-    ReadOnly Property OperandType() As Type
+    ReadOnly Property OperandType() As Mono.Cecil.TypeReference
         Get
             Return Compiler.TypeResolution.TypeCodeToType(OperandTypeCode)
         End Get
@@ -167,10 +167,10 @@ Public MustInherit Class BinaryExpression
                     ElseIf Helper.CompareType(Me.RightType, Compiler.TypeCache.System_DateTime) Then
                         Compiler.Report.ShowMessage(Messages.VBNC30311, Location, Me.LeftType.Name, Me.RightType.Name)
                     Else
-                        Compiler.Report.ShowMessage(Messages.VBNC30452, Location, Enums.GetKSStringAttribute(Me.Keyword).FriendlyValue, Me.LeftType.Name, Me.RightType.Name)
+                        Compiler.Report.ShowMessage(Messages.VBNC30452, Location, Enums.strSpecial(Me.Keyword), Me.LeftType.Name, Me.RightType.Name)
                     End If
                 Else
-                    Compiler.Report.ShowMessage(Messages.VBNC30452, Location, Enums.GetKSStringAttribute(Me.Keyword).FriendlyValue, Me.LeftType.Name, Me.RightType.Name)
+                    Compiler.Report.ShowMessage(Messages.VBNC30452, Location, Enums.strSpecial(Me.Keyword), Me.LeftType.Name, Me.RightType.Name)
                 End If
                 result = False
             End If
@@ -188,7 +188,7 @@ Public MustInherit Class BinaryExpression
             Dim doOpOverloading As Boolean = False
 
             If isLeftIntrinsic AndAlso isRightIntrinsic OrElse IsOverloadable = False Then
-                Dim destinationType As Type
+                Dim destinationType As Mono.Cecil.TypeReference
                 m_ExpressionType = Compiler.TypeResolution.TypeCodeToType(TypeConverter.GetBinaryResultType(Keyword, LeftTypeCode, RightTypeCode))
                 If LeftTypeCode <> leftOperandType Then
                     destinationType = Compiler.TypeResolution.TypeCodeToType(leftOperandType)
@@ -236,22 +236,22 @@ Public MustInherit Class BinaryExpression
 
     Function DoOperatorOverloading() As Boolean
         Dim result As Boolean = True
-        Dim methods As New Generic.List(Of MethodInfo)
+        Dim methods As New Generic.List(Of Mono.Cecil.MethodReference)
         Dim methodClassification As MethodGroupClassification
         methods = Helper.GetBinaryOperators(Compiler, CType(Me.Keyword, BinaryOperators), Me.LeftType)
         If Helper.CompareType(Me.LeftType, Me.RightType) = False Then
-            Dim methods2 As New Generic.List(Of MethodInfo)
+            Dim methods2 As New Generic.List(Of Mono.Cecil.MethodReference)
             methods2 = Helper.GetBinaryOperators(Compiler, CType(Me.Keyword, BinaryOperators), Me.RightType)
-            For Each method As MethodInfo In methods2
+            For Each method As Mono.Cecil.MethodReference In methods2
                 If methods.Contains(method) = False Then methods.Add(method)
             Next
         End If
         If methods.Count = 0 Then
-            result = Compiler.Report.ShowMessage(Messages.VBNC30452, Me.Location, Enums.GetKSStringAttribute(Me.Keyword).Value, Me.LeftType.FullName, Me.RightType.FullName) AndAlso result
+            result = Compiler.Report.ShowMessage(Messages.VBNC30452, Me.Location, Enums.strSpecial(Me.Keyword), Me.LeftType.FullName, Me.RightType.FullName) AndAlso result
             If result = False Then Return result
         End If
-        methodClassification = New MethodGroupClassification(Me, Nothing, New Expression() {Me.m_LeftExpression, Me.m_RightExpression}, methods.ToArray)
-        result = methodClassification.ResolveGroup(New ArgumentList(Me, Me.m_LeftExpression, m_RightExpression), Nothing) AndAlso result
+        methodClassification = New MethodGroupClassification(Me, Nothing, Nothing, New Expression() {Me.m_LeftExpression, Me.m_RightExpression}, methods.ToArray)
+        result = methodClassification.ResolveGroup(New ArgumentList(Me, Me.m_LeftExpression, m_RightExpression)) AndAlso result
         result = methodClassification.SuccessfullyResolved AndAlso result
         If result = False Then Return result
         m_ExpressionType = methodClassification.ResolvedMethodInfo.ReturnType
@@ -284,7 +284,9 @@ Public MustInherit Class BinaryExpression
     Protected Sub New(ByVal Parent As ParsedObject, ByVal LExp As Expression, ByVal RExp As Expression)
         MyBase.New(Parent)
         m_LeftExpression = LExp
+        m_LeftExpression.Parent = Me
         m_RightExpression = RExp
+        m_RightExpression.Parent = Me
     End Sub
 
     Protected Sub Init(ByVal LExp As Expression, ByVal RExp As Expression)
@@ -292,7 +294,7 @@ Public MustInherit Class BinaryExpression
         m_RightExpression = RExp
     End Sub
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             Return m_ExpressionType
         End Get
@@ -302,12 +304,4 @@ Public MustInherit Class BinaryExpression
     Protected MustOverride Overrides Function GenerateCodeInternal(ByVal Info As EmitInfo) As Boolean
 #End If
     MustOverride ReadOnly Property Keyword() As KS
-
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        m_LeftExpression.Dump(Dumper)
-        Dumper.Write(" " & Enums.GetKSStringAttribute(Me.Keyword).FriendlyValue & " ")
-        m_RightExpression.Dump(Dumper)
-    End Sub
-#End If
 End Class

@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ Public Class AddressOfExpression
     ''' </summary>
     ''' <remarks></remarks>
     Private m_Expression As Expression
-    Private m_ExpressionType As Type
+    Private m_ExpressionType As Mono.Cecil.TypeReference
 
     Protected Overrides Function GenerateCodeInternal(ByVal Info As EmitInfo) As Boolean
         Dim result As Boolean = True
@@ -68,14 +68,14 @@ Public Class AddressOfExpression
     End Sub
 
     Sub Init(ByVal Method As MethodDeclaration, ByVal InstanceExpression As Expression)
-        Classification = New MethodPointerClassification(Me, New MethodGroupClassification(Me, InstanceExpression, Method))
+        Classification = New MethodPointerClassification(Me, New MethodGroupClassification(Me, InstanceExpression, Nothing, Method))
     End Sub
 
     Shared Function IsMe(ByVal tm As tm) As Boolean
         Return tm.CurrentToken.Equals(KS.AddressOf)
     End Function
 
-    Function Resolve(ByVal DelegateType As Type) As Boolean
+    Function Resolve(ByVal DelegateType As Mono.Cecil.TypeReference) As Boolean
         Dim result As Boolean = True
 
         result = Classification.AsMethodPointerClassification.Resolve(DelegateType) AndAlso result
@@ -104,7 +104,7 @@ Public Class AddressOfExpression
         Return result
     End Function
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
             If MyBase.IsResolved Then
                 Return m_ExpressionType
@@ -113,14 +113,6 @@ Public Class AddressOfExpression
             End If
         End Get
     End Property
-
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write("AddressOf ")
-        m_Expression.Dump(Dumper)
-    End Sub
-#End If
-
 End Class
 
 

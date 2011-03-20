@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -260,17 +260,12 @@ Public Class Report
     End Function
 
     ''' <summary>
-    ''' Shows the message with the specified parameters.
-    ''' Tries to look up the current location in the token manager.
+    ''' Shows the message with the specified location and parameters
     ''' </summary>
     <Diagnostics.DebuggerHidden()> _
-    Function ShowMessage(ByVal Message As Messages, ByVal ParamArray Parameters() As String) As Boolean
-        If Compiler IsNot Nothing AndAlso Compiler.tm IsNot Nothing AndAlso Compiler.tm.IsCurrentTokenValid Then
-            Return ShowMessage(Message, Compiler.tm.CurrentLocation, Parameters)
-        Else
-            Dim loc As Span = Nothing
-            Return ShowMessage(Message, loc, Parameters)
-        End If
+    Function ShowMessageNoLocation(ByVal Message As Messages, ByVal ParamArray Parameters() As String) As Boolean
+        Dim Location As Span = Nothing
+        Return ShowMessage(False, New Message(Compiler, Message, Parameters, Location))
     End Function
 
     ''' <summary>
@@ -285,21 +280,8 @@ Public Class Report
     ''' Saves the message with the specified location and parameters.
     ''' </summary>
     <Diagnostics.DebuggerHidden()> _
-    Private Function SaveMessage(ByVal Message As Messages, ByVal Location As Span, ByVal ParamArray Parameters() As String) As Boolean
+    Function SaveMessage(ByVal Message As Messages, ByVal Location As Span, ByVal ParamArray Parameters() As String) As Boolean
         Return ShowMessage(True, New Message(Compiler, Message, Parameters, Location))
-    End Function
-
-    ''' <summary>
-    ''' Saves the message with the specified parameters.
-    ''' Tries to look up the current location in the token manager.
-    ''' </summary>
-    <Diagnostics.DebuggerHidden()> _
-    Function SaveMessage(ByVal Message As Messages, ByVal ParamArray Parameters() As String) As Boolean
-        If Compiler IsNot Nothing AndAlso Compiler.tm IsNot Nothing AndAlso Compiler.tm.IsCurrentTokenValid Then
-            Return SaveMessage(Message, Compiler.tm.CurrentLocation, Parameters)
-        Else
-            Return SaveMessage(Message, Nothing, Parameters)
-        End If
     End Function
 
     ''' <summary>
@@ -307,7 +289,7 @@ Public Class Report
     ''' to show it later with ShowSavedMessages()
     ''' </summary>
     <Diagnostics.DebuggerHidden()> _
-    Function ShowMessage(ByVal SaveIt As Boolean, ByVal Message As Message) As Boolean
+    Private Function ShowMessage(ByVal SaveIt As Boolean, ByVal Message As Message) As Boolean
         Dim isOnlyWarning As Boolean = False
 
         isOnlyWarning = Message.Level <= MessageLevel.Warning
@@ -341,4 +323,16 @@ Public Class Report
 
         Return isOnlyWarning
     End Function
+
+    Public Sub Trace(ByVal format As String, ByVal ParamArray args() As Object)
+        If Compiler.CommandLine.Trace = False Then Return
+        If args IsNot Nothing Then
+            For i As Integer = 0 To args.Length - 1
+                If TypeOf args(i) Is Span Then
+                    args(i) = DirectCast(args(i), Span).ToString(Compiler)
+                End If
+            Next
+        End If
+        Console.WriteLine(format, args)
+    End Sub
 End Class

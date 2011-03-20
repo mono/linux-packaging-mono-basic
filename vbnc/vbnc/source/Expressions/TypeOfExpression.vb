@@ -1,6 +1,6 @@
 ' 
 ' Visual Basic.Net Compiler
-' Copyright (C) 2004 - 2007 Rolf Bjarne Kvinge, RKvinge@novell.com
+' Copyright (C) 2004 - 2010 Rolf Bjarne Kvinge, RKvinge@novell.com
 ' 
 ' This library is free software; you can redistribute it and/or
 ' modify it under the terms of the GNU Lesser General Public
@@ -56,13 +56,12 @@ Public Class TypeOfExpression
         Dim result As Boolean = True
 
         result = m_Expression.GenerateCode(Info.Clone(Me, True, False, m_Expression.ExpressionType)) AndAlso result
-        If m_Expression.ExpressionType.IsGenericParameter Then
+        If CecilHelper.IsGenericParameter(m_Expression.ExpressionType) Then
             Emitter.EmitBox(Info, m_Expression.ExpressionType)
         End If
         Emitter.EmitIsInst(Info, m_Expression.ExpressionType, m_Type.ResolvedType)
 
         Emitter.EmitLoadNull(Info.Clone(Me, True, False, Compiler.TypeCache.System_Object))
-        Info.Stack.SwitchHead(Compiler.TypeCache.System_Object, Helper.GetTypeOrTypeBuilder(m_Type.ResolvedType))
         If m_Is Then
             Emitter.EmitNotEquals(Info, m_Type.ResolvedType)
         Else
@@ -97,18 +96,9 @@ Public Class TypeOfExpression
         End Get
     End Property
 
-    Overrides ReadOnly Property ExpressionType() As Type
+    Overrides ReadOnly Property ExpressionType() As Mono.Cecil.TypeReference
         Get
-            Return Compiler.TypeCache.System_Boolean '_Descriptor
+            Return Compiler.TypeCache.System_Boolean
         End Get
     End Property
-
-#If DEBUG Then
-    Public Overrides Sub Dump(ByVal Dumper As IndentedTextWriter)
-        Dumper.Write("TypeOf ")
-        m_Expression.Dump(Dumper)
-        Dumper.Write(" Is ")
-        Compiler.Dumper.Dump(m_Type)
-    End Sub
-#End If
 End Class

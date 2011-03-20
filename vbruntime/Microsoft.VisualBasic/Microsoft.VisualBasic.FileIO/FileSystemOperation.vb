@@ -26,7 +26,6 @@
 ' WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '
 
-#If NET_VER >= 2.0 Then
 Imports System.IO
 Imports System.Text
 Imports System.Collections.ObjectModel
@@ -395,7 +394,7 @@ Namespace Microsoft.VisualBasic.FileIO
 
         Private Sub Init(ByVal Title As String)
             m_Source = Path.GetFullPath(m_Source)
-            If m_Destination <> String.Empty Then
+            If Not m_Destination Is Nothing AndAlso m_Destination.Length <> 0 Then
                 m_Destination = Path.GetFullPath(m_Destination)
             End If
 
@@ -551,4 +550,3 @@ Namespace Microsoft.VisualBasic.FileIO
     End Class
 
 End Namespace
-#End If
