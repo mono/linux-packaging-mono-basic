@@ -8,8 +8,8 @@ Build-Depends: debhelper (>= 7.0.50~),
 Standards-Version: 3.9.1
 Section: devel
 Homepage: http://www.mono-project.com/Visual_Basic
-Vcs-Svn: svn://svn.debian.org/svn/pkg-mono/mono-basic/trunk
-Vcs-Browser: http://svn.debian.org/wsvn/pkg-mono/mono-basic/trunk/
+Vcs-Git: git://git.debian.org/pkg-mono/packages/mono-basic.git
+Vcs-Browser: http://git.debian.org/?p=pkg-mono/packages/mono-basic.git
 
 Package: libmono-microsoft-visualbasic8.0-cil
 Section: libs
