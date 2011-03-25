@@ -1,2 +1,1 @@
-debian/tmp/usr/lib/mono/gac
-debian/tmp/usr/lib/mono/4.0/Microsoft.VisualBasic.dll*
+debian/tmp/usr/lib/mono/gac/Microsoft.VisualBasic/8*
