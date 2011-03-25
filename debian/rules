@@ -12,6 +12,8 @@ VERSION = $(shell echo $(DEB_VERSION) | cut -d"-" -f1 | sed 's/+dfsg.*//')
 
 export MONO_SHARED_DIR=$(CURDIR)
 
+include /usr/share/cli-common/cli.make
+
 DEB_CLI_API_VERSION = 2.10
 
 get-orig-source:
