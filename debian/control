@@ -4,7 +4,7 @@ Maintainer: Debian Mono Group <pkg-mono-group@lists.alioth.debian.org>
 Uploaders: Mirco Bauer <meebey@debian.org>, Jo Shields <directhex@apebox.org>
 Build-Depends: debhelper (>= 5),
  cli-common-dev (>= 0.4.4),
- libmono-cil-dev
+ mono-runtime (>= 2.10)
 Standards-Version: 3.9.1
 Section: devel
 Homepage: http://www.mono-project.com/Visual_Basic
