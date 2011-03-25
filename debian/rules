@@ -14,10 +14,6 @@ export MONO_SHARED_DIR=$(CURDIR)
 
 DEB_CLI_API_VERSION = 2.0
 
-config.status: configure
-	dh_testdir
-	./configure --prefix=/usr
-
 get-orig-source:
 	uscan \
 		--package $(DEB_SOURCE_NAME) \
@@ -28,47 +24,11 @@ get-orig-source:
 		--force-download \
 		--rename
 
-build: build-stamp
-build-stamp: config.status
-	dh_testdir
-	$(MAKE)
-	touch $@
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	rm -rf $(MONO_SHARED_DIR)/.wapi
-	rm -f build/config.make
-	$(MAKE) clean
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-	$(MAKE) prefix=$(CURDIR)/debian/tmp/usr install
-
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-	dh_install -i --list-missing
-	dh_installchangelogs -i ChangeLog
-	dh_installdocs -i
-	dh_installman
+override_dh_clistrip:
 	dh_clistrip -i --dbg-package=mono-basic-dbg
-	dh_compress
-	dh_fixperms -i
-	dh_clifixperms -i
+
+override_dh_makeclilibs:
 	dh_makeclilibs -i -m $(DEB_CLI_API_VERSION)
-	dh_installdeb -i
-	dh_clideps -i
-	dh_gencontrol -i
-	dh_md5sums -i
-	dh_builddeb -i
 
-binary-arch: build install
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+%:
+	dh $@
