@@ -56,7 +56,7 @@ Description: Visual Basic 2010 Cecil libraries for Mono
 Package: mono-vbnc
 Section: devel
 Architecture: all
-Depends: ${cli:Depends}, ${misc:Depends}
+Depends: libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), ${cli:Depends}, ${misc:Depends}
 Provides: visual-basic-10.0-compiler
 Description: Mono Visual Basic Compiler (VB.NET)
  This is the Mono Visual Basic.NET Compiler (vbnc), aimed at the specifications
