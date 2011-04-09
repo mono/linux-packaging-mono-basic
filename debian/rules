@@ -32,6 +32,9 @@ override_dh_clistrip:
 override_dh_makeclilibs:
 	dh_makeclilibs -i -m $(DEB_CLI_API_VERSION)
 
+override_dh_clideps:
+	dh_clideps --exclude-moduleref=kernel32 --exclude-moduleref=ole32.dll
+
 override_dh_auto_test:
 
 %:
