@@ -1,3 +1,31 @@
+mono-basic (2.10-1) experimental; urgency=low
+
+  * [813399b] Imported Upstream version 2.10
+  * [c85d8e8] Stop converting the archive format in get-orig-source rule
+  * [a8c2507] Use Debian source format 3.0 (quilt)
+  * [9803c81] Bump Standards to version 3.9.1
+  * [8c6c640] Convert packaging to DebHelper 7
+  * [b0a16ff] Bump API version to 2.10, so packages built against mono-
+    vbnc require 2.10 minimum
+  * [694e4a4] Ensure we don't run the test suite, since it bails out on
+    a clean system
+  * [75b5b78] Since we're building a 4.0 library now, update
+    debian/install to handle 4.0 libs, not 2.0 libs
+  * [4e41d8c] Ensure we run the cli-common commands, by including
+    cli.make in debian/rules
+  * [0965d04] Split new libraries out into correctly named packages
+  * [c8c5cd8] Update Vcs-* fields - this package hasn't been in SVN for
+    ages
+  * [2772f00] Build-depend on cli-common 0.8, due to 4.0 libraries
+  * [7c89842] Add a manual dependency on libmono-microsoft-
+    visualbasic10.0-cil, because mono-vbnc doesn't technically reference
+    the assembly (it merely explodes in its absence)
+  * [3fae244] Make use of --exclude-moduleref capability of cli-common-
+    dev 0.8, to avoid bailing out due to optional Windows-only
+    P/Invokes.
+
+ -- Jo Shields <directhex@apebox.org>  Sat, 09 Apr 2011 22:38:01 +0100
+
 mono-basic (2.6.2-2) unstable; urgency=low
 
   * Upload to Debian Unstable
