@@ -1,3 +1,9 @@
+mono-basic (2.10-2) unstable; urgency=low
+
+  * [d90cbc9] Update debian/rules for DH8-compatible "--with cli"
+
+ -- Jo Shields <directhex@apebox.org>  Sat, 21 Jan 2012 11:53:01 +0000
+
 mono-basic (2.10-1) experimental; urgency=low
 
   * [813399b] Imported Upstream version 2.10
