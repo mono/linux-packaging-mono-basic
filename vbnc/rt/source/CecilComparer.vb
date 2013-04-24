@@ -572,7 +572,24 @@ Public Class CecilComparer
         End If
 
         CompareGenericParameters(Method1.GenericParameters, Method2.GenericParameters)
+        If Method1.Parameters.Count <> Method2.Parameters.Count Then
+            SaveMessage("'(%a1%).{0} has {1} parameters, while (%a2%).{2} has {3} parameters", Method1, Method1.Parameters.Count, Method2, Method2.Parameters.Count)
+        Else
+            CompareParameters(Method1.Parameters, Method2.Parameters)
+        End If
+    End Sub
 
+    Private Sub CompareParameter(ByVal P1 As ParameterDefinition, ByVal P2 As ParameterDefinition)
+        If P1.Name <> P2.Name Then
+            SaveMessage("'(%a1%).{0}'s parameter #{1} has name '{2}', while (%a2%).{3}'s parameter #{1} has name '{4}'", P1.Method, P1.Index, P1.Name, P2.Method, P2.Name)
+        End If
+        CompareAttributeList(Of CustomAttribute)(CloneCollection(Of CustomAttribute)(P1.CustomAttributes), CloneCollection(Of CustomAttribute)(P2.CustomAttributes), New ComparerMethod(Of CustomAttribute)(AddressOf CompareAttribute), New EqualChecker(Of CustomAttribute)(AddressOf AreAttributesEqual), "param attribute", New AsString(Of CustomAttribute)(AddressOf AttributeAsString), CType(P1.Method, MemberReference), CType(P2.Method, MemberReference))
+    End Sub
+
+    Private Sub CompareParameters(ByVal Parameters1 As Collection(Of ParameterDefinition), ByVal Parameters2 As Collection(Of ParameterDefinition))
+        For i As Integer = 0 To Parameters1.Count - 1
+            CompareParameter(Parameters1(i), Parameters2(i))
+        Next
     End Sub
 
     Private Sub CompareMethods(ByVal Methods1 As Collection(Of MethodDefinition), ByVal Methods2 As Collection(Of MethodDefinition))
@@ -640,14 +657,14 @@ Public Class CecilComparer
         CompareList(Of MethodDefinition)(CloneCollection(Of MethodDefinition)(Ctors1), CloneCollection(Of MethodDefinition)(Ctors2), New ComparerMethod(Of MethodDefinition)(AddressOf CompareMethod), New EqualChecker(Of MethodDefinition)(AddressOf AreSameCtor), "Constructor", New AsString(Of MethodDefinition)(AddressOf CtorAsString))
     End Sub
 
-    Private Shared _assemblies As New Hashtable
+    Private _assemblies As New Hashtable
 
     Private Class resolver
         Inherits BaseAssemblyResolver
 
     End Class
 
-    Public Shared Function FindDefinition(ByVal name As AssemblyNameReference) As AssemblyDefinition
+    Public Function FindDefinition(ByVal name As AssemblyNameReference) As AssemblyDefinition
         Dim asm As AssemblyDefinition = TryCast(_assemblies(name.Name), AssemblyDefinition)
         If asm Is Nothing Then
             Dim base As New DefaultAssemblyResolver
@@ -658,7 +675,7 @@ Public Class CecilComparer
         Return asm
     End Function
 
-    Public Shared Function FindDefinition(ByVal type As TypeReference) As TypeDefinition
+    Public Function FindDefinition(ByVal type As TypeReference) As TypeDefinition
         If type Is Nothing Then Return Nothing
         Dim tD As TypeDefinition = TryCast(type, TypeDefinition)
         If tD IsNot Nothing Then Return tD
@@ -880,3 +897,4 @@ Public Class CecilComparer
         SaveMessage(Msg, params)
     End Sub
 End Class
+

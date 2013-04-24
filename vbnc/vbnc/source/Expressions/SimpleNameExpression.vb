@@ -61,18 +61,6 @@ Public Class SimpleNameExpression
         End Get
     End Property
 
-    Public Overrides Function Clone(Optional ByVal NewParent As ParsedObject = Nothing) As Expression
-        If NewParent Is Nothing Then NewParent = Me.Parent
-        Dim result As New SimpleNameExpression(NewParent)
-        If m_TypeArgumentList Is Nothing Then
-            result.Init(m_Identifier, Nothing)
-        Else
-            result.Init(m_Identifier, m_TypeArgumentList.Clone(result))
-        End If
-
-        Return result
-    End Function
-
     Property Identifier() As Identifier
         Get
             Return m_Identifier
@@ -182,17 +170,9 @@ Public Class SimpleNameExpression
         Return result
     End Function
 
-    Public Overrides ReadOnly Property IsConstant() As Boolean
-        Get
-            Return Classification.IsConstant
-        End Get
-    End Property
-
-    Public Overrides ReadOnly Property ConstantValue() As Object
-        Get
-            Return Classification.ConstantValue
-        End Get
-    End Property
+    Public Overrides Function GetConstant(ByRef result As Object, ByVal ShowError As Boolean) As Boolean
+        Return Classification.GetConstant(result, ShowError)
+    End Function
 
     Shared Function IsMe(ByVal tm As tm) As Boolean
         Return tm.CurrentToken.IsIdentifier
@@ -200,10 +180,6 @@ Public Class SimpleNameExpression
 
     Protected Overrides Function ResolveExpressionInternal(ByVal Info As ResolveInfo) As Boolean
         Dim Name As String = m_Identifier.Identifier
-
-        If False Then
-            Helper.Stop()
-        End If
 
         '---------------------------------------------------------------------------------------------------------
         'A simple name expression consists of a single identifier followed by an optional type argument list. 
@@ -305,6 +281,7 @@ Public Class SimpleNameExpression
                 'The expression is classified as a variable if it is a local variable, static variable (...)
                 Dim varDecl As VariableDeclaration
                 varDecl = DirectCast(var, VariableDeclaration)
+                varDecl.IsReferenced = True
                 If varDecl.Modifiers.Is(ModifierMasks.Static) AndAlso varDecl.DeclaringMethod.IsShared = False Then
                     Classification = New VariableClassification(Me, varDecl, CreateMeExpression)
                 ElseIf varDecl.Modifiers.Is(ModifierMasks.Const) Then
@@ -312,6 +289,11 @@ Public Class SimpleNameExpression
                 Else
                     Classification = New VariableClassification(Me, varDecl)
                 End If
+
+                If var.Location > Me.Location Then
+                    Return Compiler.Report.ShowMessage(Messages.VBNC32000, Me.Location, var.Name)
+                End If
+
                 Return True
             ElseIf var IsNot Nothing Then
                 Throw New InternalException(Me)
@@ -414,24 +396,43 @@ Public Class SimpleNameExpression
                 '(it can resolve to a method group with several methods, some shared, some not. 
                 'So we create a classification with an instance expression, if the member is 
                 'shared, the instance expression should not be used.
-                Dim hasInstanceExpression As Boolean
-                Dim hasNotInstanceExpression As Boolean
+                Dim instanceCount As Integer
 
                 For i As Integer = 0 To members.Count - 1
                     Dim member As Mono.Cecil.MemberReference = members(i)
                     If CecilHelper.GetMemberType(member) = MemberTypes.TypeInfo OrElse CecilHelper.GetMemberType(member) = MemberTypes.NestedType Then
-                        hasNotInstanceExpression = True
+                        '
                     ElseIf Helper.IsShared(member) Then
-                        hasNotInstanceExpression = True
+                        '
                     Else
-                        hasInstanceExpression = True
+                        instanceCount += 1
                     End If
                 Next
 
-                If container Is firstcontainer AndAlso hasInstanceExpression Then
+                If container Is firstcontainer AndAlso instanceCount > 0 Then
                     'Otherwise, if the type is the immediately enclosing type and the lookup identifies a non-shared 
                     'type member, then the result is the same as a member access of the form Me.E, where E is 
                     'the identifier.
+                    If instanceCount = members.Count AndAlso IsSharedContext() Then
+                        Dim show30369 As Boolean = True
+
+                        If instanceCount = 1 Then
+                            Dim fd As FieldReference
+                            Dim pd As PropertyReference
+
+                            'this is allowed: 11.6.1 Identical Type and Member Names
+                            fd = TryCast(members(0), FieldReference)
+                            If fd IsNot Nothing Then
+                                show30369 = Helper.CompareName(fd.Name, fd.FieldType.Name) = False
+                            Else
+                                pd = TryCast(members(0), PropertyReference)
+                                If pd IsNot Nothing Then
+                                    show30369 = Helper.CompareName(pd.Name, pd.PropertyType.Name) = False
+                                End If
+                            End If
+                            If show30369 Then Return Report.ShowMessage(Messages.VBNC30369, Me.Location)
+                        End If
+                    End If
                     Classification = GetMeClassification(members, firstcontainer)
                     Return True
                 Else
@@ -439,7 +440,7 @@ Public Class SimpleNameExpression
                     'type containing the matching member and E is the identifier. In this case, it is an error for the                    
                     'identifier to refer to a non-shared member.
                     Classification = GetTypeClassification(members, firstcontainer)
-                    Return True
+                    Return Classification IsNot Nothing
                 End If
             End If
             container = DirectCast(container, BaseObject).FindFirstParent(Of IType)()
@@ -604,6 +605,9 @@ Public Class SimpleNameExpression
             If varD.IsStatic AndAlso varD.IsInitOnly AndAlso _
              (constructor Is Nothing OrElse constructor.Modifiers.Is(ModifierMasks.Shared) = False) Then
                 Return New ValueClassification(Me, var, Nothing)
+            ElseIf Not varD.IsStatic Then
+                Compiler.Report.ShowMessage(Messages.VBNC30469, Me.Location)
+                Return Nothing
             Else
                 Return New VariableClassification(Me, var, Nothing)
             End If
@@ -928,3 +932,4 @@ Public Class SimpleNameExpression
         Return True
     End Function
 End Class
+

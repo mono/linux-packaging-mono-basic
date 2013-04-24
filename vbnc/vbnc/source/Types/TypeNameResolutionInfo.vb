@@ -366,8 +366,7 @@ Public Class TypeNameResolutionInfo
                 '** exactly one standard module, then the qualified name refers to that type. If R 
                 '** matches the name of types in more than one standard module, a compile-time error occurs.
                 If m_FoundObjects.Count = 0 Then
-                    Return Name.Compiler.Report.ShowMessage(Messages.VBNC99997, Name.Location)
-                    modules = Helper.CreateList(CecilHelper.GetNestedTypes(tp))
+                    Return Name.Compiler.Report.ShowMessage(Messages.VBNC30002, Name.Location, tp.FullName.Replace("/"c, "."c) & "." & R)
                 End If
             Else
                 '**	If resolution of N fails, resolves to a type parameter, or does not resolve to a namespace 
@@ -449,25 +448,18 @@ Public Class TypeNameResolutionInfo
             obj = DirectCast(tp, BaseObject)
 
             'First check if there are nested types with the corresponding name.
-            'Get all the members in the type corresponding to the Name
-            Dim members As Generic.List(Of INameable)
-            members = tp.Members.Declarations.Index.Item(vbnc.Helper.CreateGenericTypename(R, TypeArgumentCount))
-            If members IsNot Nothing Then
-                Dim i As Integer = 0
-                While i <= members.Count - 1
-                    Dim member As INameable = members(i)
-                    'Remove all members that aren't types.
-                    If TypeOf member Is IType = False Then
-                        members.RemoveAt(i)
-                    Else
-                        i += 1
+            Dim nestedName As String = Helper.CreateGenericTypename(R, TypeArgumentCount)
+            Dim nestedType As TypeDefinition = tp.CecilType
+
+            Do
+                For i As Integer = 0 To nestedType.NestedTypes.Count - 1
+                    If Helper.CompareName(nestedType.NestedTypes(i).Name, nestedName) Then
+                        m_FoundObjects.Add(nestedType.NestedTypes(i))
+                        Return True 'There can only be one nested type with the same name
                     End If
-                End While
-                If members.Count > 0 Then
-                    m_FoundObjects.AddRange(members.ToArray)
-                    Return True
-                End If
-            End If
+                Next
+                nestedType = CecilHelper.FindDefinition(nestedType.BaseType)
+            Loop While nestedType IsNot Nothing
 
             'Then check if there are type parameters with the corresponding name
             'in the type (only if the current type is a class or a structure)
