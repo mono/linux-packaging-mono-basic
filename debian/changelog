@@ -1,3 +1,18 @@
+mono-basic (3.0~pre20130425.a74642a-1) experimental; urgency=low
+
+  * [a3bcf78] Imported Upstream version 3.0~git20130424.f5a46b1
+  * [c57b8a8] Imported Upstream version 3.0~pre20130424b.f338540
+  * [3b7d846] Imported Upstream version 3.0~pre20130425.a74642a
+  * [6d60a32] Bump ABI to 2.99, for versioning. We can't use 3.0 here, as 
+    this is as pre-3.0 git snapshot, and this would encode a requirement 
+    on 3.0 final
+  * [3faddfd] Bump build dependency to Mono 3.0, since we need .NET 4.5 
+    support
+  * [8f6d231] Add VB2012 (.NET 4.5, VB11) packaging data
+  * [305bbcb] Refresh debian/copyright with DEP5
+
+ -- Jo Shields <directhex@apebox.org>  Thu, 25 Apr 2013 00:22:29 +0100
+
 mono-basic (2.10-2) unstable; urgency=low
 
   * [d90cbc9] Update debian/rules for DH8-compatible "--with cli"
