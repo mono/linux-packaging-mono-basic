@@ -1,2 +1,2 @@
 debian/tmp/usr/bin
-debian/tmp/usr/lib/mono/4.0/vbnc*
+debian/tmp/usr/lib/mono/4.5/vbnc*

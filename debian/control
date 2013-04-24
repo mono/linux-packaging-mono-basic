@@ -39,13 +39,27 @@ Description: Visual Basic 2010 runtime libraries for Mono
  runtime, which can produce and execute CIL (Common Intermediate Language)
  bytecode (aka assemblies), and a class library.
 
+Package: libmono-microsoft-visualbasic11.0-cil
+Section: libs
+Architecture: all
+Depends: ${cli:Depends}, ${misc:Depends}
+Description: Visual Basic 2012 runtime libraries for Mono
+ This package contains the Mono Visual Basic runtime library, aimed at
+ the specifications / features of the Visual Basic 2010.
+ .
+ Mono is a platform for running and developing applications based on the
+ ECMA/ISO Standards. Mono is an open source effort led by Novell.
+ Mono provides a complete CLR (Common Language Runtime) including compiler and
+ runtime, which can produce and execute CIL (Common Intermediate Language)
+ bytecode (aka assemblies), and a class library.
+
 Package: libmono-cecil-vb0.9-cil
 Section: libs
 Architecture: all
 Depends: ${cli:Depends}, ${misc:Depends}
-Description: Visual Basic 2010 Cecil libraries for Mono
+Description: Visual Basic 2012 Cecil libraries for Mono
  This package contains the Cecil libraries for the Mono Visual Basic library, 
- aimed at the specifications / features of the Visual Basic 2010.
+ aimed at the specifications / features of the Visual Basic 2012.
  .
  Mono is a platform for running and developing applications based on the
  ECMA/ISO Standards. Mono is an open source effort led by Novell.
@@ -56,14 +70,14 @@ Description: Visual Basic 2010 Cecil libraries for Mono
 Package: mono-vbnc
 Section: devel
 Architecture: all
-Depends: libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), ${cli:Depends}, ${misc:Depends}
-Provides: visual-basic-10.0-compiler
+Depends: libmono-microsoft-visualbasic11.0-cil (= ${binary:Version}), ${cli:Depends}, ${misc:Depends}
+Provides: visual-basic-11.0-compiler
 Description: Mono Visual Basic Compiler (VB.NET)
  This is the Mono Visual Basic.NET Compiler (vbnc), aimed at the specifications
  / features of the Visual Basic 2005 compiler.
  A platform-independent compiler which produces executable CIL (Common
  Intermediate Language) binaries.
- This compiler targets the CLI (Common Language Infrastructure) 2.0 runtime
+ This compiler targets the CLI (Common Language Infrastructure) 4.5 runtime
  version.
  .
  Mono is a platform for running and developing applications based on the
@@ -75,11 +89,11 @@ Description: Mono Visual Basic Compiler (VB.NET)
 Package: mono-basic-dbg
 Priority: extra
 Section: devel
-Depends: mono-vbnc (= ${binary:Version}), libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), libmono-microsoft-visualbasic8.0-cil (= ${binary:Version}), libmono-cecil-vb0.9-cil (= ${binary:Version}), ${misc:Depends}
+Depends: mono-vbnc (= ${binary:Version}), libmono-microsoft-visualbasic11.0-cil (= ${binary:Version}), libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), libmono-microsoft-visualbasic8.0-cil (= ${binary:Version}), libmono-cecil-vb0.9-cil (= ${binary:Version}), ${misc:Depends}
 Architecture: all
 Description: Mono Visual Basic, debugging symbols
  This package contains debugging symbols of the mono-vbnc and
- libmono-microsoft-visualbasic8.0-cil package.
+ libmono-microsoft-visualbasic{8,10,11}.0-cil packages.
  .
  Mono is a platform for running and developing applications based on the
  ECMA/ISO Standards. Mono is an open source effort led by Novell.
