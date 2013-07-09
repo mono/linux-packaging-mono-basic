@@ -42,7 +42,7 @@ Description: Visual Basic 2010 runtime libraries for Mono
 Package: libmono-microsoft-visualbasic11.0-cil
 Section: libs
 Architecture: all
-Depends: ${cli:Depends}, ${misc:Depends}
+Depends: libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), ${cli:Depends}, ${misc:Depends}
 Description: Visual Basic 2012 runtime libraries for Mono
  This package contains the Mono Visual Basic runtime library, aimed at
  the specifications / features of the Visual Basic 2010.
