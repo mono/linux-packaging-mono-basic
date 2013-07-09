@@ -1,8 +1,9 @@
-mono-basic (3.0~pre20130425.a74642a-1) experimental; urgency=low
+mono-basic (3.0~pre20130627.4dcc70f-1) unstable; urgency=low
 
   * [a3bcf78] Imported Upstream version 3.0~git20130424.f5a46b1
   * [c57b8a8] Imported Upstream version 3.0~pre20130424b.f338540
   * [3b7d846] Imported Upstream version 3.0~pre20130425.a74642a
+  * [94018a3] Imported Upstream version 3.0~pre20130627.4dcc70f
   * [6d60a32] Bump ABI to 2.99, for versioning. We can't use 3.0 here, as 
     this is as pre-3.0 git snapshot, and this would encode a requirement 
     on 3.0 final
@@ -10,8 +11,14 @@ mono-basic (3.0~pre20130425.a74642a-1) experimental; urgency=low
     support
   * [8f6d231] Add VB2012 (.NET 4.5, VB11) packaging data
   * [305bbcb] Refresh debian/copyright with DEP5
+  * [71da9ff] Modify dependencies of mono-vbnc to include all references 
+    in vbnc.exe.rsp - these are default compiler flags so if they're not 
+    installed, the compiler won't work unless you pass /nostdlib (Closes: 
+    #715480)
+  * [b9f1d12] Make VB11 pull in VB10 runtime library, due to weird 
+    internal version resolution issues.
 
- -- Jo Shields <directhex@apebox.org>  Thu, 25 Apr 2013 00:22:29 +0100
+ -- Jo Shields <directhex@apebox.org>  Tue,  9 Jul 2013 22:05:29 +0100
 
 mono-basic (2.10-2) unstable; urgency=low
 
