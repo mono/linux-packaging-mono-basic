@@ -485,7 +485,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30062 = 30062
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "'ReadOnly' variable cannot be the target of an assignment."
     ''' VB   = "'ReadOnly' variable cannot be the target of an assignment."
     ''' </summary>
     ''' <remarks></remarks>
@@ -513,7 +513,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30067 = 30067
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Expression is a value and therefore cannot be the target of an assignment."
     ''' VB   = "Expression is a value and therefore cannot be the target of an assignment."
     ''' </summary>
     ''' <remarks></remarks>
@@ -548,7 +548,7 @@ Public Enum Messages
     <Message(MessageLevel.Error)> VBNC30072 = 30072
 
     ''' <summary>
-    ''' VBNC = "CHANGEME"
+    ''' VBNC = "Constant cannot be the target of an assignment."
     ''' VB   = "Constant cannot be the target of an assignment."
     ''' </summary>
     ''' <remarks></remarks>

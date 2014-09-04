@@ -1,3 +1,9 @@
+mono-basic (3.8-0xamarin1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Jo Shields <directhex@apebox.org>  Thu, 04 Sep 2014 15:04:13 +0100
+
 mono-basic (3.0~pre20130627.4dcc70f-1) unstable; urgency=low
 
   * [a3bcf78] Imported Upstream version 3.0~git20130424.f5a46b1
