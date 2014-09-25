@@ -582,54 +582,54 @@
 		<file>Bugs\31027-bug-328101.vb</file>
 		<error number="31027" />
 	</test>
-	<test id="145" name="aspnet1" target="exe">
+	<test id="145" name="aspnet1" target="exe" mytype="empty">
 		<file>Bugs\aspnet1.vb</file>
 	</test>
-	<test id="146" name="aspnet2" target="exe">
+	<test id="146" name="aspnet2" target="exe" mytype="empty">
 		<file>Bugs\aspnet2.vb</file>
 	</test>
-	<test id="147" name="aspnet3">
+	<test id="147" name="aspnet3" mytype="empty">
 		<arguments>-r:System.Web.dll -r:System.dll</arguments>
 		<file>Bugs\aspnet3.vb</file>
 	</test>
-	<test id="148" name="bug-320964" target="exe">
+	<test id="148" name="bug-320964" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-320964.vb</file>
 	</test>
-	<test id="149" name="bug-325331" target="exe">
+	<test id="149" name="bug-325331" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-325331.vb</file>
 	</test>
-	<test id="150" name="bug-325332">
+	<test id="150" name="bug-325332" mytype="empty">
 		<arguments>-doc:foo.xml /nowarn</arguments>
 		<file>Bugs\bug-325332.vb</file>
 	</test>
-	<test id="151" name="bug-325339" target="exe">
+	<test id="151" name="bug-325339" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-325339.vb</file>
 	</test>
-	<test id="152" name="bug-325346" target="exe">
+	<test id="152" name="bug-325346" target="exe" mytype="empty">
 		<file>Bugs\bug-325346.vb</file>
 	</test>
-	<test id="153" name="bug-325976">
+	<test id="153" name="bug-325976" mytype="empty">
 		<arguments>/define:"AString=\"aabb\",BBoolean=True,CString=\"mm nn pp\",DString=\"zz aa\",EBoolean=False,FBooleanAsInt=-1" </arguments>
 		<file>Bugs\bug-325976.vb</file>
 	</test>
-	<test id="154" name="bug-325976-2" target="exe">
+	<test id="154" name="bug-325976-2" target="exe" mytype="empty">
 		<arguments>/define:"AString=\"aabb\",BBoolean=True,CString=\"mm nn pp\",DString=\"zz aa\",EBoolean=False,FBooleanAsInt=-1" /target:exe</arguments>
 		<file>Bugs\bug-325976-2.vb</file>
 	</test>
-	<test id="155" name="bug-327596" target="exe">
+	<test id="155" name="bug-327596" target="exe" mytype="empty">
 		<file>Bugs\bug-327596.vb</file>
 	</test>
-	<test id="156" name="bug-332868" target="exe">
+	<test id="156" name="bug-332868" target="exe" mytype="empty">
 		<file>Bugs\bug-332868.vb</file>
 	</test>
-	<test id="157" name="bug-333403" target="winexe">
-		<arguments>/noconfig /imports:Microsoft.VisualBasic,System,System.Collections,System.Collections.Generic,System.Data,System.Drawing,System.Diagnostics,System.Windows.Forms /rootnamespace:WindowsApplication1 /define:CONFIG="Debug",DEBUG=-1,TRACE=-1,_MyType=\"WindowsForms\",PLATFORM="AnyCPU" /reference:System.Data.dll,System.dll,System.Drawing.dll,System.Windows.Forms.dll,System.Xml.dll /main:WindowsApplication1.My.MyApplication</arguments>
+	<test id="157" name="bug-333403" target="winexe" mytype="windowsforms">
+		<arguments>/noconfig /imports:Microsoft.VisualBasic,System,System.Collections,System.Collections.Generic,System.Data,System.Drawing,System.Diagnostics,System.Windows.Forms /rootnamespace:WindowsApplication1 /define:CONFIG="Debug",DEBUG=-1,TRACE=-1,PLATFORM="AnyCPU" /reference:System.Data.dll,System.dll,System.Drawing.dll,System.Windows.Forms.dll,System.Xml.dll /main:WindowsApplication1.My.MyApplication</arguments>
 		<file>Bugs\bug-333403.vb</file>
 	</test>
-	<test id="158" name="bug-333962" target="exe">
+	<test id="158" name="bug-333962" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-333962.vb</file>
 	</test>
@@ -637,86 +637,86 @@
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-359234-ProtectedDefaultBaseCtor.vb</file>
 	</test>
-	<test id="160" name="bug-392456" target="exe">
+	<test id="160" name="bug-392456" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-392456.vb</file>
 	</test>
-	<test id="161" name="bug-428340" target="exe">
+	<test id="161" name="bug-428340" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-428340.vb</file>
 	</test>
-	<test id="162" name="bug-428340-2" target="exe">
+	<test id="162" name="bug-428340-2" target="exe" mytype="empty">
 		<arguments>/rootnamespace:A</arguments>
 		<file>Bugs\bug-428340-2.vb</file>
 	</test>
-	<test id="163" name="bug-438683" target="exe">
+	<test id="163" name="bug-438683" target="exe" mytype="empty">
 		<file>Bugs\bug-438683.vb</file>
 	</test>
-	<test id="164" name="bug-444120" target="exe">
+	<test id="164" name="bug-444120" target="exe" mytype="empty">
 		<file>Bugs\bug-444120.vb</file>
 	</test>
-	<test id="165" name="bug-444811" target="exe">
+	<test id="165" name="bug-444811" target="exe" mytype="empty">
 		<file>Bugs\bug-444811.vb</file>
 	</test>
-	<test id="166" name="bug-444993" target="exe">
+	<test id="166" name="bug-444993" target="exe" mytype="empty">
 		<file>Bugs\bug-444993.vb</file>
 	</test>
-	<test id="167" name="bug-445479" target="exe">
+	<test id="167" name="bug-445479" target="exe" mytype="empty">
 		<file>Bugs\bug-445479.vb</file>
 	</test>
-	<test id="168" name="bug-74955" target="winexe">
+	<test id="168" name="bug-74955" target="winexe" mytype="empty">
 		<arguments>/main:MBasTest.MyForm /rootnamespace:MBasTest /r:System.dll /r:System.Windows.Forms.dll</arguments>
 		<file>Bugs\bug-74955.vb</file>
 	</test>
-	<test id="169" name="bug-80750">
+	<test id="169" name="bug-80750" mytype="empty">
 		<file>Bugs\bug-80750.vb</file>
 	</test>
-	<test id="170" name="bug-80752">
+	<test id="170" name="bug-80752" mytype="empty">
 		<arguments>-r:System.dll,System.Windows.Forms.dll,System.Drawing.dll,System.Drawing.Design.dll,System.Xml.dll,System.Design.dll,System.Data.dll -imports:System,System.Drawing,Microsoft.VisualBasic,System.Data</arguments>
 		<file>Bugs\bug-80752.vb</file>
 	</test>
-	<test id="171" name="bug-80833">
+	<test id="171" name="bug-80833" mytype="empty">
 		<arguments>-r:System.Windows.Forms.dll,System.dll,System.Drawing.dll -imports:System.Windows.Forms,System.Drawing,Microsoft.VisualBasic</arguments>
 		<file>Bugs\bug-80833.vb</file>
 	</test>
-	<test id="172" name="bug-80967" target="exe" workingdirectory="Bugs">
+	<test id="172" name="bug-80967" target="exe" mytype="empty" workingdirectory="Bugs">
 		<arguments>@bug-80967\bug-80967.rsp</arguments>
 	</test>
-	<test id="173" name="bug-80968">
+	<test id="173" name="bug-80968" mytype="empty">
 		<file>Bugs\bug-80968.vb</file>
 	</test>
-	<test id="174" name="bug-80989">
+	<test id="174" name="bug-80989" mytype="empty">
 		<file>Bugs\bug-80989.vb</file>
 	</test>
-	<test id="175" name="bug-80990">
+	<test id="175" name="bug-80990" mytype="empty">
 		<file>Bugs\bug-80990.vb</file>
 		<error line="1" number="40056" message="Namespace or type specified in the Imports 'Foo' doesn't contain any public member or cannot be found. Make sure the namespace or the type is defined and contains at least one public member. Make sure the imported element name doesn't use any aliases." />
 	</test>
-	<test id="176" name="bug-80995" target="exe">
+	<test id="176" name="bug-80995" target="exe" mytype="empty">
 		<file>Bugs\bug-80995.vb</file>
 	</test>
-	<test id="177" name="bug-81009" target="exe">
+	<test id="177" name="bug-81009" target="exe" mytype="empty">
 		<file>Bugs\bug-81009.vb</file>
 	</test>
-	<test id="178" name="bug-81016" target="winexe">
+	<test id="178" name="bug-81016" target="winexe" mytype="empty">
 		<arguments>-main:Form1</arguments>
 		<file>Bugs\bug-81016.vb</file>
 	</test>
-	<test id="179" name="bug-81055" target="exe">
+	<test id="179" name="bug-81055" target="exe" mytype="empty">
 		<arguments>-target:library</arguments>
 		<file>Bugs\bug-81055.vb</file>
 	</test>
-	<test id="180" name="bug-81059">
+	<test id="180" name="bug-81059" mytype="empty">
 		<file>Bugs\bug-81059.vb</file>
 	</test>
-	<test id="181" name="bug-81119" target="exe">
+	<test id="181" name="bug-81119" target="exe" mytype="empty">
 		<file>Bugs\bug-81119.vb</file>
 	</test>
 	<test id="182" name="bug-81162">
 		<arguments>-imports:System.Web -r:System.Web.dll,System.dll</arguments>
 		<file>Bugs\bug-81162.vb</file>
 	</test>
-	<test id="183" name="bug-81243" target="exe">
+	<test id="183" name="bug-81243" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Bugs\bug-81243.vb</file>
 	</test>
@@ -724,7 +724,7 @@
 		<arguments>-r:System.Drawing.dll,System.Windows.Forms.dll</arguments>
 		<file>Bugs\bug-82382.vb</file>
 	</test>
-	<test id="185" name="ia64-1" target="exe">
+	<test id="185" name="ia64-1" target="exe" mytype="empty">
 		<file>Bugs\ia64-1.vb</file>
 	</test>
 	<test id="186" name="LazyBug1">
@@ -1255,7 +1255,7 @@
 		<arguments>/r:System.dll,System.Xml.dll /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>CompileTime\GenericInterface4.vb</file>
 	</test>
-	<test id="318" name="GenericNestedType1">
+	<test id="318" name="GenericNestedType1" mytype="empty">
 		<arguments>-imports:System.Collections.Generic,System.Collections,System,System.Windows.Forms,System.Diagnostics,System.Drawing -rootnamespace:rt -r:System.Drawing.dll</arguments>
 		<file>CompileTime\GenericNestedType1.vb</file>
 	</test>
@@ -1407,7 +1407,7 @@
 		<arguments>/r:System.dll,System.Xml.dll /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>CompileTime\Imports2.vb</file>
 	</test>
-	<test id="356" name="Imports3">
+	<test id="356" name="Imports3" mytype="empty">
 		<arguments>/imports:vb=microsoft.visualbasic</arguments>
 		<file>CompileTime\Imports3.vb</file>
 	</test>
@@ -1788,7 +1788,7 @@
 		<arguments>/r:System.dll,System.Xml.dll /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>CompileTime\PowerAssignStatement1.vb</file>
 	</test>
-	<test id="451" name="PropertyAccess5">
+	<test id="451" name="PropertyAccess5" mytype="empty">
 		<arguments>/r:System.Data.dll /imports:System.Data /nowarn</arguments>
 		<file>CompileTime\PropertyAccess5.vb</file>
 	</test>
@@ -2732,7 +2732,7 @@
 		<arguments>/r:System.dll,System.Xml.dll /target:exe /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>CompileTime2\MyBase1.vb</file>
 	</test>
-	<test id="687" name="NoOutDir1" outputvbcassembly="testoutput\NoOutDir1_vbc.exe" outputassembly="testoutput\NoOutDir1.exe" target="exe" workingdirectory="testoutput">
+	<test id="687" name="NoOutDir1" outputvbcassembly="testoutput\NoOutDir1_vbc.exe" outputassembly="testoutput\NoOutDir1.exe" target="exe" mytype="empty" workingdirectory="testoutput">
 		<arguments>/out:NoOutDir1.exe</arguments>
 		<vbcarguments>/out:NoOutDir1_vbc.exe</vbcarguments>
 		<file>..\CompileTime2\NoOutDir1.vb</file>
@@ -2845,7 +2845,7 @@
 		<arguments>/r:System.dll,System.Xml.dll /target:exe /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>CompileTime2\PEFileKind-Console.vb</file>
 	</test>
-	<test id="715" name="PEFileKind-Winexe" target="winexe">
+	<test id="715" name="PEFileKind-Winexe" target="winexe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\PEFileKind-Winexe.vb</file>
 	</test>
@@ -3210,13 +3210,13 @@
 		<file>Errors\30060-9.vb</file>
 		<error number="30060" />
 	</test>
-	<test id="799" name="30064" knownfailure="We give the wrong error" expectedexitcode="1" target="exe">
+	<test id="799" name="30064" expectedexitcode="1" target="exe">
 		<arguments>-target:library</arguments>
 		<file>Errors\30064.vb</file>
 		<error number="30064" />
 	</test>
-	<test id="800" name="30068" knownfailure="We give the wrong error" expectedexitcode="1" target="exe">
-		<arguments>-target:library</arguments>
+	<test id="800" name="30068" expectedexitcode="1" target="exe">
+		<arguments>-target:library -nowarn</arguments>
 		<file>Errors\30068.vb</file>
 		<error number="30068" />
 	</test>
@@ -3230,11 +3230,11 @@
 		<file>Errors\30070-1.vb</file>
 		<error number="30070" />
 	</test>
-	<test id="803" name="30074" knownfailure="Parser error" expectedexitcode="1">
+	<test id="803" name="30074" expectedexitcode="1">
 		<file>Errors\30074.vb</file>
 		<error number="30074" />
 	</test>
-	<test id="804" name="30074-1" knownfailure="We give the wrong error" expectedexitcode="1" target="exe">
+	<test id="804" name="30074-1" expectedexitcode="1" target="exe">
 		<arguments>-target:library</arguments>
 		<file>Errors\30074-1.vb</file>
 		<error number="30074" />
@@ -3284,7 +3284,7 @@
 		<file>Errors\30207.vb</file>
 		<error number="30207" />
 	</test>
-	<test id="814" name="30209">
+	<test id="814" name="30209" mytype="empty">
 		<arguments>-target:library</arguments>
 		<file>Errors\30209.vb</file>
 	</test>
@@ -3803,7 +3803,7 @@
 		<error line="3" number="32304" message="The 'DefaultMemberAttribute' defined on 'DefaultProperty4' specifies 'iIeM' as the default member, while the property marked as the default property is 'Item'." />
 		<vbcerror line="2" number="32304" message="Conflict between the default property and the 'DefaultMemberAttribute' defined on 'DefaultProperty4'." />
 	</test>
-	<test id="918" name="42024">
+	<test id="918" name="42024" mytype="empty">
 		<arguments>/quiet</arguments>
 		<file>Errors\42024.vb</file>
 		<error line="15" number="42024" message="Unused local variable: 'NotAssigned'." />
@@ -4554,11 +4554,11 @@
 		<arguments>/r:System.dll,System.Xml.dll /target:exe /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>Mono\DefaultPropH.vb</file>
 	</test>
-	<test id="1104" name="Delegate_dll">
+	<test id="1104" name="Delegate_dll" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>Mono\Delegate_dll.vb</file>
 	</test>
-	<test id="1105" name="Delegate_exe" target="exe">
+	<test id="1105" name="Delegate_exe" target="exe" mytype="empty">
 		<arguments>/r:testoutput\Delegate_dll.dll /nowarn</arguments>
 		<file>Mono\Delegate_exe.vb</file>
 	</test>
@@ -4634,10 +4634,10 @@
 		<arguments>/r:System.dll,System.Xml.dll /target:exe /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>Mono\Error.vb</file>
 	</test>
-	<test id="1124" name="Event_dll">
+	<test id="1124" name="Event_dll" mytype="empty">
 		<file>Mono\Event_dll.vb</file>
 	</test>
-	<test id="1125" name="Event_exe" target="exe">
+	<test id="1125" name="Event_exe" target="exe" mytype="empty">
 		<arguments>/r:testoutput\Event_dll.dll /nowarn</arguments>
 		<file>Mono\Event_exe.vb</file>
 	</test>
@@ -6433,7 +6433,7 @@
 		<arguments>/r:System.dll,System.Xml.dll /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\" /optionstrict+ /optionexplicit+ /optioncompare:binary</arguments>
 		<file>Mono\Override_dll.vb</file>
 	</test>
-	<test id="1574" name="Override_exe" target="exe">
+	<test id="1574" name="Override_exe" target="exe" mytype="empty">
 		<arguments>/r:testoutput\Override_dll.dll /nowarn</arguments>
 		<file>Mono\Override_exe.vb</file>
 	</test>
@@ -6885,27 +6885,27 @@
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\abcd.vb</file>
 	</test>
-	<test id="1687" name="bug-333403" target="winexe">
-		<arguments>/noconfig /imports:Microsoft.VisualBasic,System,System.Collections,System.Collections.Generic,System.Data,System.Drawing,System.Diagnostics,System.Windows.Forms /nowarn:42016,41999,42017,42018,42019,42032,42036,42020,42021,42022 /optionstrict+ /rootnamespace:WindowsApplication1 /define:CONFIG="Debug",DEBUG=-1,TRACE=-1,_MyType=\"WindowsForms\",PLATFORM="AnyCPU" /reference:System.Data.dll,System.dll,System.Drawing.dll,System.Windows.Forms.dll,System.Xml.dll /main:WindowsApplication1.RightForm /debug+ /debug:full </arguments>
+	<test id="1687" name="bug-333403" target="winexe" mytype="windowsforms">
+		<arguments>/noconfig /imports:Microsoft.VisualBasic,System,System.Collections,System.Collections.Generic,System.Data,System.Drawing,System.Diagnostics,System.Windows.Forms /nowarn:42016,41999,42017,42018,42019,42032,42036,42020,42021,42022 /optionstrict+ /rootnamespace:WindowsApplication1 /define:CONFIG="Debug",DEBUG=-1,TRACE=-1,PLATFORM="AnyCPU" /reference:System.Data.dll,System.dll,System.Drawing.dll,System.Windows.Forms.dll,System.Xml.dll /main:WindowsApplication1.RightForm /debug+ /debug:full </arguments>
 		<file>My\bug-333403.vb</file>
 	</test>
-	<test id="1688" name="Console" target="exe">
+	<test id="1688" name="Console" target="exe" mytype="console">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\Console.vb</file>
 	</test>
-	<test id="1689" name="Custom" target="exe">
+	<test id="1689" name="Custom" target="exe" mytype="custom">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\Custom.vb</file>
 	</test>
-	<test id="1690" name="DefaultInstances1">
-		<arguments>-r:System.Web.dll -rootnamespace:WindowsApplication1 -define:_MYTYPE=\"WindowsForms\" -r:System.Windows.Forms.dll</arguments>
+	<test id="1690" name="DefaultInstances1" mytype="windowsforms">
+		<arguments>-r:System.Web.dll -rootnamespace:WindowsApplication1 -r:System.Windows.Forms.dll</arguments>
 		<file>My\DefaultInstances1.vb</file>
 	</test>
 	<test id="1691" name="DefinedSymbols" target="exe">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\DefinedSymbols.vb</file>
 	</test>
-	<test id="1692" name="Empty" target="exe">
+	<test id="1692" name="Empty" target="exe" mytype="empty">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\Empty.vb</file>
 	</test>
@@ -6917,35 +6917,35 @@
 		<arguments>-r:System.Web.dll /nowarn</arguments>
 		<file>My\My.Application1.vb</file>
 	</test>
-	<test id="1695" name="My.Forms1" target="winexe">
-		<arguments>-r:System.Web.dll -define:_MYTYPE=\"WindowsForms\"</arguments>
+	<test id="1695" name="My.Forms1" target="winexe" mytype="windowsforms">
+		<arguments>-r:System.Web.dll</arguments>
 		<file>My\My.Forms1.vb</file>
 	</test>
 	<test id="1696" name="None" target="exe">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\None.vb</file>
 	</test>
-	<test id="1697" name="Web" target="exe">
+	<test id="1697" name="Web" target="exe" mytype="web">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\Web.vb</file>
 	</test>
-	<test id="1698" name="WebControl" target="exe">
+	<test id="1698" name="WebControl" target="exe" mytype="webcontrol">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\WebControl.vb</file>
 	</test>
-	<test id="1699" name="Windows" target="exe">
+	<test id="1699" name="Windows" target="exe" mytype="windows">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\Windows.vb</file>
 	</test>
-	<test id="1700" name="WindowsForms" target="exe">
+	<test id="1700" name="WindowsForms" target="exe" mytype="windowsforms">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\WindowsForms.vb</file>
 	</test>
-	<test id="1701" name="WindowsForms_exe" target="exe">
+	<test id="1701" name="WindowsForms_exe" target="exe" mytype="windowsforms">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\WindowsForms_exe.vb</file>
 	</test>
-	<test id="1702" name="WindowsForms_library">
+	<test id="1702" name="WindowsForms_library" mytype="windowsforms">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\WindowsForms_library.vb</file>
 	</test>
@@ -6953,11 +6953,11 @@
 		<arguments>-r:System.Web.dll -define:_MYTYPE=\"WindowsForms\"</arguments>
 		<file>My\WindowsForms_module.vb</file>
 	</test>
-	<test id="1704" name="WindowsForms_winexe" target="winexe">
+	<test id="1704" name="WindowsForms_winexe" target="winexe" mytype="windowsforms">
 		<arguments>-r:System.Web.dll -define:_MYTYPE=\"WindowsForms\"</arguments>
 		<file>My\WindowsForms_winexe.vb</file>
 	</test>
-	<test id="1705" name="WindowsFormsWithCustomSubMain" target="exe">
+	<test id="1705" name="WindowsFormsWithCustomSubMain" target="exe" mytype="windowsformswithcustomsubmain">
 		<arguments>-r:System.Web.dll</arguments>
 		<file>My\WindowsFormsWithCustomSubMain.vb</file>
 	</test>
@@ -6965,7 +6965,7 @@
 		<arguments>/nowarn</arguments>
 		<file>NonCecilRelated\GenericNestedType2.vb</file>
 	</test>
-	<test id="1707" name="GenericType3">
+	<test id="1707" name="GenericType3" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>NonCecilRelated\GenericType3.vb</file>
 	</test>
@@ -6993,7 +6993,7 @@
 		<arguments>/r:System.dll,System.Xml.dll /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\"</arguments>
 		<file>NotImplementedYet\DecimalConstant1.vb</file>
 	</test>
-	<test id="1714" name="DelegateAsMethodParameter1" knownfailure="NotImplementedYet">
+	<test id="1714" name="DelegateAsMethodParameter1">
 		<arguments>/r:System.dll,System.Xml.dll /define:DEBUG /debug:FULL /nowarn /define:_MYTYPE=\"Empty\"</arguments>
 		<file>NotImplementedYet\DelegateAsMethodParameter1.vb</file>
 	</test>
@@ -7328,11 +7328,13 @@
 		<arguments>@SelfCompileWindows.response /nowarn</arguments>
 		<vbcarguments>/out:vbnc_vbc.exe</vbcarguments>
 		<testarguments>/help</testarguments>
+		<dependency>..\..\bin\Mono.Cecil.VB.dll</dependency>
+		<dependency>..\..\bin\Mono.Cecil.VB.Mdb.dll</dependency>
 	</test>
-	<test id="1809" name="GenericNestedType1" target="exe">
+	<test id="1809" name="GenericNestedType1" target="exe" mytype="empty">
 		<file>Unfixable\GenericNestedType1.vb</file>
 	</test>
-	<test id="1810" name="NestedInterfaceInheritance1">
+	<test id="1810" name="NestedInterfaceInheritance1" mytype="empty">
 		<file>Unfixable\NestedInterfaceInheritance1.vb</file>
 	</test>
 	<test id="1811" name="NoVBRuntimeRef1">
@@ -7346,7 +7348,7 @@
 	<test id="1814" name="Microsoft.VisualBasic" workingdirectory="VBRunTime">
 		<arguments>@Microsoft.VisualBasic.windows.response /noconfig /nowarn:41008,40010,42353,40000</arguments>
 	</test>
-	<test id="1816" name="DefaultCtor">
+	<test id="1816" name="DefaultCtor" mytype="empty">
 		<file>CompileTime\DefaultCtor.vb</file>
 	</test>
 	<test id="0" name="NUnitTests" target="exe" workingdirectory="NUnitTests">
@@ -7370,54 +7372,54 @@
 		<file>MethodCall4.vb</file>
 		<file>MethodOverload1.vb</file>
 	</test>
-	<test id="920" name="GenericDelegate1">
+	<test id="920" name="GenericDelegate1" mytype="empty">
 		<file>CompileTime\GenericDelegate1.vb</file>
 	</test>
-	<test id="921" name="GetUpperBound.vb">
+	<test id="921" name="GetUpperBound.vb" mytype="empty">
 		<file>CompileTime\GetUpperBound.vb</file>
 	</test>
-	<test id="922" name="AttributeFileVersion" target="exe">
+	<test id="922" name="AttributeFileVersion" target="exe" mytype="empty">
 		<file>CompileTime2\AttributeFileVersion.vb</file>
 	</test>
-	<test id="1716" name="ConstantBounds1">
+	<test id="1716" name="ConstantBounds1" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime\ConstantBounds1.vb</file>
 	</test>
-	<test id="1717" name="42020" expectedvbcexitcode="0">
+	<test id="1717" name="42020" expectedvbcexitcode="0" mytype="empty">
 		<arguments>/optionstrict:custom</arguments>
 		<file>Errors\42020.vb</file>
 		<error line="5" number="42020" message="Variable declaration without an 'As' clause; type of Object assumed." />
 	</test>
-	<test id="766" name="MultDimArray1" target="exe">
+	<test id="766" name="MultDimArray1" target="exe" mytype="empty">
 		<file>CompileTime2\MultDimArray1.vb</file>
 	</test>
-	<test id="923" name="DefaultMember1">
+	<test id="923" name="DefaultMember1" mytype="empty">
 		<arguments>-r:System.Data.dll /nowarn</arguments>
 		<file>CompileTime\DefaultMember1.vb</file>
 	</test>
-	<test id="1718" name="TryCatch5">
+	<test id="1718" name="TryCatch5" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime\TryCatch5.vb</file>
 	</test>
-	<test id="1719" name="DebugInfo1">
+	<test id="1719" name="DebugInfo1" mytype="empty">
 		<arguments>/debug:full</arguments>
 		<file>CompileTime\DebugInfo1.vb</file>
 	</test>
-	<test id="1720" name="bug-547165" target="exe">
+	<test id="1720" name="bug-547165" target="exe" mytype="empty">
 		<file>Bugs\bug-547165.vb</file>
 	</test>
-	<test id="1721" name="bug-504822">
+	<test id="1721" name="bug-504822" mytype="empty">
 		<file>Bugs\bug-504822.vb</file>
 	</test>
 	<test id="1722" name="DoLoopWhile3" mytype="empty">
 		<file>CompileTime\DoLoopWhile3.vb</file>
 		<error line="5" number="42024" message="Unused local variable: 'i'." />
 	</test>
-	<test id="1723" name="Narrowing1" target="exe">
+	<test id="1723" name="Narrowing1" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime\Narrowing1.vb</file>
 	</test>
-	<test id="1724" name="42021">
+	<test id="1724" name="42021" mytype="empty">
 		<arguments>/optionstrict:custom</arguments>
 		<file>Errors\42021.vb</file>
 		<error line="4" number="42021" message="Function without an 'As' clause; return type of Object assumed." />
@@ -7442,21 +7444,20 @@
 		<file>Errors\30127.vb</file>
 		<error number="30127" />
 	</test>
-	<test id="1729" name="UsingStatement6" target="exe">
+	<test id="1729" name="UsingStatement6" target="exe" mytype="empty">
 		<file>CompileTime2\UsingStatement6.vb</file>
 	</test>
-	<test id="1730" name="FunctionReturnVariable1" target="exe">
+	<test id="1730" name="FunctionReturnVariable1" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\FunctionReturnVariable1.vb</file>
 	</test>
-	<test id="1732" name="DefaultInstance1" target="exe">
-		<arguments>-define:_MYTYPE=\"WindowsFormsWithCustomSubMain\"</arguments>
+	<test id="1732" name="DefaultInstance1" target="exe" mytype="windowsformswithcustomsubmain">
 		<file>CompileTime2\DefaultInstance1.vb</file>
 	</test>
-	<test id="1733" name="ValueType1" target="exe">
+	<test id="1733" name="ValueType1" target="exe" mytype="empty">
 		<file>RunTime\ValueType1.vb</file>
 	</test>
-	<test id="1731" name="DefaultProperty7" target="exe">
+	<test id="1731" name="DefaultProperty7" target="exe" mytype="empty">
 		<file>CompileTime2\DefaultProperty7.vb</file>
 	</test>
 	<test id="1806" name="ConditionalExpression1" target="exe" mytype="empty">
@@ -7524,10 +7525,10 @@
 		<file>Errors\30512-3.vb</file>
 		<error number="30512" />
 	</test>
-	<test id="1830" name="ByRefStructureReturn1">
+	<test id="1830" name="ByRefStructureReturn1" mytype="empty">
 		<file>CompileTime\ByRefStructureReturn1.vb</file>
 	</test>
-	<test id="1831" name="ImplicitNullableConversions1" target="exe">
+	<test id="1831" name="ImplicitNullableConversions1" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\ImplicitNullableConversions1.vb</file>
 	</test>
@@ -7544,26 +7545,26 @@
 		<file>Errors\30311-37.vb</file>
 		<error number="30311" />
 	</test>
-	<test id="1835" name="UserDefinedNullableConversions1" target="exe">
+	<test id="1835" name="UserDefinedNullableConversions1" target="exe" mytype="empty">
 		<file>CompileTime2\UserDefinedNullableConversions1.vb</file>
 	</test>
-	<test id="1836" name="bug-629103">
+	<test id="1836" name="bug-629103" mytype="empty">
 		<file>Bugs\bug-629103.vb</file>
 	</test>
-	<test id="1837" name="bug-629369">
+	<test id="1837" name="bug-629369" mytype="empty">
 		<file>Bugs\bug-629369.vb</file>
 	</test>
-	<test id="1838" name="bug-629370">
+	<test id="1838" name="bug-629370" mytype="empty">
 		<file>Bugs\bug-629370.vb</file>
 	</test>
-	<test id="1839" name="bug-629373">
+	<test id="1839" name="bug-629373" mytype="empty">
 		<file>Bugs\bug-629373.vb</file>
 	</test>
 	<test id="1840" name="30439-2" expectedexitcode="1">
 		<file>Errors\30439-2.vb</file>
 		<error number="30439" />
 	</test>
-	<test id="1841" name="ImportsType2">
+	<test id="1841" name="ImportsType2" mytype="empty">
 		<file>CompileTime\ImportsType2.vb</file>
 	</test>
 	<test id="1842" name="30002" expectedexitcode="1">
@@ -7575,16 +7576,16 @@
 		<file>Errors\30182.vb</file>
 		<error number="30182" />
 	</test>
-	<test id="1844" name="End2" target="exe">
+	<test id="1844" name="End2" target="exe" mytype="empty">
 		<file>RunTime\End2.vb</file>
 	</test>
-	<test id="1845" name="SecurityAttribute2">
+	<test id="1845" name="SecurityAttribute2" mytype="empty">
 		<file>CompileTime\SecurityAttribute2.vb</file>
 	</test>
-	<test id="1846" name="MethodResolution1">
+	<test id="1846" name="MethodResolution1" mytype="empty">
 		<file>CompileTime\MethodResolution1.vb</file>
 	</test>
-	<test id="1847" name="Boolean2" target="exe">
+	<test id="1847" name="Boolean2" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\Boolean2.vb</file>
 	</test>
@@ -7595,7 +7596,7 @@
 		<error line="3" number="90019" message="Expected 'End'." />
 		<vbcerror line="2" number="30201" message="Expression expected." />
 	</test>
-	<test id="1849" name="ByRef13" target="exe">
+	<test id="1849" name="ByRef13" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\ByRef13.vb</file>
 	</test>
@@ -7603,10 +7604,10 @@
 		<file>Errors\30311-38.vb</file>
 		<error number="30311" />
 	</test>
-	<test id="1852" name="Optional3">
+	<test id="1852" name="Optional3" mytype="empty">
 		<file>1Declarations\Optional3.vb</file>
 	</test>
-	<test id="1851" name="For7" target="exe">
+	<test id="1851" name="For7" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\For7.vb</file>
 	</test>
@@ -7629,14 +7630,14 @@
 	<test id="1857" name="Delegate8" knownfailure="Need to update rt to support &quot;vbc compiles, vbnc doesn't&quot;" expectedvbcexitcode="0">
 		<file>1Declarations\Delegate8.vb</file>
 	</test>
-	<test id="1858" name="ByRefCType1" target="exe">
+	<test id="1858" name="ByRefCType1" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>RunTime\ByRefCType1.vb</file>
 	</test>
 	<test id="1859" name="ArrayCreationExpression6" knownfailure="We crash instead of showing correct error message (or compile like vb10 does)" expectedvbcexitcode="0">
 		<file>CompileTime\ArrayCreationExpression6.vb</file>
 	</test>
-	<test id="1860" name="MethodsWithPointers1">
+	<test id="1860" name="MethodsWithPointers1" mytype="empty">
 		<arguments>-r:MethodsWithPointers1_CS.dll /nowarn</arguments>
 		<file>CompileTime\MethodsWithPointers1.vb</file>
 		<dependency>Bin\MethodsWithPointers1_CS.dll</dependency>
@@ -7647,7 +7648,7 @@
 		<error line="6" number="30518" message="Overload resolution failed because no accessible 'C' can be called with these arguments:" />
 		<vbcerror line="6" number="30657" message="'C' has a return type that is not supported or parameter types that are not supported." />
 	</test>
-	<test id="1862" name="InferFor1" target="exe">
+	<test id="1862" name="InferFor1" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime\InferFor1.vb</file>
 	</test>
@@ -7679,7 +7680,7 @@
 		<file>Errors\30451-2.vb</file>
 		<error number="30451" />
 	</test>
-	<test id="1869" name="MethodInvocation24" target="exe">
+	<test id="1869" name="MethodInvocation24" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\MethodInvocation24.vb</file>
 	</test>
@@ -7687,7 +7688,7 @@
 		<file>Errors\30375.vb</file>
 		<error number="30375" />
 	</test>
-	<test id="1871" name="CoClass1" target="exe">
+	<test id="1871" name="CoClass1" target="exe" mytype="empty">
 		<file>CompileTime2\CoClass1.vb</file>
 	</test>
 	<test id="1872" name="30455-1" expectedexitcode="1" target="exe">
@@ -7714,23 +7715,23 @@
 		<arguments>-r:System.Web.dll -rootnamespace:WindowsApplication1 -define:_MYTYPE=\"WindowsForms\" -r:System.Windows.Forms.dll,System.Windows.forms.dll</arguments>
 		<file>CompileTime\DuplicateReference1.vb</file>
 	</test>
-	<test id="1878" name="ArrayRef1">
+	<test id="1878" name="ArrayRef1" mytype="empty">
 		<file>CompileTime\ArrayRef1.vb</file>
 	</test>
-	<test id="1879" name="RedimPreserve3">
+	<test id="1879" name="RedimPreserve3" mytype="empty">
 		<file>CompileTime\RedimPreserve3.vb</file>
 	</test>
-	<test id="1880" name="ByRefStore1">
+	<test id="1880" name="ByRefStore1" mytype="empty">
 		<file>CompileTime\ByRefStore1.vb</file>
 	</test>
-	<test id="1881" name="ByRefProperty1" target="exe">
+	<test id="1881" name="ByRefProperty1" target="exe" mytype="empty">
 		<file>CompileTime\ByRefProperty1.vb</file>
 	</test>
 	<test id="1882" name="30524" expectedexitcode="1">
 		<file>Errors\30524.vb</file>
 		<error number="30524" />
 	</test>
-	<test id="1883" name="ArrayRef2">
+	<test id="1883" name="ArrayRef2" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime\ArrayRef2.vb</file>
 	</test>
@@ -7738,7 +7739,7 @@
 		<arguments>/define:_MYTYPE=\"Empty\"</arguments>
 		<file>CompileTime\Attributes7.vb</file>
 	</test>
-	<test id="1885" name="OptionCompareText2">
+	<test id="1885" name="OptionCompareText2" mytype="empty">
 		<file>CompileTime2\OptionCompareText2.vb</file>
 	</test>
 	<test id="1886" name="30562" expectedexitcode="1" target="exe">
@@ -7749,14 +7750,14 @@
 		<file>Errors\30562-1.vb</file>
 		<error number="30562" />
 	</test>
-	<test id="1888" name="Module3" target="exe">
+	<test id="1888" name="Module3" target="exe" mytype="empty">
 		<arguments>/nowarn</arguments>
 		<file>CompileTime2\Module3.vb</file>
 	</test>
-	<test id="1889" name="PropertyAccess6" target="exe">
+	<test id="1889" name="PropertyAccess6" target="exe" mytype="empty">
 		<file>CompileTime2\PropertyAccess6.vb</file>
 	</test>
-	<test id="1890" name="Attributes8">
+	<test id="1890" name="Attributes8" mytype="empty">
 		<file>CompileTime2\Attributes8.vb</file>
 	</test>
 	<test id="1891" name="AddHandler4">
@@ -8209,7 +8210,7 @@
 		<error line="5" number="30203" message="Identifier expected." />
 		<vbcerror line="2" number="30203" message="Identifier expected." />
 	</test>
-	<test id="1994" name="TypeNameResolution3" knownfailure="doesn't work" mytype="empty">
+	<test id="1994" name="TypeNameResolution3" mytype="empty">
 		<file>CompileTime\TypeNameResolution3.vb</file>
 	</test>
 	<test id="1995" name="GenericNestedType3" mytype="empty">
@@ -12513,7 +12514,6 @@
 		<error line="752" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Char'." />
 		<error line="758" number="30518" message="Overload resolution failed because no accessible '+' can be called with these arguments:" />
 		<error line="761" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="764" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="716" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="719" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="722" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -12550,7 +12550,7 @@
 		<error line="752" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Char'." />
 		<error line="758" number="30518" message="Overload resolution failed because no accessible '+' can be called with these arguments:" />
 		<error line="761" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="764" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="764" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
 		<vbcerror line="716" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="719" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="722" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -12569,13 +12569,12 @@
 		<vbcerror line="761" number="30452" message="Operator '+' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="764" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
 	</test>
-	<test id="2369" name="OperatorIntrinsic_BinaryAdd_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2369" name="OperatorIntrinsic_BinaryAdd_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicBinaryAdd.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="827" number="30452" message="Operator '+' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
-	<test id="2370" name="OperatorIntrinsic_BinaryAdd_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
+	<test id="2370" name="OperatorIntrinsic_BinaryAdd_ObjectStrictError" expectedexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
 		<file>CompileTime2\OperatorIntrinsicBinaryAdd.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
@@ -12594,27 +12593,9 @@
 		<error line="816" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
 		<error line="820" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
 		<error line="824" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<error line="827" number="30452" message="Operator '+' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="827" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
 		<error line="831" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
 		<error line="831" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="768" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="772" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="780" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="784" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="788" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="792" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="796" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="800" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="804" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="808" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="812" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="816" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="820" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="824" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="827" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="831" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
-		<vbcerror line="831" number="30038" message="Option Strict On prohibits operands of type Object for operator '+'." />
 	</test>
 	<test id="2371" name="OperatorIntrinsic_BinarySub_" target="exe" mytype="empty">
 		<file>CompileTime2\OperatorIntrinsicBinarySub.vb</file>
@@ -13781,7 +13762,6 @@
 		<error line="701" number="30518" message="Overload resolution failed because no accessible '=' can be called with these arguments:" />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '=' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="662" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -13819,7 +13799,7 @@
 		<error line="701" number="30518" message="Overload resolution failed because no accessible '=' can be called with these arguments:" />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '=' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="710" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
 		<vbcerror line="662" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -13838,13 +13818,12 @@
 		<vbcerror line="707" number="30452" message="Operator '=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="710" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
 	</test>
-	<test id="2477" name="OperatorIntrinsic_Equals_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2477" name="OperatorIntrinsic_Equals_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicEquals.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="772" number="30452" message="Operator '=' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
-	<test id="2478" name="OperatorIntrinsic_Equals_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
+	<test id="2478" name="OperatorIntrinsic_Equals_ObjectStrictError" expectedexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
 		<file>CompileTime2\OperatorIntrinsicEquals.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
@@ -13863,27 +13842,9 @@
 		<error line="761" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
 		<error line="765" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
 		<error line="769" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<error line="772" number="30452" message="Operator '=' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="772" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
 		<error line="776" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
 		<error line="776" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="714" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="718" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="722" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="726" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="730" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="734" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="738" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="742" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="746" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="750" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="754" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="758" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="761" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="765" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="769" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="772" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="776" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
-		<vbcerror line="776" number="32013" message="Option Strict On disallows operands of type Object for operator '='. Use the 'Is' operator to test for object identity." />
 	</test>
 	<test id="2479" name="OperatorIntrinsic_Exponent_" target="exe" mytype="empty">
 		<file>CompileTime2\OperatorIntrinsicExponent.vb</file>
@@ -14812,7 +14773,6 @@
 		<error line="701" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&gt;=' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="662" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -14850,7 +14810,7 @@
 		<error line="701" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&gt;=' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
 		<vbcerror line="662" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -14869,13 +14829,12 @@
 		<vbcerror line="707" number="30452" message="Operator '&gt;=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
 	</test>
-	<test id="2549" name="OperatorIntrinsic_GE_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2549" name="OperatorIntrinsic_GE_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicGE.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="772" number="30452" message="Operator '&gt;=' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
-	<test id="2550" name="OperatorIntrinsic_GE_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
+	<test id="2550" name="OperatorIntrinsic_GE_ObjectStrictError" expectedexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
 		<file>CompileTime2\OperatorIntrinsicGE.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
@@ -14894,27 +14853,9 @@
 		<error line="761" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
 		<error line="765" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
 		<error line="769" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<error line="772" number="30452" message="Operator '&gt;=' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="772" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="714" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="718" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="722" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="726" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="730" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="734" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="738" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="742" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="746" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="750" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="754" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="758" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="761" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="765" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="769" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="772" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
-		<vbcerror line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;='." />
 	</test>
 	<test id="2551" name="OperatorIntrinsic_GT_" target="exe" mytype="empty">
 		<file>CompileTime2\OperatorIntrinsicGT.vb</file>
@@ -15345,7 +15286,6 @@
 		<error line="701" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&gt;' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="662" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -15383,7 +15323,7 @@
 		<error line="701" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&gt;' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
 		<vbcerror line="662" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -15402,11 +15342,10 @@
 		<vbcerror line="707" number="30452" message="Operator '&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
 	</test>
-	<test id="2585" name="OperatorIntrinsic_GT_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2585" name="OperatorIntrinsic_GT_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicGT.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="772" number="30452" message="Operator '&gt;' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
 	<test id="2586" name="OperatorIntrinsic_GT_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
@@ -15427,7 +15366,7 @@
 		<error line="761" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
 		<error line="765" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
 		<error line="769" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
-		<error line="772" number="30452" message="Operator '&gt;' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="772" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
 		<vbcerror line="714" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;'." />
@@ -18734,7 +18673,6 @@
 		<error line="701" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&lt;=' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="662" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -18772,7 +18710,7 @@
 		<error line="701" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&lt;=' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
 		<vbcerror line="662" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -18791,11 +18729,10 @@
 		<vbcerror line="707" number="30452" message="Operator '&lt;=' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
 	</test>
-	<test id="2729" name="OperatorIntrinsic_LE_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2729" name="OperatorIntrinsic_LE_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicLE.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="772" number="30452" message="Operator '&lt;=' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
 	<test id="2730" name="OperatorIntrinsic_LE_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
@@ -18816,7 +18753,7 @@
 		<error line="761" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
 		<error line="765" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
 		<error line="769" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
-		<error line="772" number="30452" message="Operator '&lt;=' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="772" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
 		<vbcerror line="714" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;='." />
@@ -19872,7 +19809,6 @@
 		<error line="1042" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="1045" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Date'." />
 		<error line="1048" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="1051" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="1003" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="1006" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="1009" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -19910,7 +19846,7 @@
 		<error line="1042" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="1045" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Date'." />
 		<error line="1048" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="1051" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="1051" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Like'." />
 		<vbcerror line="1003" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="1006" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="1009" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -19929,11 +19865,10 @@
 		<vbcerror line="1048" number="30452" message="Operator 'Like' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="1051" number="30038" message="Option Strict On prohibits operands of type Object for operator '...'." />
 	</test>
-	<test id="2765" name="OperatorIntrinsic_Like_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2765" name="OperatorIntrinsic_Like_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicLike.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="1114" number="30452" message="Operator 'Like' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
 	<test id="2766" name="OperatorIntrinsic_Like_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
@@ -19954,7 +19889,7 @@
 		<error line="1103" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Like'." />
 		<error line="1107" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Like'." />
 		<error line="1111" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Like'." />
-		<error line="1114" number="30452" message="Operator 'Like' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="1114" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Like'." />
 		<error line="1118" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Like'." />
 		<error line="1118" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Like'." />
 		<vbcerror line="1055" number="30038" message="Option Strict On prohibits operands of type Object for operator '...'." />
@@ -20619,7 +20554,6 @@
 		<error line="912" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="915" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Date'." />
 		<error line="918" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="921" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="873" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="876" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="879" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -20657,7 +20591,7 @@
 		<error line="912" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="915" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Date'." />
 		<error line="918" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="921" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="921" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
 		<vbcerror line="873" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="876" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="879" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -20676,11 +20610,10 @@
 		<vbcerror line="918" number="30452" message="Operator '&lt;&lt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="921" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
 	</test>
-	<test id="2801" name="OperatorIntrinsic_LShift_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2801" name="OperatorIntrinsic_LShift_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS /nowarn</arguments>
 		<file>CompileTime2\OperatorIntrinsicLShift.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="990" number="30452" message="Operator '&lt;&lt;' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
 	<test id="2802" name="OperatorIntrinsic_LShift_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT /nowarn</arguments>
@@ -20701,7 +20634,7 @@
 		<error line="974" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
 		<error line="980" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
 		<error line="985" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
-		<error line="990" number="30452" message="Operator '&lt;&lt;' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="990" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
 		<error line="994" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
 		<error line="994" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
 		<vbcerror line="925" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;&lt;'." />
@@ -21152,7 +21085,6 @@
 		<error line="701" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&lt;' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="662" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -21190,7 +21122,7 @@
 		<error line="701" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&lt;' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
 		<vbcerror line="662" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -21209,11 +21141,10 @@
 		<vbcerror line="707" number="30452" message="Operator '&lt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="710" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
 	</test>
-	<test id="2837" name="OperatorIntrinsic_LT_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2837" name="OperatorIntrinsic_LT_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicLT.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="772" number="30452" message="Operator '&lt;' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
 	<test id="2838" name="OperatorIntrinsic_LT_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
@@ -21234,7 +21165,7 @@
 		<error line="761" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
 		<error line="765" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
 		<error line="769" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
-		<error line="772" number="30452" message="Operator '&lt;' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="772" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
 		<error line="776" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
 		<vbcerror line="714" number="30038" message="Option Strict On prohibits operands of type Object for operator '&lt;'." />
@@ -22715,7 +22646,6 @@
 		<error line="701" number="30518" message="Overload resolution failed because no accessible '&lt;&gt;' can be called with these arguments:" />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&lt;&gt;' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="662" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -22753,7 +22683,7 @@
 		<error line="701" number="30518" message="Overload resolution failed because no accessible '&lt;&gt;' can be called with these arguments:" />
 		<error line="704" number="30518" message="Overload resolution failed because no accessible '&lt;&gt;' can be called with these arguments:" />
 		<error line="707" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="710" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="710" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
 		<vbcerror line="662" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="665" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="668" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -22772,11 +22702,10 @@
 		<vbcerror line="707" number="30452" message="Operator '&lt;&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="710" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
 	</test>
-	<test id="2945" name="OperatorIntrinsic_NotEquals_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="2945" name="OperatorIntrinsic_NotEquals_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS</arguments>
 		<file>CompileTime2\OperatorIntrinsicNotEquals.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="772" number="30452" message="Operator '&lt;&gt;' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
 	<test id="2946" name="OperatorIntrinsic_NotEquals_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT</arguments>
@@ -22797,7 +22726,7 @@
 		<error line="761" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
 		<error line="765" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
 		<error line="769" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
-		<error line="772" number="30452" message="Operator '&lt;&gt;' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="772" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
 		<error line="776" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
 		<error line="776" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
 		<vbcerror line="714" number="32013" message="Option Strict On disallows operands of type Object for operator '&lt;&gt;'. Use the 'Is' operator to test for object identity." />
@@ -25317,7 +25246,6 @@
 		<error line="912" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="915" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Date'." />
 		<error line="918" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="921" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Object'." />
 		<vbcerror line="873" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="876" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="879" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -25355,7 +25283,7 @@
 		<error line="912" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'String'." />
 		<error line="915" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Date'." />
 		<error line="918" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
-		<error line="921" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Object'." />
+		<error line="921" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
 		<vbcerror line="873" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Boolean'." />
 		<vbcerror line="876" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'Byte'." />
 		<vbcerror line="879" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'SByte'." />
@@ -25374,11 +25302,10 @@
 		<vbcerror line="918" number="30452" message="Operator '&gt;&gt;' is not defined for types 'System.DBNull' and 'System.DBNull'." />
 		<vbcerror line="921" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
 	</test>
-	<test id="3089" name="OperatorIntrinsic_RShift_ObjectError" expectedexitcode="1" mytype="empty">
+	<test id="3089" name="OperatorIntrinsic_RShift_ObjectError" mytype="empty">
 		<arguments>/define:Object_ERRORS /nowarn</arguments>
 		<file>CompileTime2\OperatorIntrinsicRShift.vb</file>
 		<file>CompileTime2\OperatorIntrinsic.vb</file>
-		<error line="990" number="30452" message="Operator '&gt;&gt;' is not defined for types 'Object' and 'System.DBNull'." />
 	</test>
 	<test id="3090" name="OperatorIntrinsic_RShift_ObjectStrictError" expectedexitcode="1" expectedvbcexitcode="1" mytype="empty">
 		<arguments>/optionstrict+ /define:Object_ERRORS /define:STRICT /nowarn</arguments>
@@ -25399,7 +25326,7 @@
 		<error line="974" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
 		<error line="980" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
 		<error line="985" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
-		<error line="990" number="30452" message="Operator '&gt;&gt;' is not defined for types 'Object' and 'System.DBNull'." />
+		<error line="990" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
 		<error line="994" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
 		<error line="994" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
 		<vbcerror line="925" number="30038" message="Option Strict On prohibits operands of type Object for operator '&gt;&gt;'." />
@@ -26199,5 +26126,25 @@
 		<error line="17" number="30561" message="'MF' is ambiguous, imported from the namespaces or types 'A.B, A.A'." />
 		<error line="18" number="30561" message="'MF' is ambiguous, imported from the namespaces or types 'A.B, A.A'." />
 		<error line="19" number="30561" message="'Ev' is ambiguous, imported from the namespaces or types 'A.B, A.A'." />
+	</test>
+	<test id="3166" name="bug-15863" target="exe" mytype="empty">
+		<file>Bugs\bug-15863.vb</file>
+	</test>
+	<test id="3167" name="30038" expectedexitcode="1" mytype="empty">
+		<arguments>/optionstrict+</arguments>
+		<file>Errors\30038.vb</file>
+		<error line="6" number="30038" message="Option Strict On prohibits operands of type Object for operator 'Not'." />
+	</test>
+	<test id="3168" name="30038-1" expectedexitcode="1" mytype="empty">
+		<arguments>/optionstrict+</arguments>
+		<file>Errors\30038-1.vb</file>
+		<error line="6" number="30512" message="Option Strict On disallows implicit conversions from 'Object' to 'Boolean'." />
+	</test>
+	<test id="3169" name="30074-2" expectedexitcode="1">
+		<file>Errors\30074-2.vb</file>
+		<error line="5" number="30074" message="Constant cannot be the target of an assignment." />
+	</test>
+	<test id="3171" name="AddHandlerWithStaticVariable" mytype="empty">
+		<file>CompileTime\AddHandlerWithStaticVariable.vb</file>
 	</test>
 </rt>
