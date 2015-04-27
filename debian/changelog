@@ -1,3 +1,11 @@
+mono-basic (4.0-0xamarin1) unstable; urgency=medium
+
+  * [9e7773b] Imported Upstream version 4.0
+  * [8d2f525] Delete obsolete VB lib versions
+  * [ce32e73] Compat version 7
+
+ -- Jo Shields <jo.shields@xamarin.com>  Mon, 27 Apr 2015 19:56:43 +0100
+
 mono-basic (3.8-0xamarin1) unstable; urgency=medium
 
   * New upstream release
