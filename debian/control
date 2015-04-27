@@ -11,38 +11,10 @@ Homepage: http://www.mono-project.com/Visual_Basic
 Vcs-Git: git://git.debian.org/pkg-mono/packages/mono-basic.git
 Vcs-Browser: http://git.debian.org/?p=pkg-mono/packages/mono-basic.git
 
-Package: libmono-microsoft-visualbasic8.0-cil
-Section: libs
-Architecture: all
-Depends: ${cli:Depends}, ${misc:Depends}
-Description: Visual Basic 2005 runtime libraries for Mono
- This package contains the Mono Visual Basic runtime library, aimed at
- the specifications / features of the Visual Basic 2005.
- .
- Mono is a platform for running and developing applications based on the
- ECMA/ISO Standards. Mono is an open source effort led by Novell.
- Mono provides a complete CLR (Common Language Runtime) including compiler and
- runtime, which can produce and execute CIL (Common Intermediate Language)
- bytecode (aka assemblies), and a class library.
-
-Package: libmono-microsoft-visualbasic10.0-cil
-Section: libs
-Architecture: all
-Depends: ${cli:Depends}, ${misc:Depends}
-Description: Visual Basic 2010 runtime libraries for Mono
- This package contains the Mono Visual Basic runtime library, aimed at
- the specifications / features of the Visual Basic 2010.
- .
- Mono is a platform for running and developing applications based on the
- ECMA/ISO Standards. Mono is an open source effort led by Novell.
- Mono provides a complete CLR (Common Language Runtime) including compiler and
- runtime, which can produce and execute CIL (Common Intermediate Language)
- bytecode (aka assemblies), and a class library.
-
 Package: libmono-microsoft-visualbasic11.0-cil
 Section: libs
 Architecture: all
-Depends: libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), ${cli:Depends}, ${misc:Depends}
+Depends: ${cli:Depends}, ${misc:Depends}
 Description: Visual Basic 2012 runtime libraries for Mono
  This package contains the Mono Visual Basic runtime library, aimed at
  the specifications / features of the Visual Basic 2010.
@@ -102,7 +74,7 @@ Description: Mono Visual Basic Compiler (VB.NET)
 Package: mono-basic-dbg
 Priority: extra
 Section: devel
-Depends: mono-vbnc (= ${binary:Version}), libmono-microsoft-visualbasic11.0-cil (= ${binary:Version}), libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), libmono-microsoft-visualbasic8.0-cil (= ${binary:Version}), libmono-cecil-vb0.9-cil (= ${binary:Version}), ${misc:Depends}
+Depends: mono-vbnc (= ${binary:Version}), libmono-microsoft-visualbasic11.0-cil (= ${binary:Version}), libmono-cecil-vb0.9-cil (= ${binary:Version}), ${misc:Depends}
 Architecture: all
 Description: Mono Visual Basic, debugging symbols
  This package contains debugging symbols of the mono-vbnc and
