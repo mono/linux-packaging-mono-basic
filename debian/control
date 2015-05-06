@@ -11,7 +11,9 @@ Homepage: http://www.mono-project.com/Visual_Basic
 Vcs-Git: git://git.debian.org/pkg-mono/packages/mono-basic.git
 Vcs-Browser: http://git.debian.org/?p=pkg-mono/packages/mono-basic.git
 
-Package: libmono-microsoft-visualbasic11.0-cil
+Package: libmono-microsoft-visualbasic10.0-cil
+Breaks: libmono-microsoft-visualbasic11.0-cil
+Replaces: libmono-microsoft-visualbasic11.0-cil
 Section: libs
 Architecture: all
 Depends: ${cli:Depends}, ${misc:Depends}
@@ -42,7 +44,7 @@ Description: Visual Basic 2012 Cecil libraries for Mono
 Package: mono-vbnc
 Section: devel
 Architecture: all
-Depends: libmono-microsoft-visualbasic11.0-cil (= ${binary:Version}), 
+Depends: libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), 
  libmono-accessibility4.0-cil,
  libmono-system-configuration4.0-cil,
  libmono-system-data4.0-cil,
@@ -74,7 +76,7 @@ Description: Mono Visual Basic Compiler (VB.NET)
 Package: mono-basic-dbg
 Priority: extra
 Section: devel
-Depends: mono-vbnc (= ${binary:Version}), libmono-microsoft-visualbasic11.0-cil (= ${binary:Version}), libmono-cecil-vb0.9-cil (= ${binary:Version}), ${misc:Depends}
+Depends: mono-vbnc (= ${binary:Version}), libmono-microsoft-visualbasic10.0-cil (= ${binary:Version}), libmono-cecil-vb0.9-cil (= ${binary:Version}), ${misc:Depends}
 Architecture: all
 Description: Mono Visual Basic, debugging symbols
  This package contains debugging symbols of the mono-vbnc and
