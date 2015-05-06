@@ -1,3 +1,10 @@
+mono-basic (4.0.1-0xamarin1) unstable; urgency=medium
+
+  * [1eefe24] Imported Upstream version 4.0.1
+  * [8224f77] Rename VB lib package, for older ABI
+
+ -- Jo Shields <jo.shields@xamarin.com>  Wed, 06 May 2015 16:00:03 +0100
+
 mono-basic (4.0-0xamarin1) unstable; urgency=medium
 
   * [9e7773b] Imported Upstream version 4.0
