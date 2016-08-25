@@ -4,7 +4,7 @@ License:        LGPL v2.1 only
 Group:          Development/Languages/Mono
 Summary:        Mono's VB Runtime
 Url:            http://go-mono.org/
-Version:        4.0.1
+Version:        4.6
 Release:        1
 Source0:        %{name}-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
