@@ -1,3 +1,9 @@
+mono-basic (4.6-0xamarin2) alpha; urgency=medium
+
+  * Packaging bugfix:
+
+ -- Xamarin Public Jenkins (auto-signing) <releng@xamarin.com>  Wed, 29 Mar 2017 12:24:19 +0000
+
 mono-basic (4.6-0xamarin1) alpha; urgency=medium
 
   * [a86c249] Imported Upstream version 4.6
