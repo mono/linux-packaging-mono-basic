@@ -5,7 +5,7 @@ Group:          Development/Languages/Mono
 Summary:        Mono's VB Runtime
 Url:            http://go-mono.org/
 Version:        4.6
-Release:        1
+Release:        1.xamarin.0
 Source0:        %{name}-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
