@@ -1,3 +1,9 @@
+mono-basic (4.7-0xamarin1) preview; urgency=medium
+
+  * New release - mono-basic-4.7.tar.bz2
+
+ -- Xamarin Public Jenkins (auto-signing) <releng@xamarin.com>  Thu, 05 Apr 2018 17:53:11 +0000
+
 mono-basic (4.6-0xamarin12) preview; urgency=medium
 
   * Packaging bugfix:
