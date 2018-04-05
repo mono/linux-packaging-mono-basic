@@ -4,8 +4,8 @@ License:        LGPL v2.1 only
 Group:          Development/Languages/Mono
 Summary:        Mono's VB Runtime
 Url:            http://go-mono.org/
-Version:        4.6
-Release:	0.xamarin.2
+Version:	4.7
+Release:	0.xamarin.1
 Source0:        %{name}-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
